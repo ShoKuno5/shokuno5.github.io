@@ -1,4 +1,4 @@
-# Myfolio - Sam Altman Style Portfolio
+# Myfolio
 
 A minimalist, single-column portfolio site built with Astro, MDX, and Tailwind CSS.
 
