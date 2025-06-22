@@ -7,7 +7,7 @@ import tailwindcss from '@tailwindcss/vite';
 // https://astro.build/config
 export default defineConfig({
   site: 'https://shokuno5.github.io',
-  base: '/myfolio',
+  // No base path needed for username.github.io sites
   integrations: [mdx()],
   vite: {
     plugins: [tailwindcss()]
