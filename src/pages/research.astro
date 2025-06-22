@@ -1,0 +1,81 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const papers = [
+  {
+    title: "Hierarchical Variational Autoencoders for Graph Generation",
+    authors: "S. Kuno, et al.",
+    venue: "NeurIPS 2023",
+    year: "2023",
+    link: "#"
+  },
+  {
+    title: "Efficient Optimal Transport for Large-Scale Point Clouds",
+    authors: "S. Kuno, et al.",
+    venue: "ICML 2023",
+    year: "2023",
+    link: "#"
+  },
+  {
+    title: "Neural Frame Interpolation for Anime-Style Animation",
+    authors: "S. Kuno, et al.", 
+    venue: "SIGGRAPH Asia 2022",
+    year: "2022",
+    link: "#"
+  }
+];
+---
+
+<Layout title="Research - Sho Kuno">
+  <div class="prose">
+    <h1>Research</h1>
+    <p class="text-lg text-gray-600">
+      Publications and research contributions in machine learning and computer graphics.
+    </p>
+  </div>
+  
+  <div class="mt-12">
+    <h2 class="text-2xl font-semibold mb-6">Publications</h2>
+    <div class="space-y-6">
+      {papers.map((paper) => (
+        <article class="border-l-4 border-gray-200 pl-4 hover:border-[#007aff] transition-colors">
+          <h3 class="font-semibold text-lg">
+            <a href={paper.link} class="hover:text-[#007aff] transition-colors">
+              {paper.title}
+            </a>
+          </h3>
+          <p class="text-sm text-gray-600 mt-1">
+            {paper.authors}
+          </p>
+          <p class="text-sm text-gray-500">
+            {paper.venue} • {paper.year}
+          </p>
+        </article>
+      ))}
+    </div>
+  </div>
+  
+  <div class="mt-16">
+    <h2 class="text-2xl font-semibold mb-6">Research Interests</h2>
+    <div class="grid gap-4">
+      <div class="card">
+        <h3 class="font-semibold mb-2">Generative Models</h3>
+        <p class="text-gray-600">
+          Developing novel architectures for generating structured data, with focus on graphs and 3D shapes.
+        </p>
+      </div>
+      <div class="card">
+        <h3 class="font-semibold mb-2">Computer Vision for Animation</h3>
+        <p class="text-gray-600">
+          Applying deep learning techniques to enhance and automate animation workflows.
+        </p>
+      </div>
+      <div class="card">
+        <h3 class="font-semibold mb-2">Optimal Transport Theory</h3>
+        <p class="text-gray-600">
+          Theoretical and computational aspects of optimal transport with applications to machine learning.
+        </p>
+      </div>
+    </div>
+  </div>
+</Layout>

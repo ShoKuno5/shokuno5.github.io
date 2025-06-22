@@ -1,0 +1,58 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const posts = [
+  {
+    title: "Understanding Variational Autoencoders",
+    date: "2024-03-15",
+    excerpt: "A deep dive into the mathematics and implementation of VAEs",
+    slug: "understanding-vaes"
+  },
+  {
+    title: "Efficient Training of Large Models",
+    date: "2024-02-28",
+    excerpt: "Techniques for training large neural networks with limited resources",
+    slug: "efficient-training"
+  },
+  {
+    title: "Graph Neural Networks in Practice",
+    date: "2024-01-20",
+    excerpt: "Practical considerations when implementing GNNs for real-world applications",
+    slug: "gnn-practice"
+  }
+];
+
+posts.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+---
+
+<Layout title="Blog - Sho Kuno">
+  <div class="prose">
+    <h1>Blog</h1>
+    <p class="text-lg text-gray-600">
+      Thoughts on machine learning, research, and technology.
+    </p>
+  </div>
+  
+  <div class="mt-12 space-y-8">
+    {posts.map((post) => (
+      <article class="border-b pb-8 last:border-0">
+        <time class="text-sm text-gray-500">
+          {new Date(post.date).toLocaleDateString('en-US', { 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+          })}
+        </time>
+        <h2 class="text-xl font-semibold mt-2 mb-2">
+          <a href={`/blog/${post.slug}`} class="hover:text-[#007aff] transition-colors">
+            {post.title}
+          </a>
+        </h2>
+        <p class="text-gray-600">{post.excerpt}</p>
+        <a href={`/blog/${post.slug}`} class="text-[#007aff] hover:underline text-sm mt-2 inline-block">
+          Read more →
+        </a>
+      </article>
+    ))}
+  </div>
+</Layout>

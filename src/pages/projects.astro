@@ -1,0 +1,49 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const projects = [
+  {
+    title: "GraphVAE",
+    description: "Variational autoencoders for graph-structured data",
+    tags: ["Machine Learning", "PyTorch", "Graph Neural Networks"],
+    link: "/projects/graphvae"
+  },
+  {
+    title: "AnimeInbet", 
+    description: "Frame interpolation for anime using deep learning",
+    tags: ["Computer Vision", "Animation", "Deep Learning"],
+    link: "/projects/animeinbet"
+  },
+  {
+    title: "Optimal Transport Notes",
+    description: "Interactive visualizations and notes on optimal transport theory",
+    tags: ["Theory", "Visualization", "Mathematics"],
+    link: "/projects/optimal-transport"
+  }
+];
+---
+
+<Layout title="Projects - Sho Kuno">
+  <div class="prose">
+    <h1>Projects</h1>
+    <p class="text-lg text-gray-600">
+      A selection of research projects and technical explorations.
+    </p>
+  </div>
+  
+  <div class="mt-12 space-y-6">
+    {projects.map((project) => (
+      <a href={project.link} class="block card hover:border-[#007aff]">
+        <h3 class="text-xl font-semibold mb-2">{project.title}</h3>
+        <p class="text-gray-600 mb-4">{project.description}</p>
+        <div class="flex flex-wrap gap-2">
+          {project.tags.map((tag) => (
+            <span class="text-xs px-2 py-1 bg-gray-100 rounded-md text-gray-700">
+              {tag}
+            </span>
+          ))}
+        </div>
+      </a>
+    ))}
+  </div>
+</Layout>

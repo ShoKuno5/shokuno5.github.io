@@ -1,47 +1,110 @@
-# Astro Starter Kit: Minimal
+# Myfolio - Sam Altman Style Portfolio
 
-```sh
-npm create astro@latest -- --template minimal
+A minimalist, single-column portfolio site built with Astro, MDX, and Tailwind CSS.
+
+## Features
+
+- 🎨 Clean, Sam Altman-inspired single-column layout
+- 📝 MDX support for rich content
+- 🎯 Tailwind CSS for styling
+- 📱 Fully responsive design
+- 🚀 GitHub Pages deployment ready
+- ⚡ Fast static site generation
+
+## Getting Started
+
+### Development
+
+```bash
+npm install
+npm run dev
 ```
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/withastro/astro/tree/latest/examples/minimal)
-[![Open with CodeSandbox](https://assets.codesandbox.io/github/button-edit-lime.svg)](https://codesandbox.io/p/sandbox/github/withastro/astro/tree/latest/examples/minimal)
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/withastro/astro?devcontainer_path=.devcontainer/minimal/devcontainer.json)
+Visit `http://localhost:4321` to see your site.
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+### Building
 
-## 🚀 Project Structure
-
-Inside of your Astro project, you'll see the following folders and files:
-
-```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
+```bash
+npm run build
 ```
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+### Preview Production Build
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+```bash
+npm run preview
+```
 
-Any static assets, like images, can be placed in the `public/` directory.
+## Structure
 
-## 🧞 Commands
+- `/src/pages/` - Main pages (About, Projects, Blog, Research)
+- `/src/content/` - Markdown/MDX content
+  - `/blog/` - Blog posts
+  - `/projects/` - Project descriptions
+- `/src/layouts/` - Page layouts
+- `/src/styles/` - Global styles
 
-All commands are run from the root of the project, from a terminal:
+## Customization
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+### Accent Color
+Change the accent color in `/src/styles/global.css`:
+```css
+:root {
+  --accent: #007aff; /* Change this */
+}
+```
 
-## 👀 Want to learn more?
+### Hero Text
+Edit the hero section in `/src/pages/index.astro`
 
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+### Navigation
+Update navigation links in `/src/layouts/Layout.astro`
+
+## Deployment
+
+### GitHub Pages
+
+1. Update `astro.config.mjs`:
+   - Set `site` to your GitHub Pages URL
+   - Set `base` to your repository name
+
+2. Push to GitHub
+
+3. Enable GitHub Pages in repository settings
+
+4. The site will automatically deploy on push to main branch
+
+### Custom Domain
+
+1. Add a CNAME file to `/public/` with your domain
+2. Configure DNS with your provider (Cloudflare recommended)
+
+## Adding Content
+
+### Blog Posts
+Create `.md` or `.mdx` files in `/src/content/blog/`:
+
+```markdown
+---
+title: "Your Post Title"
+description: "Post description"
+date: 2024-03-20
+tags: ["tag1", "tag2"]
+---
+
+Your content here...
+```
+
+### Projects
+Create files in `/src/content/projects/`:
+
+```markdown
+---
+title: "Project Name"
+description: "Project description"
+tags: ["Tech", "Stack"]
+github: "https://github.com/..."
+featured: true
+---
+
+Project details...
+```

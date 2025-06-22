@@ -1,16 +1,92 @@
 ---
+import Layout from '../layouts/Layout.astro';
 
+const selectedWork = [
+  {
+    title: "GraphVAE",
+    description: "Hierarchical variational autoencoders for molecular graph generation",
+    link: "/projects/graphvae",
+    type: "Research"
+  },
+  {
+    title: "AnimeInbet",
+    description: "Neural frame interpolation for anime-style animation",
+    link: "/projects/animeinbet", 
+    type: "Project"
+  },
+  {
+    title: "Optimal Transport Notes",
+    description: "Interactive visualizations and comprehensive notes on optimal transport",
+    link: "/projects/optimal-transport",
+    type: "Writing"
+  }
+];
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<Layout title="Sho Kuno — Research & Code">
+  <section class="py-16">
+    <h1 class="text-4xl md:text-5xl font-bold mb-6">
+      Sho Kuno — Research & Code
+    </h1>
+    <p class="text-xl text-gray-600 mb-8 leading-relaxed">
+      Machine learning researcher and engineer. Working on generative models, 
+      computer vision, and creative applications of AI. Currently exploring 
+      the intersection of deep learning and computational creativity.
+    </p>
+    <div class="flex gap-4 text-sm">
+      <a href="/about" class="text-[#007aff] hover:underline">Learn more →</a>
+      <a href="mailto:contact@example.com" class="text-[#007aff] hover:underline">Get in touch →</a>
+    </div>
+  </section>
+  
+  <section class="py-16">
+    <h2 class="text-2xl font-semibold mb-8">Selected Work</h2>
+    <div class="grid gap-6">
+      {selectedWork.map((work) => (
+        <a href={work.link} class="card group hover:border-[#007aff]">
+          <div class="flex justify-between items-start mb-2">
+            <h3 class="text-lg font-semibold group-hover:text-[#007aff] transition-colors">
+              {work.title}
+            </h3>
+            <span class="text-xs px-2 py-1 bg-gray-100 rounded-md text-gray-700">
+              {work.type}
+            </span>
+          </div>
+          <p class="text-gray-600">{work.description}</p>
+        </a>
+      ))}
+    </div>
+    <div class="mt-8">
+      <a href="/projects" class="text-[#007aff] hover:underline text-sm">
+        View all projects →
+      </a>
+    </div>
+  </section>
+  
+  <section class="py-16">
+    <h2 class="text-2xl font-semibold mb-8">Recent Posts</h2>
+    <div class="space-y-4">
+      <article>
+        <time class="text-sm text-gray-500">March 15, 2024</time>
+        <h3 class="text-lg font-semibold mt-1">
+          <a href="/blog/understanding-vaes" class="hover:text-[#007aff] transition-colors">
+            Understanding Variational Autoencoders
+          </a>
+        </h3>
+      </article>
+      <article>
+        <time class="text-sm text-gray-500">February 28, 2024</time>
+        <h3 class="text-lg font-semibold mt-1">
+          <a href="/blog/efficient-training" class="hover:text-[#007aff] transition-colors">
+            Efficient Training of Large Models
+          </a>
+        </h3>
+      </article>
+    </div>
+    <div class="mt-8">
+      <a href="/blog" class="text-[#007aff] hover:underline text-sm">
+        View all posts →
+      </a>
+    </div>
+  </section>
+</Layout>
