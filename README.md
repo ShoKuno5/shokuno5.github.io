@@ -4,7 +4,7 @@ A minimalist, single-column portfolio site built with Astro, MDX, and Tailwind C
 
 ## Features
 
-- 🎨 Clean, Sam Altman-inspired single-column layout
+- 🎨 Clean single-column layout
 - 📝 MDX support for rich content
 - 🎯 Tailwind CSS for styling
 - 📱 Fully responsive design
