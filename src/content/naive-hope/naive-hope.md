@@ -3,39 +3,17 @@ title: "Naive Hope"
 description: "Thoughts on optimism in technology and research"
 ---
 
-# Naive Hope
 
-In a world of increasing complexity and technological advancement, maintaining a sense of naive hope might be our most sophisticated tool.
+  So what am I contemplating? 
 
-## What is Naive Hope?
+  Perhaps it unfolds like this:
 
-Naive hope is the belief that:
-- Problems have solutions waiting to be discovered
-- Human ingenuity can overcome seemingly impossible challenges
-- Small contributions compound into significant progress
-- Optimism itself can be a catalyst for change
+  We have a structure, around the structure there exists mass. So a person might be understood as a skeletal framework with local information distributed around that skeleton. 
+  Yes, it's somewhat inelegant that we focus on the local rather than the global—because the true elegance emerges when we collapse the global to a singular point. But let's begin here anyway. It is fundamentally a skeletal structure with different data spaces attached. The connections, the edges, with their interactions—but inhabiting different vector spaces, and interaction manifesting as vector mappings. 
 
-## Why It Matters
+  This is sheaf theory, apparently. 
 
-In research and technology, breakthroughs often come from those who didn't know something was "impossible." The history of science is filled with examples of naive hope leading to revolutionary discoveries.
+  The other fascination pulling at me is the physics of language models. The way we consider, the way we think—it's simply defined dynamics over a network. What kind of networks? Networks of semantics, of mind. We need to uncover their nature. 
 
-## Cultivating Naive Hope
-
-1. **Question Assumptions**: What we "know" today may be disproven tomorrow
-2. **Embrace Failure**: Each failure is data, bringing us closer to success
-3. **Think Long-term**: Progress happens on timescales longer than quarterly reports
-4. **Collaborate Openly**: Share ideas freely; the best solutions emerge from collective effort
-
-## The Balance
-
-Naive hope isn't blind optimism. It's:
-- Grounded in scientific method
-- Tempered by ethical considerations
-- Informed by past failures
-- Driven by genuine curiosity
-
-## A Personal Note
-
-This philosophy guides my approach to research and life. In an era of cynicism, choosing hope is both radical and necessary.
-
-*"The best way to predict the future is to invent it."* – Alan Kay
+  These are the two threads, primarily concerning the morphism of structure.
+  Yet they speak to an integrated form of cognition, whether perceived through vision or language. 
