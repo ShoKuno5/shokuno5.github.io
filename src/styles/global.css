@@ -353,26 +353,37 @@ p {
 }
 
 /* Mobile Navigation Toggle */
+/* iOS Safari specific button fixes */
+#nav-toggle {
+  -webkit-touch-callout: none !important;
+  -webkit-user-select: none !important;
+  touch-action: manipulation !important;
+  cursor: pointer !important;
+}
+
 @media (max-width: 768px) {
-  /* Hide mobile menu by default */
+  /* Hide mobile menu by default with higher specificity */
   #nav-menu {
-    display: none;
-    max-height: 0;
-    overflow: hidden;
+    display: none !important;
+    max-height: 0 !important;
+    overflow: hidden !important;
     transition: max-height 0.3s ease-in-out, opacity 0.2s ease-in-out;
-    opacity: 0;
+    opacity: 0 !important;
+    visibility: hidden !important;
   }
   
-  /* Show mobile menu when active */
+  /* Show mobile menu when active with highest specificity */
   #nav-menu.is-active {
     display: block !important;
-    max-height: 400px;
-    opacity: 1;
+    max-height: 500px !important;
+    opacity: 1 !important;
+    visibility: visible !important;
   }
   
   /* Hamburger icon animation */
   #nav-toggle {
     transition: transform 0.2s ease-in-out;
+    -webkit-tap-highlight-color: transparent !important;
   }
   
   #nav-toggle.is-active {
@@ -388,11 +399,20 @@ p {
   #nav-menu.is-active ul {
     transform: translateY(0);
   }
+  
+  /* iOS Safari specific fixes */
+  #nav-menu.is-active {
+    -webkit-transform: translateZ(0) !important;
+    transform: translateZ(0) !important;
+  }
 }
 
 /* Keep menu visible on desktop */
 @media (min-width: 769px) {
   #nav-menu {
     display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    max-height: none !important;
   }
 }
