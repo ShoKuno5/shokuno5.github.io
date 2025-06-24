@@ -3,11 +3,12 @@ import Layout from '../../layouts/Layout.astro';
 import { getCollection } from 'astro:content';
 
 const posts = await getCollection('posts');
+const visiblePosts = posts.filter(post => !post.data.hidden);
 
 // Collect all unique tags
-const tagMap = new Map<string, typeof posts>();
+const tagMap = new Map<string, typeof visiblePosts>();
 
-posts.forEach(post => {
+visiblePosts.forEach(post => {
   if (post.data.tags) {
     post.data.tags.forEach(tag => {
       const normalizedTag = tag.toLowerCase();

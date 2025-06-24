@@ -13,6 +13,7 @@ export const collections = {
       date: z.date(),
       tags: z.array(z.string()).optional(),
       summary: z.string().optional(),
+      hidden: z.boolean().optional(),
     }),
   }),
   projects: defineCollection({
@@ -24,14 +25,6 @@ export const collections = {
       technologies: z.array(z.string()),
       order: z.number(),
     }),
-  }),
-  'research': defineCollection({
-    type: 'content',
-    schema: staticPageSchema,
-  }),
-  'cv': defineCollection({
-    type: 'content',
-    schema: staticPageSchema,
   }),
   'naive-hope': defineCollection({
     type: 'content',
