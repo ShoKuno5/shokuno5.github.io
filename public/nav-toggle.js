@@ -48,33 +48,68 @@
       burger.setAttribute('aria-expanded', isMenuOpen.toString());
     }
     
-    // Detect if this is a touch device
-    const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-    console.log('📱 Touch device detected:', isTouchDevice);
+    // Track last interaction to prevent conflicts
+    let lastInteractionTime = 0;
+    let lastInteractionType = '';
     
-    if (isTouchDevice) {
-      // For touch devices, use only touchstart
-      burger.addEventListener('touchstart', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        console.log('👆 Touch detected');
-        toggleMenu();
-      }, { passive: false });
-    } else {
-      // For non-touch devices, use click
-      burger.addEventListener('click', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        console.log('🖱️ Click detected');
-        toggleMenu();
-      });
+    function handleBurgerInteraction(e, eventType) {
+      const now = Date.now();
+      
+      // Prevent duplicate events within 500ms
+      if (now - lastInteractionTime < 500 && lastInteractionType !== eventType) {
+        console.log('🚫 Ignoring duplicate event:', eventType);
+        return;
+      }
+      
+      e.preventDefault();
+      e.stopPropagation();
+      
+      lastInteractionTime = now;
+      lastInteractionType = eventType;
+      
+      console.log('👆 User interaction:', eventType);
+      toggleMenu();
     }
     
-    // Close menu when clicking outside (with delay protection)
+    // Add both touch and click handlers with conflict prevention
+    burger.addEventListener('touchstart', function(e) {
+      handleBurgerInteraction(e, 'touch');
+    }, { passive: false });
+    
+    burger.addEventListener('click', function(e) {
+      handleBurgerInteraction(e, 'click');
+    });
+    
+    // Close menu when clicking outside (with enhanced protection)
     document.addEventListener('click', function(e) {
+      const now = Date.now();
+      
+      // Don't close if we just interacted with the burger
+      if (now - lastInteractionTime < 100) {
+        console.log('🛡️ Recent burger interaction, ignoring outside click');
+        return;
+      }
+      
       if (isMenuOpen && outsideClickEnabled && 
           !burger.contains(e.target) && !menu.contains(e.target)) {
         console.log('🌍 Outside click, closing menu');
+        toggleMenu();
+      }
+    });
+    
+    // Also handle touch events for outside closing on mobile
+    document.addEventListener('touchstart', function(e) {
+      const now = Date.now();
+      
+      // Don't close if we just interacted with the burger
+      if (now - lastInteractionTime < 100) {
+        console.log('🛡️ Recent burger interaction, ignoring outside touch');
+        return;
+      }
+      
+      if (isMenuOpen && outsideClickEnabled && 
+          !burger.contains(e.target) && !menu.contains(e.target)) {
+        console.log('🌍 Outside touch, closing menu');
         toggleMenu();
       }
     });
@@ -94,7 +129,7 @@
       console.log('📊 Debug info:');
       console.log('- Menu open:', isMenuOpen);
       console.log('- Outside click enabled:', outsideClickEnabled);
-      console.log('- Touch device:', isTouchDevice);
+      console.log('- Last interaction:', lastInteractionType, 'at', new Date(lastInteractionTime).toLocaleTimeString());
       console.log('- Menu classes:', menu.className);
       console.log('- Burger classes:', burger.className);
     };
