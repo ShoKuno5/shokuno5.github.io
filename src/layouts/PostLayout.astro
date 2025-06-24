@@ -194,24 +194,47 @@ const readingTimeData = content ? calculateReadingTime(content) : null;
       }
     }
     
-    // Update all headings - but only current section shows the overall article progress
+    // Store the maximum progress reached for each section
+    if (!window.sectionMaxProgress) {
+      window.sectionMaxProgress = {};
+    }
+    
+    // Update current section's max progress
+    if (currentSectionIndex >= 0) {
+      const sectionKey = `section-${currentSectionIndex}`;
+      const currentProgress = overallProgress;
+      
+      // Store the highest progress reached for this section
+      if (!window.sectionMaxProgress[sectionKey] || currentProgress > window.sectionMaxProgress[sectionKey]) {
+        window.sectionMaxProgress[sectionKey] = currentProgress;
+      }
+    }
+    
+    // Update all headings based on their actual reading progress
     headings.forEach((heading, index) => {
-      const headingTop = heading.offsetTop;
+      const sectionKey = `section-${index}`;
       
       if (index < currentSectionIndex) {
-        // Completed sections - show full progress
-        heading.style.setProperty('--progress-width', '100%');
+        // Past sections - show the maximum progress actually achieved in that section
+        const maxProgressInSection = window.sectionMaxProgress[sectionKey] || 3;
+        let progressWidth;
+        if (maxProgressInSection <= 3) {
+          progressWidth = '3rem';
+        } else {
+          progressWidth = `${Math.min(maxProgressInSection, 100)}%`;
+        }
+        heading.style.setProperty('--progress-width', progressWidth);
+        console.log(`Past section ${index + 1}: showing ${Math.round(maxProgressInSection)}% (actual reading progress)`);
       } else if (index === currentSectionIndex) {
-        // Current section - show OVERALL article progress (not section progress)
+        // Current section - show live overall article progress
         let progressWidth;
         if (overallProgress <= 3) {
           progressWidth = '3rem';
         } else {
-          // This is the key fix - show overall article progress
           progressWidth = `${Math.min(overallProgress, 100)}%`;
         }
         heading.style.setProperty('--progress-width', progressWidth);
-        console.log(`Article progress: ${Math.round(overallProgress)}% shown in section ${index + 1}`);
+        console.log(`Current section ${index + 1}: showing ${Math.round(overallProgress)}% (live progress)`);
       } else {
         // Future sections - stay at default until reached
         heading.style.setProperty('--progress-width', '3rem');
