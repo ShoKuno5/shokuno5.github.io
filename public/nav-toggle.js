@@ -1,142 +1,88 @@
 /**
- * Mobile Navigation Toggle - iOS Safari Compatible
- * Handles hamburger menu interaction for mobile screens ≤ 768px
- * Loaded via defer script in Layout.astro footer
+ * Elegant Mobile Navigation Toggle
+ * Modern, smooth mobile navigation with beautiful animations
+ * Optimized for iOS Safari and all mobile browsers
  */
 
 (function() {
   'use strict';
   
   function initMobileNav() {
-    console.log('🍔 DEBUG: Initializing mobile nav...');
-    console.log('📱 User Agent:', navigator.userAgent);
-    console.log('📏 Screen size:', window.innerWidth + 'x' + window.innerHeight);
-    
     const burger = document.getElementById('nav-toggle');
     const menu = document.getElementById('nav-menu');
     
-    console.log('🔍 DOM elements found:', {
-      burger: !!burger,
-      menu: !!menu,
-      burgerHTML: burger ? burger.outerHTML.substring(0, 200) : 'NOT FOUND',
-      menuHTML: menu ? menu.outerHTML.substring(0, 100) : 'NOT FOUND'
-    });
-    
     if (!burger || !menu) {
-      console.error('❌ Navigation elements not found');
-      alert('DEBUG: Navigation elements not found. Burger: ' + !!burger + ', Menu: ' + !!menu);
+      console.warn('Navigation elements not found');
       return;
     }
     
-    console.log('✅ Found navigation elements');
-    
-    // Test if button is visible
-    const rect = burger.getBoundingClientRect();
-    console.log('📍 Button position:', rect);
-    console.log('👁️ Button computed style:', window.getComputedStyle(burger).display);
-    
-    // Add visible confirmation that script loaded
-    setTimeout(() => {
-      alert('DEBUG: Mobile nav script loaded successfully! Button visible: ' + (rect.width > 0 && rect.height > 0));
-    }, 1000);
-    
     let isMenuOpen = false;
-    let outsideClickEnabled = false;
     
     function toggleMenu() {
-      console.log('🎯 DEBUG: Toggle menu, current state:', isMenuOpen);
-      
       isMenuOpen = !isMenuOpen;
       
       if (isMenuOpen) {
-        // Show menu with inline style
+        // Open menu with elegant animations
         menu.style.display = 'block';
-        burger.style.backgroundColor = '#ff0000'; // Change color when active
-        console.log('✅ DEBUG: Menu OPENED');
-        alert('DEBUG: Menu opened!');
+        burger.classList.add('active');
+        menu.classList.add('active');
         
-        // Enable outside click after a delay to prevent immediate closing
+        // Enable outside click after animation
         setTimeout(() => {
-          outsideClickEnabled = true;
-          console.log('🔓 Outside click enabled');
+          document.addEventListener('click', handleOutsideClick);
         }, 300);
       } else {
-        // Hide menu
-        menu.style.display = 'none';
-        burger.style.backgroundColor = '#ffff00'; // Reset color
-        outsideClickEnabled = false;
-        console.log('❌ DEBUG: Menu CLOSED');
-        alert('DEBUG: Menu closed!');
+        // Close menu
+        burger.classList.remove('active');
+        menu.classList.remove('active');
+        
+        // Hide after animation completes
+        setTimeout(() => {
+          if (!isMenuOpen) {
+            menu.style.display = 'none';
+          }
+        }, 300);
+        
+        document.removeEventListener('click', handleOutsideClick);
       }
       
       burger.setAttribute('aria-expanded', isMenuOpen.toString());
     }
     
-    // Simplified event handling for iPhone
-    function handleBurgerTap(e) {
+    function handleOutsideClick(e) {
+      if (!burger.contains(e.target) && !menu.contains(e.target)) {
+        toggleMenu();
+      }
+    }
+    
+    // Clean event handling for all devices
+    function handleInteraction(e) {
       e.preventDefault();
       e.stopPropagation();
-      
-      console.log('🎯 DEBUG: Button tapped!');
-      alert('DEBUG: Button was tapped - calling toggleMenu()');
-      
       toggleMenu();
     }
     
-    // Add event listeners - try multiple approaches
-    console.log('🔧 Adding event listeners...');
+    // Add event listeners
+    burger.addEventListener('touchstart', handleInteraction, { passive: false });
+    burger.addEventListener('click', handleInteraction);
     
-    // Method 1: Touchstart (primary for iOS)
-    burger.addEventListener('touchstart', handleBurgerTap, { passive: false });
-    
-    // Method 2: Click (fallback)
-    burger.addEventListener('click', handleBurgerTap);
-    
-    // Method 3: Touchend (alternative for iOS)
-    burger.addEventListener('touchend', function(e) {
-      e.preventDefault();
-      console.log('🎯 DEBUG: Touchend detected');
-      // Don't call toggleMenu here to avoid double-firing
-    }, { passive: false });
-    
-    // Test the button manually
-    console.log('🧪 Testing button manually...');
-    setTimeout(() => {
-      console.log('🧪 Manual test - calling toggleMenu directly');
-      toggleMenu();
-      
-      setTimeout(() => {
-        console.log('🧪 Manual test - closing menu');
-        toggleMenu();
-      }, 2000);
-    }, 3000);
-    
-    // Simplified outside click handling
-    document.addEventListener('click', function(e) {
-      if (isMenuOpen && !burger.contains(e.target) && !menu.contains(e.target)) {
-        console.log('🌍 DEBUG: Outside click, closing menu');
-        toggleMenu();
-      }
-    });
-    
-    // Close menu when pressing Escape
+    // Close menu with Escape key
     document.addEventListener('keydown', function(e) {
       if (e.key === 'Escape' && isMenuOpen) {
-        console.log('⌨️ DEBUG: Escape pressed, closing menu');
         toggleMenu();
       }
     });
     
-    console.log('🎉 DEBUG: Mobile nav initialized successfully');
-    
-    // Debug function
-    window.debugMobileNav = function() {
-      console.log('📊 Debug info:');
-      console.log('- Menu open:', isMenuOpen);
-      console.log('- Outside click enabled:', outsideClickEnabled);
-      console.log('- Menu display:', menu.style.display);
-      console.log('- Button background:', burger.style.backgroundColor);
-    };
+    // Close menu when navigating to a new page
+    menu.addEventListener('click', function(e) {
+      if (e.target.tagName === 'A') {
+        setTimeout(() => {
+          if (isMenuOpen) {
+            toggleMenu();
+          }
+        }, 150);
+      }
+    });
   }
   
   // Initialize when DOM is ready
