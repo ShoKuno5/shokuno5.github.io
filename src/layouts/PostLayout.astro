@@ -204,22 +204,54 @@ const readingTimeData = content ? calculateReadingTime(content) : null;
       }
     }
     
-    // Calculate content-based progress
+    // Calculate word-count based reading progress
     let contentProgress = 0;
-    if (currentSectionIndex >= 0 && headings.length > 0) {
-      // Each section represents equal portion of the content
-      const progressPerSection = 100 / headings.length;
+    if (currentSectionIndex >= 0) {
+      // Get all text content in the article
+      const articleText = article.textContent || '';
+      const totalWords = articleText.trim().split(/\s+/).filter(word => word.length > 0).length;
       
-      // Base progress for completed sections
-      const completedSectionsProgress = currentSectionIndex * progressPerSection;
+      // Calculate how many words we've read so far
+      let wordsRead = 0;
       
-      // Progress within current section
-      const currentSectionProgress = progressInCurrentSection * progressPerSection;
+      // Add words from all completed sections
+      for (let i = 0; i <= currentSectionIndex; i++) {
+        const heading = headings[i];
+        const nextHeading = headings[i + 1];
+        
+        // Get section content (from heading to next heading or end of article)
+        let sectionContent = '';
+        if (nextHeading) {
+          // Find all content between this heading and next heading
+          let currentElement = heading.nextElementSibling;
+          while (currentElement && currentElement !== nextHeading) {
+            sectionContent += currentElement.textContent || '';
+            currentElement = currentElement.nextElementSibling;
+          }
+        } else {
+          // Last section - get everything after this heading
+          let currentElement = heading.nextElementSibling;
+          while (currentElement) {
+            sectionContent += currentElement.textContent || '';
+            currentElement = currentElement.nextElementSibling;
+          }
+        }
+        
+        const sectionWords = sectionContent.trim().split(/\s+/).filter(word => word.length > 0).length;
+        
+        if (i < currentSectionIndex) {
+          // Completed section - count all words
+          wordsRead += sectionWords;
+        } else {
+          // Current section - count words based on reading progress
+          wordsRead += Math.floor(sectionWords * progressInCurrentSection);
+        }
+      }
       
-      // Total content progress
-      contentProgress = completedSectionsProgress + currentSectionProgress;
+      // Calculate overall reading progress
+      contentProgress = totalWords > 0 ? (wordsRead / totalWords) * 100 : 0;
       
-      console.log(`Section ${currentSectionIndex + 1}/${headings.length} | Section progress: ${Math.round(progressInCurrentSection * 100)}% | Total: ${Math.round(contentProgress)}%`);
+      console.log(`Words read: ${wordsRead}/${totalWords} | Reading progress: ${Math.round(contentProgress)}%`);
     }
     
     // Apply progress to current section
