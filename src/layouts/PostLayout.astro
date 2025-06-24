@@ -236,8 +236,24 @@ const readingTimeData = content ? calculateReadingTime(content) : null;
         heading.style.setProperty('--progress-width', progressWidth);
         console.log(`Current section ${index + 1}: showing ${Math.round(overallProgress)}% (live progress)`);
       } else {
-        // Future sections - stay at default until reached
-        heading.style.setProperty('--progress-width', '3rem');
+        // Future sections - check if they're visible on screen
+        const headingRect = heading.getBoundingClientRect();
+        const isVisible = headingRect.top < windowHeight && headingRect.bottom > 0;
+        
+        if (isVisible) {
+          // Section is visible - show current overall progress
+          let progressWidth;
+          if (overallProgress <= 3) {
+            progressWidth = '3rem';
+          } else {
+            progressWidth = `${Math.min(overallProgress, 100)}%`;
+          }
+          heading.style.setProperty('--progress-width', progressWidth);
+          console.log(`Visible future section ${index + 1}: showing ${Math.round(overallProgress)}% (current progress)`);
+        } else {
+          // Section is not visible - keep at default
+          heading.style.setProperty('--progress-width', '3rem');
+        }
       }
     });
   }
