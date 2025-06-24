@@ -30,10 +30,10 @@ const nav = [
     <title>{title}</title>
   </head>
   <body>
-    <header class="border-b border-gray-200 bg-white">
-      <div class="max-w-[672px] mx-auto px-4 py-4">
+    <header class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-200">
+      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4 lg:py-6">
         <div class="flex items-center justify-between">
-          <a href="/" class="text-xl font-semibold text-gray-900 hover:text-[#007aff] transition-colors">
+          <a href="/" class="text-xl font-semibold transition-all duration-300 bg-gradient-to-r from-primary-600 to-accent-purple bg-clip-text text-transparent hover:from-primary-700 hover:to-accent-purple">
             Sho Kuno
           </a>
           
@@ -52,7 +52,7 @@ const nav = [
                 <li class="relative group">
                   {item.submenu ? (
                     <>
-                      <button class="text-gray-700 hover:text-[#007aff] transition-colors flex items-center space-x-1">
+                      <button class="text-gray-700 hover:text-primary-600 transition-colors flex items-center space-x-1">
                         <span>{item.label}</span>
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
@@ -61,7 +61,7 @@ const nav = [
                       <ul class="absolute left-0 mt-2 w-40 bg-white border border-gray-200 rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
                         {item.submenu.map((subitem) => (
                           <li>
-                            <a href={subitem.href} class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-[#007aff]">
+                            <a href={subitem.href} class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary-600">
                               {subitem.label}
                             </a>
                           </li>
@@ -69,7 +69,7 @@ const nav = [
                       </ul>
                     </>
                   ) : (
-                    <a href={item.href} class="text-gray-700 hover:text-[#007aff] transition-colors">
+                    <a href={item.href} class="text-gray-700 hover:text-primary-600 transition-colors">
                       {item.label}
                     </a>
                   )}
@@ -86,7 +86,7 @@ const nav = [
               <li>
                 {item.submenu ? (
                   <details class="group">
-                    <summary class="cursor-pointer text-gray-700 hover:text-[#007aff] transition-colors flex items-center justify-between py-2">
+                    <summary class="cursor-pointer text-gray-700 hover:text-primary-600 transition-colors flex items-center justify-between py-2">
                       <span>{item.label}</span>
                       <svg class="w-4 h-4 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
@@ -95,7 +95,7 @@ const nav = [
                     <ul class="ml-4 mt-2 space-y-2">
                       {item.submenu.map((subitem) => (
                         <li>
-                          <a href={subitem.href} class="block text-gray-600 hover:text-[#007aff] transition-colors py-1">
+                          <a href={subitem.href} class="block text-gray-600 hover:text-primary-600 transition-colors py-1">
                             {subitem.label}
                           </a>
                         </li>
@@ -103,7 +103,7 @@ const nav = [
                     </ul>
                   </details>
                 ) : (
-                  <a href={item.href} class="block text-gray-700 hover:text-[#007aff] transition-colors py-2">
+                  <a href={item.href} class="block text-gray-700 hover:text-primary-600 transition-colors py-2">
                     {item.label}
                   </a>
                 )}
@@ -118,9 +118,11 @@ const nav = [
       <slot />
     </main>
     
-    <footer class="border-t border-gray-200 mt-16">
-      <div class="max-w-[672px] mx-auto px-4 py-8 text-center text-sm text-gray-600">
-        © {new Date().getFullYear()} Sho Kuno. All rights reserved.
+    <footer class="border-t border-gray-200 mt-24 bg-gray-50">
+      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-center">
+        <p class="text-sm text-gray-600">
+          © {new Date().getFullYear()} Sho Kuno. All rights reserved.
+        </p>
       </div>
     </footer>
   </body>

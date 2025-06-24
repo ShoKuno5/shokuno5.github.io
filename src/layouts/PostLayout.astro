@@ -12,18 +12,18 @@ const { title, date, tags, description } = Astro.props;
 ---
 
 <Layout title={title} description={description}>
-  <article class="max-w-[672px] mx-auto px-4 py-8">
-    <header class="mb-8">
-      <h1 class="text-3xl font-bold mb-4">{title}</h1>
-      <div class="flex items-center gap-4 text-sm text-gray-600">
-        <time>{date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</time>
+  <article class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
+    <header class="mb-12">
+      <h1 class="text-4xl lg:text-5xl font-bold mb-6 leading-tight bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">{title}</h1>
+      <div class="flex items-center gap-6 text-gray-500 mb-6">
+        <time class="font-medium">{date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</time>
       </div>
       {tags && tags.length > 0 && (
-        <div class="mt-4 flex flex-wrap gap-2">
+        <div class="flex flex-wrap gap-3">
           {tags.map((tag) => (
             <a 
               href={`/posts/tags/#tag-${tag.toLowerCase().replace(/\s+/g, '-')}`}
-              class="text-xs px-2 py-1 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors"
+              class="inline-flex items-center px-4 py-2 text-sm font-medium bg-primary-50 text-primary-700 rounded-full hover:bg-primary-100 transition-colors"
             >
               {tag}
             </a>
@@ -32,7 +32,7 @@ const { title, date, tags, description } = Astro.props;
       )}
     </header>
     
-    <div class="prose prose-gray max-w-none">
+    <div class="prose prose-xl prose-gray max-w-none prose-headings:text-gray-900 prose-p:text-gray-700 prose-a:text-primary-600 prose-a:no-underline hover:prose-a:underline prose-pre:bg-gray-50 prose-code:text-primary-600 prose-blockquote:border-primary-200">
       <slot />
     </div>
     
