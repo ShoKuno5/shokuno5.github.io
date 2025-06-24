@@ -324,8 +324,8 @@ const readingTimeData = content ? calculateReadingTime(content) : null;
   </Layout>
 )}
 
-{!isHomepageMode && (
-<!-- Silent Reading Progress Script - Only for individual posts -->
+{!isHomepageMode && !isStaticPage && (
+<!-- Silent Reading Progress Script - Only for individual posts (not static pages) -->
 <script is:inline>
 (function() {
   'use strict';
