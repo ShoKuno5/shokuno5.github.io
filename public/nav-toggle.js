@@ -15,10 +15,17 @@
     
     if (!burger || !menu) {
       console.error('❌ Navigation elements not found');
+      console.log('🔍 Available elements:', {
+        burger: !!burger,
+        menu: !!menu,
+        burgerClasses: burger?.className,
+        menuClasses: menu?.className
+      });
       return;
     }
     
     console.log('✅ Found navigation elements');
+    console.log('🔍 Burger element:', burger.outerHTML.substring(0, 100));
     
     let isMenuOpen = false;
     let outsideClickEnabled = false;

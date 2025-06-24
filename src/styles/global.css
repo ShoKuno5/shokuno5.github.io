@@ -352,90 +352,83 @@ p {
   scrollbar-width: none;
 }
 
-/* Mobile Navigation Toggle - iOS Safari Compatible */
+/* Mobile Navigation Toggle - Simplified for Maximum Compatibility */
 
-/* Mobile menu button styling */
-.mobile-menu-button {
-  width: 44px !important;
-  height: 44px !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  cursor: pointer !important;
+/* Hamburger menu button - guaranteed visibility */
+.hamburger-menu-btn {
+  display: block;
+  width: 48px;
+  height: 48px;
+  padding: 12px;
+  border: 2px solid #ff0000; /* Temporary red border for debugging */
+  background: rgba(255, 0, 0, 0.1); /* Temporary red background for debugging */
+  cursor: pointer;
+  position: relative;
+  z-index: 1000;
   
-  /* iOS Safari specific touch handling */
-  -webkit-touch-callout: none !important;
-  -webkit-user-select: none !important;
-  -webkit-tap-highlight-color: transparent !important;
-  touch-action: manipulation !important;
+  /* iOS Safari touch handling */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
   
-  /* Ensure it's clickable */
-  position: relative !important;
-  z-index: 1000 !important;
-  
-  /* Visual feedback */
-  border-radius: 8px !important;
-  transition: background-color 0.15s ease !important;
-  
-  /* Ensure visibility on all devices */
-  color: #374151 !important;
-  background-color: transparent !important;
+  /* Ensure visibility */
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
 }
 
-/* Force hamburger button to show on mobile devices */
+.hamburger-menu-btn:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.hamburger-menu-btn:active {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+/* Hamburger lines container */
+.hamburger-lines {
+  width: 24px;
+  height: 18px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* Individual hamburger lines */
+.hamburger-lines .line {
+  display: block;
+  width: 24px;
+  height: 2px;
+  background-color: #374151;
+  border-radius: 1px;
+  transition: all 0.3s ease;
+}
+
+/* Active state animations */
+.hamburger-menu-btn.is-active .line:nth-child(1) {
+  transform: rotate(45deg) translate(5px, 5px);
+}
+
+.hamburger-menu-btn.is-active .line:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger-menu-btn.is-active .line:nth-child(3) {
+  transform: rotate(-45deg) translate(7px, -6px);
+}
+
+/* Show on mobile, hide on desktop */
 @media (max-width: 1023px) {
-  .mobile-menu-button {
-    display: flex !important;
+  .hamburger-menu-btn {
+    display: block !important;
   }
 }
 
-/* Hide hamburger button on desktop */
 @media (min-width: 1024px) {
-  .mobile-menu-button {
+  .hamburger-menu-btn {
     display: none !important;
   }
-}
-
-.mobile-menu-button:hover,
-.mobile-menu-button:focus {
-  background-color: rgba(0, 0, 0, 0.05) !important;
-}
-
-.mobile-menu-button:active {
-  background-color: rgba(0, 0, 0, 0.1) !important;
-}
-
-/* CSS-based hamburger icon - guaranteed to work on all devices */
-.hamburger-icon {
-  width: 24px !important;
-  height: 18px !important;
-  position: relative !important;
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: space-between !important;
-  pointer-events: none !important;
-}
-
-.hamburger-icon span {
-  display: block !important;
-  width: 100% !important;
-  height: 2px !important;
-  background-color: currentColor !important;
-  transition: all 0.3s ease !important;
-  border-radius: 1px !important;
-}
-
-/* Animation when menu is active */
-.mobile-menu-button.is-active .hamburger-icon span:nth-child(1) {
-  transform: rotate(45deg) translate(5px, 5px) !important;
-}
-
-.mobile-menu-button.is-active .hamburger-icon span:nth-child(2) {
-  opacity: 0 !important;
-}
-
-.mobile-menu-button.is-active .hamburger-icon span:nth-child(3) {
-  transform: rotate(-45deg) translate(7px, -6px) !important;
 }
 
 /* Mobile menu styling - simplified for iOS Safari */
