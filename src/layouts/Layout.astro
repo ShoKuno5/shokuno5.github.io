@@ -391,29 +391,57 @@ const nav: NavItem[] = [
         }
       }
       
-      // Show on scroll up, hide on scroll down
+      // More nuanced scroll behavior
       function handleScroll() {
         const currentScrollY = window.pageYOffset;
         
-        if (currentScrollY < 50) {
-          // Always show at top of page
+        if (currentScrollY < 100) {
+          // Always show near top of page
           showHeader();
-        } else if (currentScrollY < lastScrollY) {
-          // Scrolling up - show header
-          showHeader();
-        } else if (currentScrollY > lastScrollY + 10) {
-          // Scrolling down - hide header (with small threshold)
-          hideHeader();
+        } else {
+          // Only hide if scrolling fast or at very bottom
+          const scrollSpeed = Math.abs(currentScrollY - lastScrollY);
+          const isAtBottom = (window.innerHeight + currentScrollY) >= document.documentElement.scrollHeight - 10;
+          
+          if (isAtBottom) {
+            // Show at bottom for easy navigation
+            showHeader();
+          } else if (scrollSpeed > 30) {
+            // Fast scrolling - user is seeking, show navigation
+            showHeader();
+          }
+          // Don't auto-hide on normal reading scroll
         }
         
         lastScrollY = currentScrollY;
       }
       
-      // Show on mouse movement near top
+      // Show on mouse movement near top or deliberate seeking
       function handleMouseMove(e) {
-        if (e.clientY < 100) { // Mouse in top 100px
+        if (e.clientY < 120) { // Mouse in top 120px
           showHeader();
         }
+      }
+      
+      // Show on keyboard navigation
+      function handleKeyPress(e) {
+        // Show on common navigation keys
+        if (['Tab', 'Escape', 'Home', 'End', 'ArrowUp', 'ArrowDown'].includes(e.key)) {
+          showHeader();
+        }
+      }
+      
+      // Show after period of inactivity (user might want to navigate)
+      let inactivityTimer = null;
+      function resetInactivityTimer() {
+        if (inactivityTimer) clearTimeout(inactivityTimer);
+        
+        // Show menu after 10 seconds of no interaction (in case user wants to navigate)
+        inactivityTimer = setTimeout(() => {
+          if (window.pageYOffset > 200) { // Only if not near top
+            showHeader();
+          }
+        }, 10000);
       }
       
       // Show on header hover
@@ -445,14 +473,23 @@ const nav: NavItem[] = [
         // Event listeners
         window.addEventListener('scroll', throttledScroll, { passive: true });
         document.addEventListener('mousemove', handleMouseMove, { passive: true });
+        document.addEventListener('keydown', handleKeyPress, { passive: true });
         header.addEventListener('mouseenter', handleHeaderHover);
+        
+        // Reset inactivity timer on any user interaction
+        ['scroll', 'mousemove', 'keydown', 'touchstart'].forEach(event => {
+          document.addEventListener(event, resetInactivityTimer, { passive: true });
+        });
         
         // Don't hide header when user is interacting with it
         header.addEventListener('mouseleave', () => {
-          if (window.pageYOffset > 100) {
-            hideTimeout = setTimeout(hideHeader, 1000);
+          if (window.pageYOffset > 200) {
+            hideTimeout = setTimeout(hideHeader, 2000); // Longer delay
           }
         });
+        
+        // Start inactivity timer
+        resetInactivityTimer();
       }
       
       if (document.readyState === 'loading') {
