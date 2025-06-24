@@ -351,3 +351,48 @@ p {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* Mobile Navigation Toggle */
+@media (max-width: 768px) {
+  /* Hide mobile menu by default */
+  #nav-menu {
+    display: none;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-in-out, opacity 0.2s ease-in-out;
+    opacity: 0;
+  }
+  
+  /* Show mobile menu when active */
+  #nav-menu.is-active {
+    display: block !important;
+    max-height: 400px;
+    opacity: 1;
+  }
+  
+  /* Hamburger icon animation */
+  #nav-toggle {
+    transition: transform 0.2s ease-in-out;
+  }
+  
+  #nav-toggle.is-active {
+    transform: rotate(90deg);
+  }
+  
+  /* Smooth slide-down animation for menu items */
+  #nav-menu ul {
+    transform: translateY(-10px);
+    transition: transform 0.3s ease-in-out 0.1s;
+  }
+  
+  #nav-menu.is-active ul {
+    transform: translateY(0);
+  }
+}
+
+/* Keep menu visible on desktop */
+@media (min-width: 769px) {
+  #nav-menu {
+    display: block !important;
+  }
+}

@@ -46,12 +46,11 @@ const nav = [
           </a>
           
           <!-- Mobile menu -->
-          <input type="checkbox" id="menu-toggle" class="hidden peer" />
-          <label for="menu-toggle" class="cursor-pointer md:hidden">
+          <button id="nav-toggle" class="cursor-pointer md:hidden" aria-label="Toggle navigation menu" aria-expanded="false">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
             </svg>
-          </label>
+          </button>
           
           <!-- Desktop navigation -->
           <nav class="hidden md:block">
@@ -88,7 +87,7 @@ const nav = [
         </div>
         
         <!-- Mobile navigation -->
-        <nav class="peer-checked:block hidden md:hidden mt-4">
+        <nav id="nav-menu" class="hidden md:hidden mt-4">
           <ul class="space-y-2">
             {nav.map((item) => (
               <li>
@@ -122,6 +121,7 @@ const nav = [
       </div>
     </header>
     
+    <script src="/nav-toggle.js" defer></script>
     <main class="min-h-screen">
       <slot />
     </main>
