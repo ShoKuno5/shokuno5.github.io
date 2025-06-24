@@ -54,8 +54,8 @@ const nav: NavItem[] = [
     <title>{title}</title>
   </head>
   <body>
-    <!-- Modern, clean header -->
-    <header style="
+    <!-- Auto-hide navigation header -->
+    <header id="main-header" class="auto-hide-header" style="
       position: fixed;
       top: 0;
       left: 0;
@@ -67,7 +67,8 @@ const nav: NavItem[] = [
       border-bottom: 1px solid rgba(0, 0, 0, 0.05);
       box-shadow: 0 1px 20px rgba(0, 0, 0, 0.08);
       -webkit-transform: translateZ(0);
-      transform: translateZ(0);
+      transform: translateY(-100%) translateZ(0);
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     ">
       <div style="
         max-width: 72rem;
@@ -346,8 +347,134 @@ const nav: NavItem[] = [
     
     <script src="/nav-toggle.js?v=2025" defer is:inline></script>
     
+    <!-- Auto-hide Navigation Script -->
+    <script is:inline>
+    (function() {
+      'use strict';
+      
+      let lastScrollY = 0;
+      let isHeaderVisible = false;
+      let hideTimeout = null;
+      
+      const header = document.getElementById('main-header');
+      if (!header) return;
+      
+      function showHeader() {
+        if (!isHeaderVisible) {
+          header.style.transform = 'translateY(0) translateZ(0)';
+          isHeaderVisible = true;
+        }
+        
+        // Clear existing timeout
+        if (hideTimeout) {
+          clearTimeout(hideTimeout);
+          hideTimeout = null;
+        }
+        
+        // Auto-hide after 3 seconds if not interacting
+        hideTimeout = setTimeout(() => {
+          if (window.pageYOffset > 100) { // Only auto-hide if scrolled down
+            hideHeader();
+          }
+        }, 3000);
+      }
+      
+      function hideHeader() {
+        if (isHeaderVisible) {
+          header.style.transform = 'translateY(-100%) translateZ(0)';
+          isHeaderVisible = false;
+        }
+        
+        if (hideTimeout) {
+          clearTimeout(hideTimeout);
+          hideTimeout = null;
+        }
+      }
+      
+      // Show on scroll up, hide on scroll down
+      function handleScroll() {
+        const currentScrollY = window.pageYOffset;
+        
+        if (currentScrollY < 50) {
+          // Always show at top of page
+          showHeader();
+        } else if (currentScrollY < lastScrollY) {
+          // Scrolling up - show header
+          showHeader();
+        } else if (currentScrollY > lastScrollY + 10) {
+          // Scrolling down - hide header (with small threshold)
+          hideHeader();
+        }
+        
+        lastScrollY = currentScrollY;
+      }
+      
+      // Show on mouse movement near top
+      function handleMouseMove(e) {
+        if (e.clientY < 100) { // Mouse in top 100px
+          showHeader();
+        }
+      }
+      
+      // Show on header hover
+      function handleHeaderHover() {
+        showHeader();
+      }
+      
+      // Throttle scroll events
+      let scrollTicking = false;
+      function throttledScroll() {
+        if (!scrollTicking) {
+          requestAnimationFrame(function() {
+            handleScroll();
+            scrollTicking = false;
+          });
+          scrollTicking = true;
+        }
+      }
+      
+      // Initialize when DOM is ready
+      function init() {
+        // Start with header hidden if not at top
+        if (window.pageYOffset > 50) {
+          hideHeader();
+        } else {
+          showHeader();
+        }
+        
+        // Event listeners
+        window.addEventListener('scroll', throttledScroll, { passive: true });
+        document.addEventListener('mousemove', handleMouseMove, { passive: true });
+        header.addEventListener('mouseenter', handleHeaderHover);
+        
+        // Don't hide header when user is interacting with it
+        header.addEventListener('mouseleave', () => {
+          if (window.pageYOffset > 100) {
+            hideTimeout = setTimeout(hideHeader, 1000);
+          }
+        });
+      }
+      
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+      } else {
+        init();
+      }
+      
+    })();
+    </script>
+    
     <!-- Beautiful interactive styles -->
     <style>
+      /* Auto-hide header styles */
+      .auto-hide-header.visible {
+        transform: translateY(0) translateZ(0) !important;
+      }
+      
+      .auto-hide-header.hidden {
+        transform: translateY(-100%) translateZ(0) !important;
+      }
+      
       /* Navigation hover effects */
       .nav-link:hover {
         color: #0066cc !important;

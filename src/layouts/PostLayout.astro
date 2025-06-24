@@ -24,6 +24,18 @@ const readingTimeData = content ? calculateReadingTime(content) : null;
 ---
 
 <Layout title={title} description={description}>
+  <!-- Reading Progress Bar -->
+  <div id="reading-progress" style="
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 0%;
+    height: 3px;
+    background: linear-gradient(90deg, #0066cc, #8b5cf6);
+    z-index: 9999;
+    transition: width 0.1s ease-out;
+  "></div>
+  
   <!-- Sophisticated article layout with enhanced typography -->
   <article style="
     max-width: 45rem;
@@ -150,6 +162,66 @@ const readingTimeData = content ? calculateReadingTime(content) : null;
     )}
   </article>
 </Layout>
+
+<!-- Reading Progress Bar Script -->
+<script is:inline>
+(function() {
+  'use strict';
+  
+  function updateReadingProgress() {
+    const progressBar = document.getElementById('reading-progress');
+    if (!progressBar) return;
+    
+    const article = document.querySelector('article');
+    if (!article) return;
+    
+    const windowHeight = window.innerHeight;
+    const documentHeight = document.documentElement.scrollHeight - windowHeight;
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    
+    // Calculate progress through the article content
+    const articleTop = article.offsetTop;
+    const articleHeight = article.offsetHeight;
+    const articleBottom = articleTop + articleHeight;
+    
+    let progress = 0;
+    if (scrollTop >= articleTop) {
+      if (scrollTop >= articleBottom - windowHeight) {
+        progress = 100;
+      } else {
+        const scrollIntoArticle = scrollTop - articleTop;
+        const readableHeight = articleHeight - windowHeight;
+        progress = Math.min((scrollIntoArticle / readableHeight) * 100, 100);
+      }
+    }
+    
+    progressBar.style.width = Math.max(0, progress) + '%';
+  }
+  
+  // Throttle scroll events for performance
+  let ticking = false;
+  function handleScroll() {
+    if (!ticking) {
+      requestAnimationFrame(function() {
+        updateReadingProgress();
+        ticking = false;
+      });
+      ticking = true;
+    }
+  }
+  
+  // Initialize when DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() {
+      window.addEventListener('scroll', handleScroll, { passive: true });
+      updateReadingProgress(); // Initial calculation
+    });
+  } else {
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    updateReadingProgress(); // Initial calculation
+  }
+})();
+</script>
 
 <!-- Sophisticated Markdown Typography -->
 <style is:global>
