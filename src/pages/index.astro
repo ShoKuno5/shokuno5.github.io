@@ -30,16 +30,17 @@ const sortedPosts = visiblePosts.sort((a, b) => b.data.date.getTime() - a.data.d
                 line-height: 1.2;
                 letter-spacing: -0.025em;
                 margin-bottom: 1.25rem;
-                background: linear-gradient(135deg, #1f2937, #4b5563, #0066cc);
-                -webkit-background-clip: text;
-                background-clip: text;
-                color: transparent;
               ">
                 <a href={`/posts/${post.slug}/`} style="
                   text-decoration: none;
-                  color: inherit;
-                  transition: opacity 0.2s ease;
-                " onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
+                  background: linear-gradient(135deg, #1f2937, #4b5563, #0066cc);
+                  -webkit-background-clip: text;
+                  background-clip: text;
+                  color: transparent;
+                  transition: all 0.2s ease;
+                  display: inline-block;
+                " 
+                class="gradient-title-link">
                   {post.data.title}
                 </a>
               </h1>
@@ -126,9 +127,9 @@ const sortedPosts = visiblePosts.sort((a, b) => b.data.date.getTime() - a.data.d
                 onmouseover="this.style.color='#0052a3'"
                 onmouseout="this.style.color='#0066cc'"
               >
-                Read full post
+                Join the discussion
                 <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-3.582 8-8 8a8.959 8.959 0 01-4.906-1.465L3 21l2.535-5.094A8.963 8.963 0 013 12c0-4.418 3.582-8 8-8s8 3.582 8 8z" />
                 </svg>
               </a>
             </div>
@@ -140,6 +141,35 @@ const sortedPosts = visiblePosts.sort((a, b) => b.data.date.getTime() - a.data.d
 </Layout>
 
 <style is:global>
+  /* Gradient title link effects - preserve gradient across all states */
+  .gradient-title-link,
+  .gradient-title-link:visited,
+  .gradient-title-link:hover,
+  .gradient-title-link:focus,
+  .gradient-title-link:active {
+    background: linear-gradient(135deg, #1f2937, #4b5563, #0066cc) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    color: transparent !important;
+    outline: none;
+  }
+  
+  .gradient-title-link:hover {
+    background: linear-gradient(135deg, #374151, #6b7280, #2563eb) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    color: transparent !important;
+    transform: translateY(-1px);
+  }
+  
+  .gradient-title-link:active {
+    background: linear-gradient(135deg, #111827, #374151, #1d4ed8) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    color: transparent !important;
+    transform: translateY(0);
+  }
+
   /* Tag hover effects to match PostLayout */
   .tag-link:hover {
     background: linear-gradient(135deg, #e2e8f0, #cbd5e1) !important;
