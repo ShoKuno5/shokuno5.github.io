@@ -55,16 +55,30 @@
       }
     }
     
-    // Clean event handling for all devices
+    // Prevent double-firing on mobile devices
+    let lastEventTime = 0;
+    
     function handleInteraction(e) {
+      const now = Date.now();
+      
+      // Prevent rapid duplicate events (within 500ms)
+      if (now - lastEventTime < 500) {
+        e.preventDefault();
+        return;
+      }
+      
+      lastEventTime = now;
       e.preventDefault();
       e.stopPropagation();
       toggleMenu();
     }
     
-    // Add event listeners
-    burger.addEventListener('touchstart', handleInteraction, { passive: false });
-    burger.addEventListener('click', handleInteraction);
+    // Use only touchstart for touch devices, click for others
+    if ('ontouchstart' in window) {
+      burger.addEventListener('touchstart', handleInteraction, { passive: false });
+    } else {
+      burger.addEventListener('click', handleInteraction);
+    }
     
     // Close menu with Escape key
     document.addEventListener('keydown', function(e) {
