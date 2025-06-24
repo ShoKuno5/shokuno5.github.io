@@ -8,37 +8,52 @@
   'use strict';
   
   function initMobileNav() {
-    console.log('🍔 Initializing mobile nav...');
+    console.log('🍔 DEBUG: Initializing mobile nav...');
+    console.log('📱 User Agent:', navigator.userAgent);
+    console.log('📏 Screen size:', window.innerWidth + 'x' + window.innerHeight);
     
     const burger = document.getElementById('nav-toggle');
     const menu = document.getElementById('nav-menu');
     
+    console.log('🔍 DOM elements found:', {
+      burger: !!burger,
+      menu: !!menu,
+      burgerHTML: burger ? burger.outerHTML.substring(0, 200) : 'NOT FOUND',
+      menuHTML: menu ? menu.outerHTML.substring(0, 100) : 'NOT FOUND'
+    });
+    
     if (!burger || !menu) {
       console.error('❌ Navigation elements not found');
-      console.log('🔍 Available elements:', {
-        burger: !!burger,
-        menu: !!menu,
-        burgerClasses: burger?.className,
-        menuClasses: menu?.className
-      });
+      alert('DEBUG: Navigation elements not found. Burger: ' + !!burger + ', Menu: ' + !!menu);
       return;
     }
     
     console.log('✅ Found navigation elements');
-    console.log('🔍 Burger element:', burger.outerHTML.substring(0, 100));
+    
+    // Test if button is visible
+    const rect = burger.getBoundingClientRect();
+    console.log('📍 Button position:', rect);
+    console.log('👁️ Button computed style:', window.getComputedStyle(burger).display);
+    
+    // Add visible confirmation that script loaded
+    setTimeout(() => {
+      alert('DEBUG: Mobile nav script loaded successfully! Button visible: ' + (rect.width > 0 && rect.height > 0));
+    }, 1000);
     
     let isMenuOpen = false;
     let outsideClickEnabled = false;
     
     function toggleMenu() {
-      console.log('🎯 Toggle menu, current state:', isMenuOpen);
+      console.log('🎯 DEBUG: Toggle menu, current state:', isMenuOpen);
       
       isMenuOpen = !isMenuOpen;
       
       if (isMenuOpen) {
-        burger.classList.add('is-active');
-        menu.classList.add('is-active');
-        console.log('✅ Menu OPENED');
+        // Show menu with inline style
+        menu.style.display = 'block';
+        burger.style.backgroundColor = '#ff0000'; // Change color when active
+        console.log('✅ DEBUG: Menu OPENED');
+        alert('DEBUG: Menu opened!');
         
         // Enable outside click after a delay to prevent immediate closing
         setTimeout(() => {
@@ -46,10 +61,12 @@
           console.log('🔓 Outside click enabled');
         }, 300);
       } else {
-        burger.classList.remove('is-active');
-        menu.classList.remove('is-active');
+        // Hide menu
+        menu.style.display = 'none';
+        burger.style.backgroundColor = '#ffff00'; // Reset color
         outsideClickEnabled = false;
-        console.log('❌ Menu CLOSED');
+        console.log('❌ DEBUG: Menu CLOSED');
+        alert('DEBUG: Menu closed!');
       }
       
       burger.setAttribute('aria-expanded', isMenuOpen.toString());

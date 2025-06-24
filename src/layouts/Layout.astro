@@ -38,79 +38,171 @@ const nav = [
     <title>{title}</title>
   </head>
   <body>
-    <header class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-200 relative">
-      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4 lg:py-6">
-        <div class="flex items-center justify-between">
-          <a href="/" class="text-xl font-semibold transition-all duration-300 bg-gradient-to-r from-primary-600 to-accent-purple bg-clip-text text-transparent hover:from-primary-700 hover:to-accent-purple">
-            Sho Kuno
-          </a>
+    <!-- Simplified header for iOS Safari compatibility -->
+    <header style="
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      background: #ffffff;
+      border-bottom: 1px solid #e5e5e5;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      -webkit-transform: translateZ(0);
+      transform: translateZ(0);
+      will-change: transform;
+    ">
+      <div style="
+        max-width: 72rem;
+        margin: 0 auto;
+        padding: 1rem;
+        display: grid;
+        grid-template-columns: 1fr auto;
+        align-items: center;
+        gap: 1rem;
+        min-height: 60px;
+      ">
+        <!-- Simple logo without gradient -->
+        <a href="/" style="
+          font-size: 1.25rem;
+          font-weight: 600;
+          color: #0066cc;
+          text-decoration: none;
+          justify-self: start;
+        ">
+          Sho Kuno
+        </a>
+        
+        <!-- Debug hamburger button with multiple fallbacks -->
+        <div style="
+          justify-self: end;
+          display: block;
+          position: relative;
+        ">
+          <!-- Temporary debug header -->
+          <div style="
+            background: #00ff00;
+            color: #000000;
+            padding: 4px 8px;
+            font-size: 12px;
+            margin-bottom: 4px;
+            border: 2px solid #ff0000;
+          ">HEADER DEBUG</div>
           
-          <!-- Mobile menu button - simplified for visibility -->
           <button 
             id="nav-toggle" 
-            class="hamburger-menu-btn"
             type="button" 
             aria-label="Toggle navigation menu" 
             aria-expanded="false"
+            style="
+              display: block !important;
+              width: 50px !important;
+              height: 50px !important;
+              padding: 8px !important;
+              border: 3px solid #ff0000 !important;
+              background: #ffff00 !important;
+              cursor: pointer !important;
+              border-radius: 8px !important;
+              position: relative !important;
+              z-index: 1001 !important;
+              -webkit-tap-highlight-color: transparent !important;
+              -webkit-touch-callout: none !important;
+              -webkit-user-select: none !important;
+              touch-action: manipulation !important;
+            "
           >
-            <div class="hamburger-lines">
-              <span class="line"></span>
-              <span class="line"></span>
-              <span class="line"></span>
+            <span style="
+              display: block;
+              font-size: 10px;
+              color: #000000;
+              font-weight: bold;
+              margin-bottom: 2px;
+            ">MENU</span>
+            <div style="
+              width: 24px;
+              height: 18px;
+              position: relative;
+              margin: 0 auto;
+            ">
+              <span style="
+                display: block;
+                width: 24px;
+                height: 3px;
+                background-color: #000000;
+                margin-bottom: 4px;
+                border-radius: 2px;
+              "></span>
+              <span style="
+                display: block;
+                width: 24px;
+                height: 3px;
+                background-color: #000000;
+                margin-bottom: 4px;
+                border-radius: 2px;
+              "></span>
+              <span style="
+                display: block;
+                width: 24px;
+                height: 3px;
+                background-color: #000000;
+                border-radius: 2px;
+              "></span>
             </div>
           </button>
-          
-          <!-- Desktop navigation -->
-          <nav class="hidden lg:block">
-            <ul class="flex space-x-6">
-              {nav.map((item) => (
-                <li class="relative group">
-                  {item.submenu ? (
-                    <>
-                      <button class="text-gray-700 hover:text-primary-600 transition-colors flex items-center space-x-1">
-                        <span>{item.label}</span>
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                        </svg>
-                      </button>
-                      <ul class="absolute left-0 mt-2 w-40 bg-white border border-gray-200 rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
-                        {item.submenu.map((subitem) => (
-                          <li>
-                            <a href={subitem.href} class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary-600">
-                              {subitem.label}
-                            </a>
-                          </li>
-                        ))}
-                      </ul>
-                    </>
-                  ) : (
-                    <a href={item.href} class="text-gray-700 hover:text-primary-600 transition-colors">
-                      {item.label}
-                    </a>
-                  )}
-                </li>
-              ))}
-            </ul>
-          </nav>
         </div>
         
-        <!-- Mobile navigation -->
-        <nav id="nav-menu" class="hidden lg:hidden mt-4">
-          <ul class="space-y-2">
+        <!-- Desktop navigation - hidden on mobile -->
+        <nav style="display: none;" id="desktop-nav">
+          <ul style="display: flex; gap: 1.5rem; list-style: none; margin: 0; padding: 0;">
             {nav.map((item) => (
-              <li>
+              <li style="position: relative;">
                 {item.submenu ? (
-                  <details class="group">
-                    <summary class="cursor-pointer text-gray-700 hover:text-primary-600 transition-colors flex items-center justify-between py-2">
+                  <>
+                    <button style="color: #374151; text-decoration: none; display: flex; align-items: center; gap: 0.25rem;">
                       <span>{item.label}</span>
-                      <svg class="w-4 h-4 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg style="width: 1rem; height: 1rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+                  </>
+                ) : (
+                  <a href={item.href} style="color: #374151; text-decoration: none;">
+                    {item.label}
+                  </a>
+                )}
+              </li>
+            ))}
+          </ul>
+        </nav>
+        
+        <!-- Mobile navigation - positioned absolutely -->
+        <nav id="nav-menu" style="
+          display: none;
+          position: absolute;
+          top: 100%;
+          left: 0;
+          right: 0;
+          background: #ffffff;
+          border-bottom: 1px solid #e5e5e5;
+          box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+          z-index: 999;
+          border: 2px solid #00ff00;
+        ">
+          <ul style="padding: 1rem; margin: 0; list-style: none;">
+            {nav.map((item) => (
+              <li style="margin-bottom: 0.5rem;">
+                {item.submenu ? (
+                  <details>
+                    <summary style="cursor: pointer; color: #374151; padding: 0.5rem 0; display: flex; align-items: center; justify-content: space-between;">
+                      <span>{item.label}</span>
+                      <svg style="width: 1rem; height: 1rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                       </svg>
                     </summary>
-                    <ul class="ml-4 mt-2 space-y-2">
+                    <ul style="margin-left: 1rem; margin-top: 0.5rem;">
                       {item.submenu.map((subitem) => (
                         <li>
-                          <a href={subitem.href} class="block text-gray-600 hover:text-primary-600 transition-colors py-1">
+                          <a href={subitem.href} style="display: block; color: #6B7280; text-decoration: none; padding: 0.25rem 0;">
                             {subitem.label}
                           </a>
                         </li>
@@ -118,7 +210,7 @@ const nav = [
                     </ul>
                   </details>
                 ) : (
-                  <a href={item.href} class="block text-gray-700 hover:text-primary-600 transition-colors py-2">
+                  <a href={item.href} style="display: block; color: #374151; text-decoration: none; padding: 0.5rem 0;">
                     {item.label}
                   </a>
                 )}
@@ -130,7 +222,7 @@ const nav = [
     </header>
     
     <script src="/nav-toggle.js" defer></script>
-    <main class="min-h-screen">
+    <main style="min-height: 100vh; padding-top: 80px;">
       <slot />
     </main>
     
