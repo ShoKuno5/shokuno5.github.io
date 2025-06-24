@@ -19,20 +19,65 @@ const actualShowComments = isStaticPage ? false : showComments;
 ---
 
 <Layout title={title} description={description}>
-  <article class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
-    <header class="mb-12">
-      <h1 class="text-4xl lg:text-5xl font-bold mb-6 leading-tight bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">{title}</h1>
+  <!-- Sophisticated article layout with enhanced typography -->
+  <article style="
+    max-width: 45rem;
+    margin: 0 auto;
+    padding: 3rem 1.5rem;
+    min-height: 100vh;
+  ">
+    <!-- Elegant header with improved typography -->
+    <header style="
+      margin-bottom: 3rem;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    ">
+      <h1 style="
+        font-size: 2.5rem;
+        font-weight: 800;
+        line-height: 1.1;
+        letter-spacing: -0.025em;
+        margin-bottom: 1.5rem;
+        background: linear-gradient(135deg, #1f2937, #4b5563, #0066cc);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      ">{title}</h1>
+      
       {actualShowMeta && (
-        <div class="flex items-center gap-6 text-gray-500 mb-6">
-          <time class="font-medium">{date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</time>
+        <div style="
+          display: flex;
+          align-items: center;
+          gap: 1.5rem;
+          color: #6b7280;
+          margin-bottom: 1.5rem;
+          font-size: 0.9rem;
+        ">
+          <time style="font-weight: 500;">
+            {date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+          </time>
         </div>
       )}
+      
       {tags && tags.length > 0 && (
-        <div class="flex flex-wrap gap-3">
+        <div style="display: flex; flex-wrap: wrap; gap: 0.75rem;">
           {tags.map((tag) => (
             <a 
               href={`/posts/tags/#tag-${tag.toLowerCase().replace(/\s+/g, '-')}`}
-              class="inline-flex items-center px-4 py-2 text-sm font-medium bg-primary-50 text-primary-700 rounded-full hover:bg-primary-100 transition-colors"
+              style="
+                display: inline-flex;
+                align-items: center;
+                padding: 0.5rem 1rem;
+                font-size: 0.8rem;
+                font-weight: 500;
+                background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+                color: #475569;
+                border-radius: 2rem;
+                text-decoration: none;
+                transition: all 0.2s ease;
+                border: 1px solid rgba(0, 0, 0, 0.05);
+              "
+              class="tag-link"
             >
               {tag}
             </a>
@@ -41,12 +86,17 @@ const actualShowComments = isStaticPage ? false : showComments;
       )}
     </header>
     
-    <div class="markdown-body">
+    <!-- Enhanced markdown content with sophisticated typography -->
+    <div class="sophisticated-markdown">
       <slot />
     </div>
     
     {actualShowComments && (
-      <div class="mt-16 pt-8 border-t border-gray-200">
+      <div style="
+        margin-top: 4rem;
+        padding-top: 2rem;
+        border-top: 1px solid rgba(0, 0, 0, 0.06);
+      ">
         <script
           src="https://giscus.app/client.js"
           data-repo="ShoKuno5/shokuno5.github.io"
@@ -70,32 +120,324 @@ const actualShowComments = isStaticPage ? false : showComments;
   </article>
 </Layout>
 
+<!-- Sophisticated Markdown Typography -->
 <style>
-  :global(.prose h1) {
-    @apply text-2xl;
+  /* Tag hover effects */
+  .tag-link:hover {
+    background: linear-gradient(135deg, #e2e8f0, #cbd5e1) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+    color: #334155 !important;
   }
   
-  :global(.prose h2) {
-    @apply text-xl;
+  /* Enhanced markdown styling for sophisticated typography */
+  .sophisticated-markdown {
+    font-family: 'Inter', 'Noto Sans JP', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    font-size: 1.125rem;
+    line-height: 1.8;
+    color: #374151;
+    letter-spacing: -0.011em;
   }
   
-  :global(.prose h3) {
-    @apply text-lg;
+  /* Typography Hierarchy */
+  .sophisticated-markdown h1 {
+    font-size: 2.25rem;
+    font-weight: 800;
+    line-height: 1.2;
+    letter-spacing: -0.025em;
+    margin: 3rem 0 1.5rem 0;
+    color: #111827;
+    background: linear-gradient(135deg, #111827, #374151);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
   }
   
-  :global(.prose pre) {
-    @apply bg-gray-50 rounded-lg p-4 overflow-x-auto;
+  .sophisticated-markdown h2 {
+    font-size: 1.875rem;
+    font-weight: 700;
+    line-height: 1.3;
+    letter-spacing: -0.025em;
+    margin: 2.5rem 0 1.25rem 0;
+    color: #1f2937;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid #e5e7eb;
+    position: relative;
   }
   
-  :global(.prose code) {
-    @apply bg-gray-100 px-1 py-0.5 rounded text-sm;
+  .sophisticated-markdown h2::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 3rem;
+    height: 2px;
+    background: linear-gradient(135deg, #0066cc, #8b5cf6);
+    border-radius: 1px;
   }
   
-  :global(.prose pre code) {
-    @apply bg-transparent p-0;
+  .sophisticated-markdown h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    line-height: 1.4;
+    letter-spacing: -0.025em;
+    margin: 2rem 0 1rem 0;
+    color: #374151;
+    position: relative;
+    padding-left: 1rem;
   }
   
-  :global(.prose a) {
-    @apply text-[#007aff] no-underline hover:underline;
+  .sophisticated-markdown h3::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.25rem;
+    width: 4px;
+    height: 1.5rem;
+    background: linear-gradient(135deg, #0066cc, #8b5cf6);
+    border-radius: 2px;
+  }
+  
+  .sophisticated-markdown h4 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    line-height: 1.5;
+    margin: 1.75rem 0 0.75rem 0;
+    color: #4b5563;
+  }
+  
+  .sophisticated-markdown h5,
+  .sophisticated-markdown h6 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    line-height: 1.5;
+    margin: 1.5rem 0 0.5rem 0;
+    color: #6b7280;
+  }
+  
+  /* Paragraphs and text */
+  .sophisticated-markdown p {
+    margin: 1.5rem 0;
+    text-align: justify;
+    hyphens: auto;
+    -webkit-hyphens: auto;
+    -moz-hyphens: auto;
+  }
+  
+  .sophisticated-markdown p:first-of-type {
+    font-size: 1.2rem;
+    line-height: 1.7;
+    color: #1f2937;
+    font-weight: 400;
+  }
+  
+  /* Links */
+  .sophisticated-markdown a {
+    color: #0066cc;
+    text-decoration: none;
+    font-weight: 500;
+    border-bottom: 1px solid transparent;
+    transition: all 0.2s ease;
+    position: relative;
+  }
+  
+  .sophisticated-markdown a:hover {
+    color: #0052a3;
+    border-bottom-color: #0066cc;
+  }
+  
+  /* Lists */
+  .sophisticated-markdown ul,
+  .sophisticated-markdown ol {
+    margin: 1.5rem 0;
+    padding-left: 2rem;
+  }
+  
+  .sophisticated-markdown li {
+    margin: 0.75rem 0;
+    line-height: 1.7;
+  }
+  
+  .sophisticated-markdown ul li {
+    list-style: none;
+    position: relative;
+  }
+  
+  .sophisticated-markdown ul li::before {
+    content: '•';
+    color: #0066cc;
+    font-weight: bold;
+    position: absolute;
+    left: -1.5rem;
+    font-size: 1.2rem;
+  }
+  
+  .sophisticated-markdown ol li {
+    counter-increment: item;
+  }
+  
+  .sophisticated-markdown ol {
+    counter-reset: item;
+  }
+  
+  .sophisticated-markdown ol li::marker {
+    color: #0066cc;
+    font-weight: 600;
+  }
+  
+  /* Code blocks */
+  .sophisticated-markdown pre {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin: 2rem 0;
+    overflow-x: auto;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+  
+  .sophisticated-markdown code {
+    background: #f1f5f9;
+    color: #475569;
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+    font-size: 0.9em;
+    font-weight: 500;
+    font-family: 'SF Mono', Monaco, Consolas, 'Liberation Mono', monospace;
+    border: 1px solid #e2e8f0;
+  }
+  
+  .sophisticated-markdown pre code {
+    background: transparent;
+    color: inherit;
+    padding: 0;
+    border: none;
+    font-size: inherit;
+  }
+  
+  /* Blockquotes */
+  .sophisticated-markdown blockquote {
+    margin: 2rem 0;
+    padding: 1.5rem 2rem;
+    background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+    border-left: 4px solid #0066cc;
+    border-radius: 0 12px 12px 0;
+    font-style: italic;
+    color: #475569;
+    position: relative;
+  }
+  
+  .sophisticated-markdown blockquote::before {
+    content: '"';
+    position: absolute;
+    top: -0.5rem;
+    left: 1rem;
+    font-size: 4rem;
+    color: #cbd5e1;
+    font-family: Georgia, serif;
+  }
+  
+  .sophisticated-markdown blockquote p {
+    margin: 0;
+    font-size: 1.1rem;
+    line-height: 1.6;
+  }
+  
+  /* Tables */
+  .sophisticated-markdown table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 2rem 0;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+  
+  .sophisticated-markdown th,
+  .sophisticated-markdown td {
+    padding: 1rem 1.5rem;
+    text-align: left;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  
+  .sophisticated-markdown th {
+    background: #f9fafb;
+    font-weight: 600;
+    color: #374151;
+  }
+  
+  .sophisticated-markdown tr:hover {
+    background: #f9fafb;
+  }
+  
+  /* Images */
+  .sophisticated-markdown img {
+    max-width: 100%;
+    height: auto;
+    margin: 2rem auto;
+    display: block;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Horizontal rules */
+  .sophisticated-markdown hr {
+    border: none;
+    height: 1px;
+    background: linear-gradient(135deg, transparent, #e5e7eb, transparent);
+    margin: 3rem 0;
+  }
+  
+  /* Strong and emphasis */
+  .sophisticated-markdown strong {
+    font-weight: 700;
+    color: #1f2937;
+  }
+  
+  .sophisticated-markdown em {
+    font-style: italic;
+    color: #4b5563;
+  }
+  
+  /* Responsive design */
+  @media (max-width: 768px) {
+    .sophisticated-markdown {
+      font-size: 1rem;
+      line-height: 1.7;
+    }
+    
+    .sophisticated-markdown h1 {
+      font-size: 1.875rem;
+    }
+    
+    .sophisticated-markdown h2 {
+      font-size: 1.5rem;
+    }
+    
+    .sophisticated-markdown h3 {
+      font-size: 1.25rem;
+    }
+    
+    .sophisticated-markdown p:first-of-type {
+      font-size: 1.125rem;
+    }
+    
+    .sophisticated-markdown pre {
+      padding: 1rem;
+      font-size: 0.8rem;
+    }
+    
+    .sophisticated-markdown blockquote {
+      padding: 1rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    
+    .sophisticated-markdown th,
+    .sophisticated-markdown td {
+      padding: 0.75rem 1rem;
+    }
   }
 </style>
