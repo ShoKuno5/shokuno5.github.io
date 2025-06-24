@@ -1,5 +1,5 @@
 ---
-import Layout from '../layouts/Layout.astro';
+import PostLayout from '../layouts/PostLayout.astro';
 import { getEntry } from 'astro:content';
 
 const research = await getEntry('research', 'research');
@@ -9,26 +9,12 @@ if (!research) {
 const { Content } = await research.render();
 ---
 
-<Layout title={research.data.title} description={research.data.description}>
-  <div class="max-w-[672px] mx-auto px-4 py-8 prose prose-gray max-w-none">
-    <Content />
-  </div>
-</Layout>
-
-<style>
-  :global(.prose h1) {
-    @apply text-3xl;
-  }
-  
-  :global(.prose h2) {
-    @apply text-2xl;
-  }
-  
-  :global(.prose h3) {
-    @apply text-xl;
-  }
-  
-  :global(.prose a) {
-    @apply text-[#007aff] no-underline hover:underline;
-  }
-</style>
+<PostLayout 
+  title={research.data.title}
+  date={new Date('2024-01-01')}
+  description={research.data.description}
+  showMeta={false}
+  showComments={false}
+>
+  <Content />
+</PostLayout>

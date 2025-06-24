@@ -1,5 +1,5 @@
 ---
-import Layout from '../layouts/Layout.astro';
+import PostLayout from '../layouts/PostLayout.astro';
 import { getEntry } from 'astro:content';
 
 const naiveHope = await getEntry('naive-hope', 'naive-hope');
@@ -9,30 +9,12 @@ if (!naiveHope) {
 const { Content } = await naiveHope.render();
 ---
 
-<Layout title={naiveHope.data.title} description={naiveHope.data.description}>
-  <div class="max-w-[672px] mx-auto px-4 py-8 prose prose-gray max-w-none">
-    <Content />
-  </div>
-</Layout>
-
-<style>
-  :global(.prose h1) {
-    @apply text-3xl;
-  }
-  
-  :global(.prose h2) {
-    @apply text-2xl;
-  }
-  
-  :global(.prose h3) {
-    @apply text-xl;
-  }
-  
-  :global(.prose a) {
-    @apply text-[#007aff] no-underline hover:underline;
-  }
-  
-  :global(.prose blockquote) {
-    @apply border-l-4 border-gray-300 pl-4 italic;
-  }
-</style>
+<PostLayout 
+  title={naiveHope.data.title}
+  date={new Date('2024-01-01')}
+  description={naiveHope.data.description}
+  showMeta={false}
+  showComments={false}
+>
+  <Content />
+</PostLayout>
