@@ -24,19 +24,6 @@ const readingTimeData = content ? calculateReadingTime(content) : null;
 ---
 
 <Layout title={title} description={description}>
-  <!-- Reading Progress Bar -->
-  <div id="reading-progress" style="
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 0%;
-    height: 4px;
-    background: linear-gradient(90deg, #0066cc, #8b5cf6);
-    z-index: 10000;
-    transition: width 0.15s ease-out;
-    box-shadow: 0 0 10px rgba(0, 102, 204, 0.3);
-  "></div>
-  
   <!-- Sophisticated article layout with enhanced typography -->
   <article style="
     max-width: 45rem;
@@ -164,48 +151,49 @@ const readingTimeData = content ? calculateReadingTime(content) : null;
   </article>
 </Layout>
 
-<!-- Reading Progress Bar Script -->
+<!-- Silent Reading Progress Script -->
 <script is:inline>
 (function() {
   'use strict';
   
-  function updateReadingProgress() {
-    const progressBar = document.getElementById('reading-progress');
-    if (!progressBar) return;
-    
+  function updateSilentProgress() {
     const article = document.querySelector('article');
     if (!article) return;
     
     const windowHeight = window.innerHeight;
     const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-    
-    // More reliable calculation for mobile
-    const articleRect = article.getBoundingClientRect();
-    const articleTop = article.offsetTop;
-    const articleHeight = article.offsetHeight;
-    
-    // Simple percentage based on total scroll through document
     const documentHeight = document.documentElement.scrollHeight - windowHeight;
-    let progress = 0;
     
+    // Calculate overall reading progress (0-100)
+    let progress = 0;
     if (documentHeight > 0) {
       progress = Math.min((scrollTop / documentHeight) * 100, 100);
     }
     
-    // Alternative calculation based on article visibility
-    if (scrollTop >= articleTop) {
-      const scrollIntoArticle = scrollTop - articleTop;
-      const readableHeight = Math.max(articleHeight - windowHeight, articleHeight * 0.8);
-      const articleProgress = Math.min((scrollIntoArticle / readableHeight) * 100, 100);
-      progress = Math.max(progress, articleProgress);
+    // Find all h2 elements in the article
+    const headings = article.querySelectorAll('.sophisticated-markdown h2');
+    if (headings.length === 0) return;
+    
+    // Calculate width based on progress (from 3rem to 100%)
+    const minWidth = 3; // 3rem in rem units
+    const maxWidthPercent = 100;
+    
+    // Smooth interpolation from 3rem to 100%
+    let progressWidth;
+    if (progress <= 5) {
+      // Start with 3rem for first 5% of scroll
+      progressWidth = `${minWidth}rem`;
+    } else {
+      // Gradually expand from 3rem to 100%
+      const expandProgress = (progress - 5) / 95; // Normalize to 0-1
+      const currentPercent = expandProgress * maxWidthPercent;
+      progressWidth = `${Math.min(currentPercent, maxWidthPercent)}%`;
     }
     
-    progressBar.style.width = Math.max(0, Math.min(progress, 100)) + '%';
-    
-    // Debug for mobile (remove after testing)
-    if (window.innerWidth <= 768) {
-      progressBar.setAttribute('data-progress', Math.round(progress));
-    }
+    // Apply to all h2 headings
+    headings.forEach(heading => {
+      heading.style.setProperty('--progress-width', progressWidth);
+    });
   }
   
   // Throttle scroll events for performance
@@ -213,22 +201,21 @@ const readingTimeData = content ? calculateReadingTime(content) : null;
   function handleScroll() {
     if (!ticking) {
       requestAnimationFrame(function() {
-        updateReadingProgress();
+        updateSilentProgress();
         ticking = false;
       });
       ticking = true;
     }
   }
   
-  // Handle both scroll and touch events
+  // Handle touch events for mobile
   function handleTouch() {
-    // Small delay to ensure scroll position is updated
-    setTimeout(updateReadingProgress, 50);
+    setTimeout(updateSilentProgress, 50);
   }
   
   // Initialize when DOM is ready
   function init() {
-    updateReadingProgress(); // Initial calculation
+    updateSilentProgress(); // Initial calculation
     
     // Add scroll listeners
     window.addEventListener('scroll', handleScroll, { passive: true });
@@ -239,7 +226,7 @@ const readingTimeData = content ? calculateReadingTime(content) : null;
     
     // Recalculate on resize (orientation change)
     window.addEventListener('resize', function() {
-      setTimeout(updateReadingProgress, 100);
+      setTimeout(updateSilentProgress, 100);
     }, { passive: true });
   }
   
@@ -301,10 +288,12 @@ const readingTimeData = content ? calculateReadingTime(content) : null;
     position: absolute;
     bottom: -2px;
     left: 0;
-    width: 3rem;
+    width: var(--progress-width, 3rem);
     height: 2px;
     background: linear-gradient(135deg, #0066cc, #8b5cf6);
     border-radius: 1px;
+    transition: width 0.3s ease-out;
+    max-width: 100%;
   }
   
   .sophisticated-markdown h3 {
@@ -533,29 +522,6 @@ const readingTimeData = content ? calculateReadingTime(content) : null;
     color: #4b5563;
   }
   
-  /* Mobile-enhanced progress bar */
-  @media (max-width: 768px) {
-    #reading-progress {
-      height: 5px !important;
-      box-shadow: 0 0 15px rgba(0, 102, 204, 0.4) !important;
-    }
-    
-    /* Show progress value for debugging */
-    #reading-progress::after {
-      content: attr(data-progress) '%';
-      position: absolute;
-      right: 10px;
-      top: 6px;
-      font-size: 12px;
-      color: #0066cc;
-      font-weight: bold;
-      background: rgba(255, 255, 255, 0.9);
-      padding: 2px 6px;
-      border-radius: 10px;
-      opacity: 0.8;
-    }
-  }
-
   /* Responsive design */
   @media (max-width: 768px) {
     .sophisticated-markdown {
