@@ -1,0 +1,44 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+
+const posts = await getCollection('posts');
+const sortedPosts = posts.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+
+// Group posts by year
+const postsByYear = sortedPosts.reduce((acc, post) => {
+  const year = post.data.date.getFullYear();
+  if (!acc[year]) acc[year] = [];
+  acc[year].push(post);
+  return acc;
+}, {} as Record<number, typeof posts>);
+
+const years = Object.keys(postsByYear).sort((a, b) => Number(b) - Number(a));
+---
+
+<Layout title="All Posts" description="Archive of all blog posts">
+  <div class="max-w-[672px] mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-8">All Posts</h1>
+    
+    {years.map((year) => (
+      <section class="mb-10">
+        <h2 class="text-2xl font-semibold mb-4 text-gray-800">{year}</h2>
+        <ul class="space-y-3">
+          {postsByYear[Number(year)].map((post) => (
+            <li class="flex items-baseline">
+              <a 
+                href={`/posts/${post.slug}/`}
+                class="text-gray-900 hover:text-[#007aff] transition-colors flex-grow"
+              >
+                {post.data.title}
+              </a>
+              <span class="text-sm text-gray-600 ml-4 flex-shrink-0">
+                {post.data.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+              </span>
+            </li>
+          ))}
+        </ul>
+      </section>
+    ))}
+  </div>
+</Layout>

@@ -1,0 +1,51 @@
+---
+title: "CV"
+description: "Curriculum Vitae"
+---
+
+# Curriculum Vitae
+
+## Education
+
+**PhD in Computer Science**  
+*University Name, 2020-2024*  
+Thesis: Advanced Techniques in Generative Modeling
+
+**MSc in Machine Learning**  
+*University Name, 2018-2020*  
+Graduated with Distinction
+
+**BSc in Computer Science**  
+*University Name, 2014-2018*  
+Summa Cum Laude
+
+## Professional Experience
+
+**Research Scientist**  
+*AI Research Lab, 2024-Present*  
+- Leading research on next-generation AI models
+- Published 5+ papers in top-tier conferences
+
+**Machine Learning Engineer**  
+*Tech Company, 2020-2024*  
+- Developed production ML systems
+- Improved model efficiency by 40%
+
+## Skills
+
+**Programming**: Python, TypeScript, Rust, C++  
+**ML Frameworks**: PyTorch, TensorFlow, JAX  
+**Cloud**: AWS, GCP, Azure  
+**Tools**: Docker, Kubernetes, Git
+
+## Awards & Honors
+
+- Best Paper Award, ICML 2024
+- Google PhD Fellowship, 2022
+- Dean's List, 2016-2018
+
+## Languages
+
+- English (Native)
+- Japanese (Professional)
+- Spanish (Conversational)

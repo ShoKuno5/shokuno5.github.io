@@ -2,14 +2,14 @@
 import Layout from '../layouts/Layout.astro';
 import { getEntry } from 'astro:content';
 
-const research = await getEntry('research', 'research');
-if (!research) {
-  throw new Error('Research page not found');
+const cv = await getEntry('cv', 'cv');
+if (!cv) {
+  throw new Error('CV page not found');
 }
-const { Content } = await research.render();
+const { Content } = await cv.render();
 ---
 
-<Layout title={research.data.title} description={research.data.description}>
+<Layout title={cv.data.title} description={cv.data.description}>
   <div class="max-w-[672px] mx-auto px-4 py-8 prose prose-gray max-w-none">
     <Content />
   </div>

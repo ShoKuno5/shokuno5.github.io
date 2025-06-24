@@ -1,29 +1,40 @@
-import { defineCollection, z } from 'astro:content';
+import { z, defineCollection } from 'astro:content';
 
-const blogCollection = defineCollection({
-  type: 'content',
-  schema: z.object({
-    title: z.string(),
-    description: z.string(),
-    date: z.date(),
-    tags: z.array(z.string()).optional(),
-    draft: z.boolean().optional(),
-  }),
-});
-
-const projectsCollection = defineCollection({
-  type: 'content',
-  schema: z.object({
-    title: z.string(),
-    description: z.string(),
-    tags: z.array(z.string()),
-    link: z.string().optional(),
-    github: z.string().optional(),
-    featured: z.boolean().optional(),
-  }),
+const staticPageSchema = z.object({
+  title: z.string(),
+  description: z.string(),
 });
 
 export const collections = {
-  'blog': blogCollection,
-  'projects': projectsCollection,
+  posts: defineCollection({
+    type: 'content',
+    schema: z.object({
+      title: z.string(),
+      date: z.date(),
+      tags: z.array(z.string()).optional(),
+      summary: z.string().optional(),
+    }),
+  }),
+  projects: defineCollection({
+    type: 'content',
+    schema: z.object({
+      title: z.string(),
+      description: z.string(),
+      link: z.string().url(),
+      technologies: z.array(z.string()),
+      order: z.number(),
+    }),
+  }),
+  'research': defineCollection({
+    type: 'content',
+    schema: staticPageSchema,
+  }),
+  'cv': defineCollection({
+    type: 'content',
+    schema: staticPageSchema,
+  }),
+  'naive-hope': defineCollection({
+    type: 'content',
+    schema: staticPageSchema,
+  }),
 };

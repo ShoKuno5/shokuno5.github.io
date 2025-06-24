@@ -1,9 +1,9 @@
 ---
 title: "GraphVAE"
 description: "Hierarchical variational autoencoders for molecular graph generation"
-tags: ["Machine Learning", "PyTorch", "Graph Neural Networks"]
-github: "https://github.com/example/graphvae"
-featured: true
+link: "https://github.com/example/graphvae"
+technologies: ["Machine Learning", "PyTorch", "Graph Neural Networks"]
+order: 1
 ---
 
 # GraphVAE

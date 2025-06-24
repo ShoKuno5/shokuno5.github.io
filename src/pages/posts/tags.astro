@@ -1,0 +1,88 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+
+const posts = await getCollection('posts');
+
+// Collect all unique tags
+const tagMap = new Map<string, typeof posts>();
+
+posts.forEach(post => {
+  if (post.data.tags) {
+    post.data.tags.forEach(tag => {
+      const normalizedTag = tag.toLowerCase();
+      if (!tagMap.has(normalizedTag)) {
+        tagMap.set(normalizedTag, []);
+      }
+      tagMap.get(normalizedTag)!.push(post);
+    });
+  }
+});
+
+// Sort tags alphabetically
+const sortedTags = Array.from(tagMap.entries()).sort((a, b) => a[0].localeCompare(b[0]));
+
+// Sort posts within each tag by date
+sortedTags.forEach(([_, tagPosts]) => {
+  tagPosts.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+});
+---
+
+<Layout title="All Tags" description="Browse posts by tags">
+  <div class="max-w-[672px] mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-8">All Tags</h1>
+    
+    <!-- Tag cloud -->
+    <nav class="mb-12 p-6 bg-gray-50 rounded-lg">
+      <h2 class="text-lg font-semibold mb-4 text-gray-700">Jump to tag:</h2>
+      <div class="flex flex-wrap gap-3">
+        {sortedTags.map(([tag, tagPosts]) => (
+          <a 
+            href={`#tag-${tag.replace(/\s+/g, '-')}`}
+            class="px-3 py-1 bg-white border border-gray-200 rounded-full text-sm text-gray-700 hover:bg-gray-100 hover:border-gray-300 transition-colors"
+          >
+            {tag} ({tagPosts.length})
+          </a>
+        ))}
+      </div>
+    </nav>
+    
+    <!-- Posts by tag -->
+    <div class="space-y-12">
+      {sortedTags.map(([tag, tagPosts]) => (
+        <section id={`tag-${tag.replace(/\s+/g, '-')}`} class="scroll-mt-8">
+          <h2 class="text-2xl font-semibold mb-4 text-gray-800">
+            {tag}
+            <span class="text-sm font-normal text-gray-600 ml-2">({tagPosts.length} posts)</span>
+          </h2>
+          <ul class="space-y-3">
+            {tagPosts.map((post) => (
+              <li class="flex items-baseline">
+                <a 
+                  href={`/posts/${post.slug}/`}
+                  class="text-gray-900 hover:text-[#007aff] transition-colors flex-grow"
+                >
+                  {post.data.title}
+                </a>
+                <span class="text-sm text-gray-600 ml-4 flex-shrink-0">
+                  {post.data.date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
+                </span>
+              </li>
+            ))}
+          </ul>
+          <div class="mt-4">
+            <a href="#" class="text-sm text-gray-500 hover:text-[#007aff] transition-colors">
+              ↑ Back to top
+            </a>
+          </div>
+        </section>
+      ))}
+    </div>
+  </div>
+</Layout>
+
+<style>
+  html {
+    scroll-behavior: smooth;
+  }
+</style>
