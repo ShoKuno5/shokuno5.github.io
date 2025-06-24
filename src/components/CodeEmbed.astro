@@ -6,10 +6,9 @@ export interface Props {
   src: string;
   title?: string;
   language?: string;
-  showLineNumbers?: boolean;
 }
 
-const { src, title, language = 'javascript', showLineNumbers = true } = Astro.props;
+const { src, title, language = 'javascript' } = Astro.props;
 
 // Read file content from public/files directory
 let content = '';

@@ -6,7 +6,14 @@ export interface Props {
 
 const { title, description = '' } = Astro.props;
 
-const nav = [
+interface NavItem {
+  label: string;
+  href?: string;
+  external?: boolean;
+  submenu?: NavItem[];
+}
+
+const nav: NavItem[] = [
   { label: 'Research', href: '/posts/2024-01-01-research/' },
   { label: 'CV', href: '/posts/2024-01-02-cv/' },
   { 
@@ -337,7 +344,7 @@ const nav = [
       </div>
     </header>
     
-    <script src="/nav-toggle.js?v=2025" defer></script>
+    <script src="/nav-toggle.js?v=2025" defer is:inline></script>
     
     <!-- Beautiful interactive styles -->
     <style>
