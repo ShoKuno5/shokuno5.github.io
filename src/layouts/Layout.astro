@@ -355,6 +355,8 @@ const nav: NavItem[] = [
       let lastScrollY = 0;
       let isHeaderVisible = false;
       let hideTimeout = null;
+      let scrollBuffer = []; // Track recent scroll positions
+      let scrollDirection = 'none';
       
       const header = document.getElementById('main-header');
       if (!header) return;
@@ -391,26 +393,47 @@ const nav: NavItem[] = [
         }
       }
       
-      // More nuanced scroll behavior
+      // Smart scroll behavior with proper direction detection
       function handleScroll() {
         const currentScrollY = window.pageYOffset;
+        const scrollDelta = currentScrollY - lastScrollY;
+        
+        // Add to scroll buffer (keep last 5 scroll events)
+        scrollBuffer.push(scrollDelta);
+        if (scrollBuffer.length > 5) {
+          scrollBuffer.shift();
+        }
+        
+        // Calculate overall scroll direction from buffer
+        const totalDelta = scrollBuffer.reduce((sum, delta) => sum + delta, 0);
+        const avgDelta = totalDelta / scrollBuffer.length;
         
         if (currentScrollY < 100) {
           // Always show near top of page
           showHeader();
+          scrollDirection = 'top';
         } else {
-          // Only hide if scrolling fast or at very bottom
-          const scrollSpeed = Math.abs(currentScrollY - lastScrollY);
           const isAtBottom = (window.innerHeight + currentScrollY) >= document.documentElement.scrollHeight - 10;
           
           if (isAtBottom) {
             // Show at bottom for easy navigation
             showHeader();
-          } else if (scrollSpeed > 30) {
-            // Fast scrolling - user is seeking, show navigation
-            showHeader();
+            scrollDirection = 'bottom';
+          } else if (Math.abs(avgDelta) > 5) {
+            // Determine direction based on consistent scrolling
+            if (avgDelta < -15 && scrollDirection !== 'up') {
+              // Deliberate scroll up (at least 15px average upward)
+              showHeader();
+              scrollDirection = 'up';
+            } else if (avgDelta > 10 && scrollDirection !== 'down') {
+              // Deliberate scroll down
+              if (isHeaderVisible) {
+                hideHeader();
+              }
+              scrollDirection = 'down';
+            }
           }
-          // Don't auto-hide on normal reading scroll
+          // Ignore small scroll movements (reading micro-adjustments)
         }
         
         lastScrollY = currentScrollY;
