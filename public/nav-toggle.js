@@ -7,92 +7,96 @@
 (function() {
   'use strict';
   
-  // Wait for DOM to be fully loaded
   function initMobileNav() {
     console.log('🍔 Initializing mobile nav...');
     
     const burger = document.getElementById('nav-toggle');
     const menu = document.getElementById('nav-menu');
     
-    if (!burger) {
-      console.error('❌ Hamburger button not found');
+    if (!burger || !menu) {
+      console.error('❌ Navigation elements not found');
       return;
     }
     
-    if (!menu) {
-      console.error('❌ Mobile menu not found');
-      return;
-    }
-    
-    console.log('✅ Found burger and menu elements');
+    console.log('✅ Found navigation elements');
     
     let isMenuOpen = false;
+    let outsideClickEnabled = false;
     
     function toggleMenu() {
-      console.log('🎯 Toggle menu called, current state:', isMenuOpen);
+      console.log('🎯 Toggle menu, current state:', isMenuOpen);
       
       isMenuOpen = !isMenuOpen;
       
-      // Update classes
       if (isMenuOpen) {
         burger.classList.add('is-active');
         menu.classList.add('is-active');
-        menu.style.display = 'block';
-        menu.style.visibility = 'visible';
-        menu.style.opacity = '1';
-        menu.style.maxHeight = '500px';
+        console.log('✅ Menu OPENED');
+        
+        // Enable outside click after a delay to prevent immediate closing
+        setTimeout(() => {
+          outsideClickEnabled = true;
+          console.log('🔓 Outside click enabled');
+        }, 300);
       } else {
         burger.classList.remove('is-active');
         menu.classList.remove('is-active');
-        menu.style.display = 'none';
-        menu.style.visibility = 'hidden';
-        menu.style.opacity = '0';
-        menu.style.maxHeight = '0';
+        outsideClickEnabled = false;
+        console.log('❌ Menu CLOSED');
       }
       
-      // Update ARIA
       burger.setAttribute('aria-expanded', isMenuOpen.toString());
-      
-      console.log('📱 Menu is now:', isMenuOpen ? 'OPEN' : 'CLOSED');
     }
     
-    // Multiple event listeners for maximum iOS compatibility
-    function addClickHandler(element, handler) {
-      // Regular click
-      element.addEventListener('click', handler, { passive: false });
-      
-      // Touch events for iOS
-      element.addEventListener('touchstart', handler, { passive: false });
-      element.addEventListener('touchend', function(e) {
+    // Detect if this is a touch device
+    const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    console.log('📱 Touch device detected:', isTouchDevice);
+    
+    if (isTouchDevice) {
+      // For touch devices, use only touchstart
+      burger.addEventListener('touchstart', function(e) {
         e.preventDefault();
-        handler(e);
+        e.stopPropagation();
+        console.log('👆 Touch detected');
+        toggleMenu();
       }, { passive: false });
-      
-      // Keyboard support
-      element.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          handler(e);
-        }
+    } else {
+      // For non-touch devices, use click
+      burger.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log('🖱️ Click detected');
+        toggleMenu();
       });
     }
     
-    function handleInteraction(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      console.log('👆 User interaction detected:', e.type);
-      toggleMenu();
-    }
+    // Close menu when clicking outside (with delay protection)
+    document.addEventListener('click', function(e) {
+      if (isMenuOpen && outsideClickEnabled && 
+          !burger.contains(e.target) && !menu.contains(e.target)) {
+        console.log('🌍 Outside click, closing menu');
+        toggleMenu();
+      }
+    });
     
-    // Add all event listeners
-    addClickHandler(burger, handleInteraction);
+    // Close menu when pressing Escape
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && isMenuOpen) {
+        console.log('⌨️ Escape pressed, closing menu');
+        toggleMenu();
+      }
+    });
     
     console.log('🎉 Mobile nav initialized successfully');
     
-    // Test function for debugging
-    window.testMobileNav = function() {
-      console.log('🧪 Manual test triggered');
-      toggleMenu();
+    // Debug function
+    window.debugMobileNav = function() {
+      console.log('📊 Debug info:');
+      console.log('- Menu open:', isMenuOpen);
+      console.log('- Outside click enabled:', outsideClickEnabled);
+      console.log('- Touch device:', isTouchDevice);
+      console.log('- Menu classes:', menu.className);
+      console.log('- Burger classes:', burger.className);
     };
   }
   

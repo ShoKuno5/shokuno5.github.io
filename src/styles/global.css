@@ -375,7 +375,7 @@ p {
   
   /* Visual feedback */
   border-radius: 8px !important;
-  transition: background-color 0.2s ease !important;
+  transition: background-color 0.15s ease !important;
 }
 
 .mobile-menu-button:hover,
@@ -385,53 +385,37 @@ p {
 
 .mobile-menu-button:active {
   background-color: rgba(0, 0, 0, 0.1) !important;
-  transform: scale(0.95) !important;
 }
 
 .hamburger-icon {
   width: 24px !important;
   height: 24px !important;
   pointer-events: none !important;
-  transition: transform 0.2s ease-in-out !important;
+  transition: transform 0.2s ease !important;
 }
 
 .mobile-menu-button.is-active .hamburger-icon {
   transform: rotate(90deg) !important;
 }
 
-/* Mobile menu styling */
+/* Mobile menu styling - simplified for iOS Safari */
 @media (max-width: 768px) {
   /* Hide mobile menu by default */
   #nav-menu {
     display: none !important;
-    max-height: 0 !important;
-    overflow: hidden !important;
-    opacity: 0 !important;
-    visibility: hidden !important;
-    transition: all 0.3s ease-in-out !important;
-    
-    /* Position below header */
     position: absolute !important;
     top: 100% !important;
     left: 0 !important;
     right: 0 !important;
-    
-    /* Styling */
+    z-index: 999 !important;
     background: white !important;
     border-bottom: 1px solid #e5e5e5 !important;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
-    
-    /* iOS Safari compatibility */
-    -webkit-transform: translateZ(0) !important;
-    transform: translateZ(0) !important;
   }
   
-  /* Show mobile menu when active */
+  /* Show mobile menu when active - no animations to avoid conflicts */
   #nav-menu.is-active {
     display: block !important;
-    max-height: 500px !important;
-    opacity: 1 !important;
-    visibility: visible !important;
   }
   
   /* Mobile menu list styling */
@@ -439,12 +423,6 @@ p {
     padding: 1rem !important;
     margin: 0 !important;
     list-style: none !important;
-    transform: translateY(-10px) !important;
-    transition: transform 0.3s ease-in-out 0.1s !important;
-  }
-  
-  #nav-menu.is-active ul {
-    transform: translateY(0) !important;
   }
   
   /* Mobile menu links */
@@ -454,7 +432,7 @@ p {
     color: #374151 !important;
     text-decoration: none !important;
     border-bottom: 1px solid #f3f4f6 !important;
-    transition: color 0.2s ease !important;
+    transition: color 0.15s ease !important;
   }
   
   #nav-menu a:hover {
