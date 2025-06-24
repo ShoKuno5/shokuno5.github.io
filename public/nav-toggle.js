@@ -72,68 +72,49 @@
       burger.setAttribute('aria-expanded', isMenuOpen.toString());
     }
     
-    // Track last interaction to prevent conflicts
-    let lastInteractionTime = 0;
-    let lastInteractionType = '';
-    
-    function handleBurgerInteraction(e, eventType) {
-      const now = Date.now();
-      
-      // Prevent duplicate events within 500ms
-      if (now - lastInteractionTime < 500 && lastInteractionType !== eventType) {
-        console.log('🚫 Ignoring duplicate event:', eventType);
-        return;
-      }
-      
+    // Simplified event handling for iPhone
+    function handleBurgerTap(e) {
       e.preventDefault();
       e.stopPropagation();
       
-      lastInteractionTime = now;
-      lastInteractionType = eventType;
+      console.log('🎯 DEBUG: Button tapped!');
+      alert('DEBUG: Button was tapped - calling toggleMenu()');
       
-      console.log('👆 User interaction:', eventType);
       toggleMenu();
     }
     
-    // Add both touch and click handlers with conflict prevention
-    burger.addEventListener('touchstart', function(e) {
-      handleBurgerInteraction(e, 'touch');
+    // Add event listeners - try multiple approaches
+    console.log('🔧 Adding event listeners...');
+    
+    // Method 1: Touchstart (primary for iOS)
+    burger.addEventListener('touchstart', handleBurgerTap, { passive: false });
+    
+    // Method 2: Click (fallback)
+    burger.addEventListener('click', handleBurgerTap);
+    
+    // Method 3: Touchend (alternative for iOS)
+    burger.addEventListener('touchend', function(e) {
+      e.preventDefault();
+      console.log('🎯 DEBUG: Touchend detected');
+      // Don't call toggleMenu here to avoid double-firing
     }, { passive: false });
     
-    burger.addEventListener('click', function(e) {
-      handleBurgerInteraction(e, 'click');
-    });
-    
-    // Close menu when clicking outside (with enhanced protection)
-    document.addEventListener('click', function(e) {
-      const now = Date.now();
+    // Test the button manually
+    console.log('🧪 Testing button manually...');
+    setTimeout(() => {
+      console.log('🧪 Manual test - calling toggleMenu directly');
+      toggleMenu();
       
-      // Don't close if we just interacted with the burger
-      if (now - lastInteractionTime < 100) {
-        console.log('🛡️ Recent burger interaction, ignoring outside click');
-        return;
-      }
-      
-      if (isMenuOpen && outsideClickEnabled && 
-          !burger.contains(e.target) && !menu.contains(e.target)) {
-        console.log('🌍 Outside click, closing menu');
+      setTimeout(() => {
+        console.log('🧪 Manual test - closing menu');
         toggleMenu();
-      }
-    });
+      }, 2000);
+    }, 3000);
     
-    // Also handle touch events for outside closing on mobile
-    document.addEventListener('touchstart', function(e) {
-      const now = Date.now();
-      
-      // Don't close if we just interacted with the burger
-      if (now - lastInteractionTime < 100) {
-        console.log('🛡️ Recent burger interaction, ignoring outside touch');
-        return;
-      }
-      
-      if (isMenuOpen && outsideClickEnabled && 
-          !burger.contains(e.target) && !menu.contains(e.target)) {
-        console.log('🌍 Outside touch, closing menu');
+    // Simplified outside click handling
+    document.addEventListener('click', function(e) {
+      if (isMenuOpen && !burger.contains(e.target) && !menu.contains(e.target)) {
+        console.log('🌍 DEBUG: Outside click, closing menu');
         toggleMenu();
       }
     });
@@ -141,21 +122,20 @@
     // Close menu when pressing Escape
     document.addEventListener('keydown', function(e) {
       if (e.key === 'Escape' && isMenuOpen) {
-        console.log('⌨️ Escape pressed, closing menu');
+        console.log('⌨️ DEBUG: Escape pressed, closing menu');
         toggleMenu();
       }
     });
     
-    console.log('🎉 Mobile nav initialized successfully');
+    console.log('🎉 DEBUG: Mobile nav initialized successfully');
     
     // Debug function
     window.debugMobileNav = function() {
       console.log('📊 Debug info:');
       console.log('- Menu open:', isMenuOpen);
       console.log('- Outside click enabled:', outsideClickEnabled);
-      console.log('- Last interaction:', lastInteractionType, 'at', new Date(lastInteractionTime).toLocaleTimeString());
-      console.log('- Menu classes:', menu.className);
-      console.log('- Burger classes:', burger.className);
+      console.log('- Menu display:', menu.style.display);
+      console.log('- Button background:', burger.style.backgroundColor);
     };
   }
   
