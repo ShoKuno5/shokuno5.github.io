@@ -10,44 +10,65 @@ export interface Props {
   showMeta?: boolean;
   showComments?: boolean;
   content?: string;
+  mode?: 'homepage' | 'full';
+  slug?: string;
 }
 
-const { title, date, tags, description, showMeta = true, showComments = true, content } = Astro.props;
+const { title, date, tags, description, showMeta = true, showComments = true, content, mode = 'full', slug } = Astro.props;
 
 // Check if this is a hidden/static page based on title
 const isStaticPage = title === 'Research' || title === 'CV';
-const actualShowMeta = isStaticPage ? false : showMeta;
-const actualShowComments = isStaticPage ? false : showComments;
+
+// Adaptive display based on mode
+const isHomepageMode = mode === 'homepage';
+const actualShowMeta = isStaticPage ? false : (isHomepageMode ? showMeta : showMeta);
+const actualShowComments = isStaticPage ? false : (isHomepageMode ? false : showComments);
 
 // Calculate reading time if content is provided
 const readingTimeData = content ? calculateReadingTime(content) : null;
 ---
 
-<Layout title={title} description={description}>
-  <!-- Sophisticated article layout with enhanced typography -->
-  <article style="
-    max-width: 45rem;
-    margin: 0 auto;
-    padding: 3rem 1.5rem;
-    min-height: 100vh;
-  ">
+{isHomepageMode ? (
+  <!-- Homepage mode: just the article -->
+  <article style="max-width: 45rem; margin: 0 auto; padding: 3rem 1.5rem;">
     <!-- Elegant header with improved typography -->
     <header style="
       margin-bottom: 3rem;
       padding-bottom: 2rem;
       border-bottom: 1px solid rgba(0, 0, 0, 0.06);
     ">
-      <h1 style="
-        font-size: 2.5rem;
-        font-weight: 800;
-        line-height: 1.1;
-        letter-spacing: -0.025em;
-        margin-bottom: 1.5rem;
-        background: linear-gradient(135deg, #1f2937, #4b5563, #0066cc);
-        -webkit-background-clip: text;
-        background-clip: text;
-        color: transparent;
-      ">{title}</h1>
+      {isHomepageMode && slug ? (
+        <h1 style="
+          font-size: 2.5rem;
+          font-weight: 800;
+          line-height: 1.1;
+          letter-spacing: -0.025em;
+          margin-bottom: 1.5rem;
+        ">
+          <a href={`/posts/${slug}/`} style="
+            background: linear-gradient(135deg, #1f2937, #4b5563, #0066cc);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-decoration: none;
+            transition: all 0.2s ease;
+          " class="gradient-title-link">
+            {title}
+          </a>
+        </h1>
+      ) : (
+        <h1 style="
+          font-size: 2.5rem;
+          font-weight: 800;
+          line-height: 1.1;
+          letter-spacing: -0.025em;
+          margin-bottom: 1.5rem;
+          background: linear-gradient(135deg, #1f2937, #4b5563, #0066cc);
+          -webkit-background-clip: text;
+          background-clip: text;
+          color: transparent;
+        ">{title}</h1>
+      )}
       
       {actualShowMeta && (
         <div style="
@@ -148,10 +169,163 @@ const readingTimeData = content ? calculateReadingTime(content) : null;
         </script>
       </div>
     )}
+    
+    {isHomepageMode && slug && (
+      <div style="
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid rgba(0, 0, 0, 0.04);
+      ">
+        <a 
+          href={`/posts/${slug}/`}
+          style="
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #0066cc;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: color 0.2s ease;
+          "
+          onmouseover="this.style.color='#0052a3'"
+          onmouseout="this.style.color='#0066cc'"
+        >
+          Join the discussion
+          <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-3.582 8-8 8a8.959 8.959 0 01-4.906-1.465L3 21l2.535-5.094A8.963 8.963 0 013 12c0-4.418 3.582-8 8-8s8 3.582 8 8z" />
+          </svg>
+        </a>
+      </div>
+    )}
   </article>
-</Layout>
+) : (
+  <!-- Individual post mode: full layout -->
+  <Layout title={title} description={description}>
+    <article style="max-width: 45rem; margin: 0 auto; padding: 3rem 1.5rem; min-height: 100vh;">
+      <!-- Elegant header with improved typography -->
+      <header style="
+        margin-bottom: 3rem;
+        padding-bottom: 2rem;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+      ">
+        <h1 style="
+          font-size: 2.5rem;
+          font-weight: 800;
+          line-height: 1.1;
+          letter-spacing: -0.025em;
+          margin-bottom: 1.5rem;
+          background: linear-gradient(135deg, #1f2937, #4b5563, #0066cc);
+          -webkit-background-clip: text;
+          background-clip: text;
+          color: transparent;
+        ">{title}</h1>
+        
+        {actualShowMeta && (
+          <div style="
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            color: #6b7280;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+            flex-wrap: wrap;
+          ">
+            <time style="font-weight: 500;">
+              {date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+            </time>
+            {readingTimeData && (
+              <div style="
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+              ">
+                <svg style="width: 1rem; height: 1rem; opacity: 0.7;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span style="font-weight: 500;">{readingTimeData.readingTimeText}</span>
+              </div>
+            )}
+            {readingTimeData && (
+              <div style="
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                opacity: 0.8;
+              ">
+                <svg style="width: 1rem; height: 1rem; opacity: 0.7;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <span style="font-size: 0.85rem;">{readingTimeData.wordCount} words</span>
+              </div>
+            )}
+          </div>
+        )}
+        
+        {tags && tags.length > 0 && (
+          <div style="display: flex; flex-wrap: wrap; gap: 0.75rem;">
+            {tags.map((tag) => (
+              <a 
+                href={`/posts/tags/#tag-${tag.toLowerCase().replace(/\s+/g, '-')}`}
+                style="
+                  display: inline-flex;
+                  align-items: center;
+                  padding: 0.5rem 1rem;
+                  font-size: 0.8rem;
+                  font-weight: 500;
+                  background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+                  color: #475569;
+                  border-radius: 2rem;
+                  text-decoration: none;
+                  transition: all 0.2s ease;
+                  border: 1px solid rgba(0, 0, 0, 0.05);
+                "
+                class="tag-link"
+              >
+                {tag}
+              </a>
+            ))}
+          </div>
+        )}
+      </header>
+      
+      <!-- Enhanced markdown content with sophisticated typography -->
+      <div class="sophisticated-markdown">
+        <slot />
+      </div>
+      
+      {actualShowComments && (
+        <div style="
+          margin-top: 4rem;
+          padding-top: 2rem;
+          border-top: 1px solid rgba(0, 0, 0, 0.06);
+        ">
+          <script
+            src="https://giscus.app/client.js"
+            data-repo="ShoKuno5/shokuno5.github.io"
+            data-repo-id="R_kgDOO_0Lcg"
+            data-category="Announcements"
+            data-category-id="DIC_kwDOO_0Lcs4Cr6Ty"
+            data-mapping="pathname"
+            data-strict="0"
+            data-reactions-enabled="1"
+            data-emit-metadata="0"
+            data-input-position="bottom"
+            data-theme="preferred_color_scheme"
+            data-lang="en"
+            data-loading="lazy"
+            crossorigin="anonymous"
+            async
+            is:inline>
+          </script>
+        </div>
+      )}
+    </article>
+  </Layout>
+)}
 
-<!-- Silent Reading Progress Script -->
+{!isHomepageMode && (
+<!-- Silent Reading Progress Script - Only for individual posts -->
 <script is:inline>
 (function() {
   'use strict';
@@ -169,8 +343,6 @@ const readingTimeData = content ? calculateReadingTime(content) : null;
     if (documentHeight > 0) {
       overallProgress = Math.min((scrollTop / documentHeight) * 100, 100);
     }
-    
-    console.log(`Scroll: ${scrollTop}px / ${documentHeight}px = ${Math.round(overallProgress)}% overall progress`);
     
     // Find all h2 elements in the article
     const headings = article.querySelectorAll('.sophisticated-markdown h2');
@@ -224,9 +396,8 @@ const readingTimeData = content ? calculateReadingTime(content) : null;
           progressWidth = `${Math.min(maxProgressInSection, 100)}%`;
         }
         heading.style.setProperty('--progress-width', progressWidth);
-        console.log(`Past section ${index + 1}: showing ${Math.round(maxProgressInSection)}% (actual reading progress)`);
       } else if (index === currentSectionIndex) {
-        // Current section - show live overall article progress
+        // Current section - show live overall progress
         let progressWidth;
         if (overallProgress <= 3) {
           progressWidth = '3rem';
@@ -234,7 +405,6 @@ const readingTimeData = content ? calculateReadingTime(content) : null;
           progressWidth = `${Math.min(overallProgress, 100)}%`;
         }
         heading.style.setProperty('--progress-width', progressWidth);
-        console.log(`Current section ${index + 1}: showing ${Math.round(overallProgress)}% (live progress)`);
       } else {
         // Future sections - check if they're visible on screen
         const headingRect = heading.getBoundingClientRect();
@@ -249,7 +419,6 @@ const readingTimeData = content ? calculateReadingTime(content) : null;
             progressWidth = `${Math.min(overallProgress, 100)}%`;
           }
           heading.style.setProperty('--progress-width', progressWidth);
-          console.log(`Visible future section ${index + 1}: showing ${Math.round(overallProgress)}% (current progress)`);
         } else {
           // Section is not visible - keep at default
           heading.style.setProperty('--progress-width', '3rem');
@@ -299,6 +468,7 @@ const readingTimeData = content ? calculateReadingTime(content) : null;
   }
 })();
 </script>
+)}
 
 <!-- Sophisticated Markdown Typography -->
 <style is:global>
