@@ -165,13 +165,7 @@ const readingTimeData = content ? calculateReadingTime(content) : null;
     
     const windowHeight = window.innerHeight;
     const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-    const documentHeight = document.documentElement.scrollHeight - windowHeight;
-    
-    // Calculate overall reading progress through entire blog post (0-100%)
-    let overallProgress = 0;
-    if (documentHeight > 0) {
-      overallProgress = Math.min((scrollTop / documentHeight) * 100, 100);
-    }
+    const viewportMiddle = scrollTop + windowHeight / 2;
     
     // Find all h2 elements in the article
     const headings = article.querySelectorAll('.sophisticated-markdown h2');
@@ -180,17 +174,16 @@ const readingTimeData = content ? calculateReadingTime(content) : null;
       return;
     }
     
-    console.log('Progress:', Math.round(overallProgress), '% | Headings found:', headings.length);
-    
-    const viewportMiddle = scrollTop + windowHeight / 2;
+    console.log('Headings found:', headings.length);
     
     // Reset all headings to default width first
     headings.forEach(heading => {
       heading.style.setProperty('--progress-width', '3rem');
     });
     
-    // Find which heading is currently being read
-    let currentHeadingIndex = -1;
+    // Find which section we're currently reading
+    let currentSectionIndex = -1;
+    let progressInCurrentSection = 0;
     
     for (let i = 0; i < headings.length; i++) {
       const heading = headings[i];
@@ -200,30 +193,56 @@ const readingTimeData = content ? calculateReadingTime(content) : null;
       
       // Check if we're currently in this section
       if (viewportMiddle >= headingTop && viewportMiddle < nextHeadingTop) {
-        currentHeadingIndex = i;
+        currentSectionIndex = i;
         
-        // Apply overall reading progress to current section
-        let progressWidth;
-        if (overallProgress <= 5) {
-          // First 5% of blog - keep at 3rem
-          progressWidth = '3rem';
-        } else {
-          // Show overall blog reading progress in current section
-          progressWidth = `${Math.min(overallProgress, 100)}%`;
-        }
+        // Calculate how far through this section we are (0-1)
+        const sectionHeight = nextHeadingTop - headingTop;
+        const positionInSection = viewportMiddle - headingTop;
+        progressInCurrentSection = Math.min(Math.max(positionInSection / sectionHeight, 0), 1);
         
-        console.log('Updating heading', i, 'with width:', progressWidth);
-        heading.style.setProperty('--progress-width', progressWidth);
         break;
       }
     }
     
-    // Show completed sections at 100% (sections we've fully passed)
-    for (let i = 0; i < headings.length; i++) {
-      if (i < currentHeadingIndex) {
-        const heading = headings[i];
-        heading.style.setProperty('--progress-width', '100%');
+    // Calculate content-based progress
+    let contentProgress = 0;
+    if (currentSectionIndex >= 0 && headings.length > 0) {
+      // Each section represents equal portion of the content
+      const progressPerSection = 100 / headings.length;
+      
+      // Base progress for completed sections
+      const completedSectionsProgress = currentSectionIndex * progressPerSection;
+      
+      // Progress within current section
+      const currentSectionProgress = progressInCurrentSection * progressPerSection;
+      
+      // Total content progress
+      contentProgress = completedSectionsProgress + currentSectionProgress;
+      
+      console.log(`Section ${currentSectionIndex + 1}/${headings.length} | Section progress: ${Math.round(progressInCurrentSection * 100)}% | Total: ${Math.round(contentProgress)}%`);
+    }
+    
+    // Apply progress to current section
+    if (currentSectionIndex >= 0) {
+      const currentHeading = headings[currentSectionIndex];
+      
+      let progressWidth;
+      if (contentProgress <= 5) {
+        // First 5% of content - keep at 3rem
+        progressWidth = '3rem';
+      } else {
+        // Show content-based progress
+        progressWidth = `${Math.min(contentProgress, 100)}%`;
       }
+      
+      console.log('Updating heading', currentSectionIndex, 'with width:', progressWidth);
+      currentHeading.style.setProperty('--progress-width', progressWidth);
+    }
+    
+    // Show completed sections at 100%
+    for (let i = 0; i < currentSectionIndex; i++) {
+      const heading = headings[i];
+      heading.style.setProperty('--progress-width', '100%');
     }
   }
   
