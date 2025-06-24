@@ -164,11 +164,13 @@ const readingTimeData = content ? calculateReadingTime(content) : null;
     const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
     const documentHeight = document.documentElement.scrollHeight - windowHeight;
     
-    // Calculate overall scroll progress (0-100%)
+    // Calculate overall scroll progress through the entire article (0-100%)
     let overallProgress = 0;
     if (documentHeight > 0) {
       overallProgress = Math.min((scrollTop / documentHeight) * 100, 100);
     }
+    
+    console.log(`Scroll: ${scrollTop}px / ${documentHeight}px = ${Math.round(overallProgress)}% overall progress`);
     
     // Find all h2 elements in the article
     const headings = article.querySelectorAll('.sophisticated-markdown h2');
@@ -192,7 +194,7 @@ const readingTimeData = content ? calculateReadingTime(content) : null;
       }
     }
     
-    // Update all headings based on their relationship to current position
+    // Update all headings - but only current section shows the overall article progress
     headings.forEach((heading, index) => {
       const headingTop = heading.offsetTop;
       
@@ -200,25 +202,19 @@ const readingTimeData = content ? calculateReadingTime(content) : null;
         // Completed sections - show full progress
         heading.style.setProperty('--progress-width', '100%');
       } else if (index === currentSectionIndex) {
-        // Current section - show overall reading progress
+        // Current section - show OVERALL article progress (not section progress)
         let progressWidth;
         if (overallProgress <= 3) {
           progressWidth = '3rem';
         } else {
+          // This is the key fix - show overall article progress
           progressWidth = `${Math.min(overallProgress, 100)}%`;
         }
         heading.style.setProperty('--progress-width', progressWidth);
+        console.log(`Article progress: ${Math.round(overallProgress)}% shown in section ${index + 1}`);
       } else {
-        // Future sections - only show progress if they're close to being reached
-        const distanceToHeading = headingTop - viewportMiddle;
-        if (distanceToHeading < windowHeight * 0.3) {
-          // Section is coming into view soon - start showing minimal progress
-          const proximityProgress = Math.max(3, overallProgress * 0.1); // Very minimal
-          heading.style.setProperty('--progress-width', `${proximityProgress}%`);
-        } else {
-          // Section is far away - keep at default
-          heading.style.setProperty('--progress-width', '3rem');
-        }
+        // Future sections - stay at default until reached
+        heading.style.setProperty('--progress-width', '3rem');
       }
     });
   }
