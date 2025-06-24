@@ -382,6 +382,20 @@ p {
   background-color: transparent !important;
 }
 
+/* Force hamburger button to show on mobile devices */
+@media (max-width: 1023px) {
+  .mobile-menu-button {
+    display: flex !important;
+  }
+}
+
+/* Hide hamburger button on desktop */
+@media (min-width: 1024px) {
+  .mobile-menu-button {
+    display: none !important;
+  }
+}
+
 .mobile-menu-button:hover,
 .mobile-menu-button:focus {
   background-color: rgba(0, 0, 0, 0.05) !important;
@@ -425,7 +439,7 @@ p {
 }
 
 /* Mobile menu styling - simplified for iOS Safari */
-@media (max-width: 768px) {
+@media (max-width: 1023px) {
   /* Hide mobile menu by default */
   #nav-menu {
     display: none !important;
@@ -471,7 +485,7 @@ p {
 }
 
 /* Keep menu visible on desktop */
-@media (min-width: 769px) {
+@media (min-width: 1024px) {
   #nav-menu {
     display: block !important;
     visibility: visible !important;
