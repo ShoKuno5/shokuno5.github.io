@@ -1,5 +1,6 @@
 /**
- * Elegant Mobile Navigation Toggle
+ * Elegant Mobile Navigation Toggle v2025
+ * Clean production version - no debug messages
  * Modern, smooth mobile navigation with beautiful animations
  * Optimized for iOS Safari and all mobile browsers
  */
@@ -12,7 +13,6 @@
     const menu = document.getElementById('nav-menu');
     
     if (!burger || !menu) {
-      console.warn('Navigation elements not found');
       return;
     }
     
