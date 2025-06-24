@@ -1,46 +1,106 @@
 /**
- * Mobile Navigation Toggle
+ * Mobile Navigation Toggle - iOS Safari Compatible
  * Handles hamburger menu interaction for mobile screens ≤ 768px
  * Loaded via defer script in Layout.astro footer
  */
 
-document.addEventListener('DOMContentLoaded', function() {
-  console.log('Nav toggle script loaded'); // Debug log
+(function() {
+  'use strict';
   
-  const burger = document.getElementById('nav-toggle');
-  const menu = document.getElementById('nav-menu');
-  
-  console.log('Burger:', burger, 'Menu:', menu); // Debug log
-  
-  if (!burger || !menu) {
-    console.error('Nav elements not found');
-    return;
+  // Wait for DOM to be fully loaded
+  function initMobileNav() {
+    console.log('🍔 Initializing mobile nav...');
+    
+    const burger = document.getElementById('nav-toggle');
+    const menu = document.getElementById('nav-menu');
+    
+    if (!burger) {
+      console.error('❌ Hamburger button not found');
+      return;
+    }
+    
+    if (!menu) {
+      console.error('❌ Mobile menu not found');
+      return;
+    }
+    
+    console.log('✅ Found burger and menu elements');
+    
+    let isMenuOpen = false;
+    
+    function toggleMenu() {
+      console.log('🎯 Toggle menu called, current state:', isMenuOpen);
+      
+      isMenuOpen = !isMenuOpen;
+      
+      // Update classes
+      if (isMenuOpen) {
+        burger.classList.add('is-active');
+        menu.classList.add('is-active');
+        menu.style.display = 'block';
+        menu.style.visibility = 'visible';
+        menu.style.opacity = '1';
+        menu.style.maxHeight = '500px';
+      } else {
+        burger.classList.remove('is-active');
+        menu.classList.remove('is-active');
+        menu.style.display = 'none';
+        menu.style.visibility = 'hidden';
+        menu.style.opacity = '0';
+        menu.style.maxHeight = '0';
+      }
+      
+      // Update ARIA
+      burger.setAttribute('aria-expanded', isMenuOpen.toString());
+      
+      console.log('📱 Menu is now:', isMenuOpen ? 'OPEN' : 'CLOSED');
+    }
+    
+    // Multiple event listeners for maximum iOS compatibility
+    function addClickHandler(element, handler) {
+      // Regular click
+      element.addEventListener('click', handler, { passive: false });
+      
+      // Touch events for iOS
+      element.addEventListener('touchstart', handler, { passive: false });
+      element.addEventListener('touchend', function(e) {
+        e.preventDefault();
+        handler(e);
+      }, { passive: false });
+      
+      // Keyboard support
+      element.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          handler(e);
+        }
+      });
+    }
+    
+    function handleInteraction(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      console.log('👆 User interaction detected:', e.type);
+      toggleMenu();
+    }
+    
+    // Add all event listeners
+    addClickHandler(burger, handleInteraction);
+    
+    console.log('🎉 Mobile nav initialized successfully');
+    
+    // Test function for debugging
+    window.testMobileNav = function() {
+      console.log('🧪 Manual test triggered');
+      toggleMenu();
+    };
   }
   
-  function toggleMenu(e) {
-    e.preventDefault(); // Prevent any default behavior
-    e.stopPropagation(); // Stop event bubbling
-    
-    console.log('Menu toggle clicked'); // Debug log
-    
-    const isActive = menu.classList.contains('is-active');
-    
-    // Toggle active state classes
-    burger.classList.toggle('is-active', !isActive);
-    menu.classList.toggle('is-active', !isActive);
-    
-    // Update aria-expanded for accessibility
-    burger.setAttribute('aria-expanded', (!isActive).toString());
-    
-    console.log('Menu is now:', !isActive ? 'open' : 'closed'); // Debug log
+  // Initialize when DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initMobileNav);
+  } else {
+    initMobileNav();
   }
   
-  // Add multiple event listeners for iOS compatibility
-  burger.addEventListener('click', toggleMenu);
-  burger.addEventListener('touchstart', toggleMenu, { passive: false });
-  
-  // Force iOS to recognize the button as clickable
-  burger.style.cursor = 'pointer';
-  burger.style.webkitTouchCallout = 'none';
-  burger.style.webkitUserSelect = 'none';
-});
+})();

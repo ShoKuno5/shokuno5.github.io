@@ -352,27 +352,81 @@ p {
   scrollbar-width: none;
 }
 
-/* Mobile Navigation Toggle */
-/* iOS Safari specific button fixes */
-#nav-toggle {
+/* Mobile Navigation Toggle - iOS Safari Compatible */
+
+/* Mobile menu button styling */
+.mobile-menu-button {
+  width: 44px !important;
+  height: 44px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  
+  /* iOS Safari specific touch handling */
   -webkit-touch-callout: none !important;
   -webkit-user-select: none !important;
+  -webkit-tap-highlight-color: transparent !important;
   touch-action: manipulation !important;
-  cursor: pointer !important;
+  
+  /* Ensure it's clickable */
+  position: relative !important;
+  z-index: 1000 !important;
+  
+  /* Visual feedback */
+  border-radius: 8px !important;
+  transition: background-color 0.2s ease !important;
 }
 
+.mobile-menu-button:hover,
+.mobile-menu-button:focus {
+  background-color: rgba(0, 0, 0, 0.05) !important;
+}
+
+.mobile-menu-button:active {
+  background-color: rgba(0, 0, 0, 0.1) !important;
+  transform: scale(0.95) !important;
+}
+
+.hamburger-icon {
+  width: 24px !important;
+  height: 24px !important;
+  pointer-events: none !important;
+  transition: transform 0.2s ease-in-out !important;
+}
+
+.mobile-menu-button.is-active .hamburger-icon {
+  transform: rotate(90deg) !important;
+}
+
+/* Mobile menu styling */
 @media (max-width: 768px) {
-  /* Hide mobile menu by default with higher specificity */
+  /* Hide mobile menu by default */
   #nav-menu {
     display: none !important;
     max-height: 0 !important;
     overflow: hidden !important;
-    transition: max-height 0.3s ease-in-out, opacity 0.2s ease-in-out;
     opacity: 0 !important;
     visibility: hidden !important;
+    transition: all 0.3s ease-in-out !important;
+    
+    /* Position below header */
+    position: absolute !important;
+    top: 100% !important;
+    left: 0 !important;
+    right: 0 !important;
+    
+    /* Styling */
+    background: white !important;
+    border-bottom: 1px solid #e5e5e5 !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+    
+    /* iOS Safari compatibility */
+    -webkit-transform: translateZ(0) !important;
+    transform: translateZ(0) !important;
   }
   
-  /* Show mobile menu when active with highest specificity */
+  /* Show mobile menu when active */
   #nav-menu.is-active {
     display: block !important;
     max-height: 500px !important;
@@ -380,30 +434,35 @@ p {
     visibility: visible !important;
   }
   
-  /* Hamburger icon animation */
-  #nav-toggle {
-    transition: transform 0.2s ease-in-out;
-    -webkit-tap-highlight-color: transparent !important;
-  }
-  
-  #nav-toggle.is-active {
-    transform: rotate(90deg);
-  }
-  
-  /* Smooth slide-down animation for menu items */
+  /* Mobile menu list styling */
   #nav-menu ul {
-    transform: translateY(-10px);
-    transition: transform 0.3s ease-in-out 0.1s;
+    padding: 1rem !important;
+    margin: 0 !important;
+    list-style: none !important;
+    transform: translateY(-10px) !important;
+    transition: transform 0.3s ease-in-out 0.1s !important;
   }
   
   #nav-menu.is-active ul {
-    transform: translateY(0);
+    transform: translateY(0) !important;
   }
   
-  /* iOS Safari specific fixes */
-  #nav-menu.is-active {
-    -webkit-transform: translateZ(0) !important;
-    transform: translateZ(0) !important;
+  /* Mobile menu links */
+  #nav-menu a {
+    display: block !important;
+    padding: 0.75rem 0 !important;
+    color: #374151 !important;
+    text-decoration: none !important;
+    border-bottom: 1px solid #f3f4f6 !important;
+    transition: color 0.2s ease !important;
+  }
+  
+  #nav-menu a:hover {
+    color: #0066cc !important;
+  }
+  
+  #nav-menu a:last-child {
+    border-bottom: none !important;
   }
 }
 
@@ -414,5 +473,13 @@ p {
     visibility: visible !important;
     opacity: 1 !important;
     max-height: none !important;
+    position: static !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+  
+  .mobile-menu-button {
+    display: none !important;
   }
 }
