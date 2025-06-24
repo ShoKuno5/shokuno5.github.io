@@ -17,6 +17,15 @@ const nav = [
     ]
   },
   { label: 'Naive Hope', href: '/naive-hope/' },
+  { 
+    label: 'Contact', 
+    submenu: [
+      { label: 'Email', href: 'mailto:your@email.com', external: true },
+      { label: 'LinkedIn', href: 'https://linkedin.com/in/yourprofile', external: true },
+      { label: 'GitHub', href: 'https://github.com/yourusername', external: true },
+      { label: 'Twitter', href: 'https://twitter.com/yourhandle', external: true },
+    ]
+  },
 ];
 ---
 
@@ -131,7 +140,10 @@ const nav = [
                       " class="dropdown-menu">
                         {item.submenu.map((subitem) => (
                           <li>
-                            <a href={subitem.href} style="
+                            <a href={subitem.href} 
+                               target={subitem.external ? '_blank' : undefined}
+                               rel={subitem.external ? 'noopener noreferrer' : undefined}
+                               style="
                               display: block;
                               color: #374151;
                               text-decoration: none;
@@ -139,8 +151,14 @@ const nav = [
                               border-radius: 8px;
                               font-size: 0.9rem;
                               transition: all 0.2s ease;
+                              position: relative;
                             " class="dropdown-item">
-                              {subitem.label}
+                              <span>{subitem.label}</span>
+                              {subitem.external && (
+                                <svg style="width: 0.8rem; height: 0.8rem; margin-left: 0.5rem; opacity: 0.6;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                </svg>
+                              )}
                             </a>
                           </li>
                         ))}
@@ -273,8 +291,12 @@ const nav = [
                     <ul style="margin-left: 1rem; margin-top: 0.5rem; margin-bottom: 1rem;">
                       {item.submenu.map((subitem) => (
                         <li>
-                          <a href={subitem.href} style="
-                            display: block; 
+                          <a href={subitem.href} 
+                             target={subitem.external ? '_blank' : undefined}
+                             rel={subitem.external ? 'noopener noreferrer' : undefined}
+                             style="
+                            display: flex; 
+                            align-items: center;
                             color: #6B7280; 
                             text-decoration: none; 
                             padding: 0.75rem 0;
@@ -283,7 +305,12 @@ const nav = [
                             border-left: 2px solid transparent;
                             padding-left: 1rem;
                           " class="mobile-sub-link">
-                            {subitem.label}
+                            <span>{subitem.label}</span>
+                            {subitem.external && (
+                              <svg style="width: 0.8rem; height: 0.8rem; margin-left: 0.5rem; opacity: 0.6;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                              </svg>
+                            )}
                           </a>
                         </li>
                       ))}

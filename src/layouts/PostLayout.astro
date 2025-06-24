@@ -1,5 +1,6 @@
 ---
 import Layout from './Layout.astro';
+import { calculateReadingTime } from '../utils/readingTime';
 
 export interface Props {
   title: string;
@@ -8,14 +9,18 @@ export interface Props {
   description?: string;
   showMeta?: boolean;
   showComments?: boolean;
+  content?: string;
 }
 
-const { title, date, tags, description, showMeta = true, showComments = true } = Astro.props;
+const { title, date, tags, description, showMeta = true, showComments = true, content } = Astro.props;
 
 // Check if this is a hidden/static page based on title
 const isStaticPage = title === 'Research' || title === 'CV';
 const actualShowMeta = isStaticPage ? false : showMeta;
 const actualShowComments = isStaticPage ? false : showComments;
+
+// Calculate reading time if content is provided
+const readingTimeData = content ? calculateReadingTime(content) : null;
 ---
 
 <Layout title={title} description={description}>
@@ -52,10 +57,36 @@ const actualShowComments = isStaticPage ? false : showComments;
           color: #6b7280;
           margin-bottom: 1.5rem;
           font-size: 0.9rem;
+          flex-wrap: wrap;
         ">
           <time style="font-weight: 500;">
             {date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
           </time>
+          {readingTimeData && (
+            <div style="
+              display: flex;
+              align-items: center;
+              gap: 0.5rem;
+            ">
+              <svg style="width: 1rem; height: 1rem; opacity: 0.7;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span style="font-weight: 500;">{readingTimeData.readingTimeText}</span>
+            </div>
+          )}
+          {readingTimeData && (
+            <div style="
+              display: flex;
+              align-items: center;
+              gap: 0.5rem;
+              opacity: 0.8;
+            ">
+              <svg style="width: 1rem; height: 1rem; opacity: 0.7;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              <span style="font-size: 0.85rem;">{readingTimeData.wordCount} words</span>
+            </div>
+          )}
         </div>
       )}
       
@@ -121,7 +152,7 @@ const actualShowComments = isStaticPage ? false : showComments;
 </Layout>
 
 <!-- Sophisticated Markdown Typography -->
-<style>
+<style is:global>
   /* Tag hover effects */
   .tag-link:hover {
     background: linear-gradient(135deg, #e2e8f0, #cbd5e1) !important;
