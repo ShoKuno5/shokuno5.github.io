@@ -158,32 +158,26 @@ const readingTimeData = content ? calculateReadingTime(content) : null;
   
   function updateSilentProgress() {
     const article = document.querySelector('article');
-    if (!article) {
-      console.log('No article found');
-      return;
-    }
+    if (!article) return;
     
     const windowHeight = window.innerHeight;
     const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-    const viewportMiddle = scrollTop + windowHeight / 2;
+    const documentHeight = document.documentElement.scrollHeight - windowHeight;
+    
+    // Calculate overall scroll progress (0-100%)
+    let overallProgress = 0;
+    if (documentHeight > 0) {
+      overallProgress = Math.min((scrollTop / documentHeight) * 100, 100);
+    }
     
     // Find all h2 elements in the article
     const headings = article.querySelectorAll('.sophisticated-markdown h2');
-    if (headings.length === 0) {
-      console.log('No h2 headings found in .sophisticated-markdown');
-      return;
-    }
+    if (headings.length === 0) return;
     
-    console.log('Headings found:', headings.length);
-    
-    // Reset all headings to default width first
-    headings.forEach(heading => {
-      heading.style.setProperty('--progress-width', '3rem');
-    });
+    const viewportMiddle = scrollTop + windowHeight / 2;
     
     // Find which section we're currently reading
     let currentSectionIndex = -1;
-    let progressInCurrentSection = 0;
     
     for (let i = 0; i < headings.length; i++) {
       const heading = headings[i];
@@ -194,88 +188,39 @@ const readingTimeData = content ? calculateReadingTime(content) : null;
       // Check if we're currently in this section
       if (viewportMiddle >= headingTop && viewportMiddle < nextHeadingTop) {
         currentSectionIndex = i;
-        
-        // Calculate how far through this section we are (0-1)
-        const sectionHeight = nextHeadingTop - headingTop;
-        const positionInSection = viewportMiddle - headingTop;
-        progressInCurrentSection = Math.min(Math.max(positionInSection / sectionHeight, 0), 1);
-        
         break;
       }
     }
     
-    // Calculate word-count based reading progress
-    let contentProgress = 0;
-    if (currentSectionIndex >= 0) {
-      // Get all text content in the article
-      const articleText = article.textContent || '';
-      const totalWords = articleText.trim().split(/\s+/).filter(word => word.length > 0).length;
+    // Update all headings based on their relationship to current position
+    headings.forEach((heading, index) => {
+      const headingTop = heading.offsetTop;
       
-      // Calculate how many words we've read so far
-      let wordsRead = 0;
-      
-      // Add words from all completed sections
-      for (let i = 0; i <= currentSectionIndex; i++) {
-        const heading = headings[i];
-        const nextHeading = headings[i + 1];
-        
-        // Get section content (from heading to next heading or end of article)
-        let sectionContent = '';
-        if (nextHeading) {
-          // Find all content between this heading and next heading
-          let currentElement = heading.nextElementSibling;
-          while (currentElement && currentElement !== nextHeading) {
-            sectionContent += currentElement.textContent || '';
-            currentElement = currentElement.nextElementSibling;
-          }
+      if (index < currentSectionIndex) {
+        // Completed sections - show full progress
+        heading.style.setProperty('--progress-width', '100%');
+      } else if (index === currentSectionIndex) {
+        // Current section - show overall reading progress
+        let progressWidth;
+        if (overallProgress <= 3) {
+          progressWidth = '3rem';
         } else {
-          // Last section - get everything after this heading
-          let currentElement = heading.nextElementSibling;
-          while (currentElement) {
-            sectionContent += currentElement.textContent || '';
-            currentElement = currentElement.nextElementSibling;
-          }
+          progressWidth = `${Math.min(overallProgress, 100)}%`;
         }
-        
-        const sectionWords = sectionContent.trim().split(/\s+/).filter(word => word.length > 0).length;
-        
-        if (i < currentSectionIndex) {
-          // Completed section - count all words
-          wordsRead += sectionWords;
-        } else {
-          // Current section - count words based on reading progress
-          wordsRead += Math.floor(sectionWords * progressInCurrentSection);
-        }
-      }
-      
-      // Calculate overall reading progress
-      contentProgress = totalWords > 0 ? (wordsRead / totalWords) * 100 : 0;
-      
-      console.log(`Words read: ${wordsRead}/${totalWords} | Reading progress: ${Math.round(contentProgress)}%`);
-    }
-    
-    // Apply progress to current section
-    if (currentSectionIndex >= 0) {
-      const currentHeading = headings[currentSectionIndex];
-      
-      let progressWidth;
-      if (contentProgress <= 5) {
-        // First 5% of content - keep at 3rem
-        progressWidth = '3rem';
+        heading.style.setProperty('--progress-width', progressWidth);
       } else {
-        // Show content-based progress
-        progressWidth = `${Math.min(contentProgress, 100)}%`;
+        // Future sections - only show progress if they're close to being reached
+        const distanceToHeading = headingTop - viewportMiddle;
+        if (distanceToHeading < windowHeight * 0.3) {
+          // Section is coming into view soon - start showing minimal progress
+          const proximityProgress = Math.max(3, overallProgress * 0.1); // Very minimal
+          heading.style.setProperty('--progress-width', `${proximityProgress}%`);
+        } else {
+          // Section is far away - keep at default
+          heading.style.setProperty('--progress-width', '3rem');
+        }
       }
-      
-      console.log('Updating heading', currentSectionIndex, 'with width:', progressWidth);
-      currentHeading.style.setProperty('--progress-width', progressWidth);
-    }
-    
-    // Show completed sections at 100%
-    for (let i = 0; i < currentSectionIndex; i++) {
-      const heading = headings[i];
-      heading.style.setProperty('--progress-width', '100%');
-    }
+    });
   }
   
   // Throttle scroll events for performance
