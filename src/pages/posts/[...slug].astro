@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import PostLayout from '../../layouts/PostLayout.astro';
 import { getGitDatesForContent } from '../../utils/gitDates';
+import { extractDateFromFilename } from '../../utils/extractDateFromFilename';
 
 export async function getStaticPaths() {
   const posts = await getCollection('posts');
@@ -14,9 +15,12 @@ export async function getStaticPaths() {
 const { post } = Astro.props;
 const { Content } = await post.render();
 
-// Get git dates if frontmatter dates are missing
+// Get dates with proper priority
 const gitDates = getGitDatesForContent('posts', post.slug);
-const publishDate = post.data.date || gitDates?.created || new Date();
+const filenameDate = extractDateFromFilename(post.slug);
+
+// Priority: frontmatter date > filename date > git created date
+const publishDate = post.data.date || filenameDate || gitDates?.created || new Date();
 const modifiedDate = post.data.modified || gitDates?.modified || publishDate;
 ---
 
