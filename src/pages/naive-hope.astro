@@ -10,7 +10,7 @@ if (!naiveHope) {
 const { Content } = await naiveHope.render();
 
 // Get password from environment variable
-const PASSWORD = import.meta.env.NAIVE_HOPE_PASSWORD || 'default-password';
+const PASSWORD = import.meta.env.PUBLIC_NAIVE_HOPE_PASSWORD || 'default-password';
 ---
 
 <PostLayout 
