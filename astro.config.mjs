@@ -8,5 +8,12 @@ import tailwind from '@astrojs/tailwind';
 export default defineConfig({
   site: 'https://shokuno5.github.io',
   // No base path needed for username.github.io sites
+  i18n: {
+    defaultLocale: 'en',
+    locales: ['en', 'ja'],
+    routing: {
+      prefixDefaultLocale: false
+    }
+  },
   integrations: [mdx(), tailwind()]
 });

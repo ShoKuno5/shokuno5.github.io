@@ -1,0 +1,70 @@
+---
+interface Props {
+  currentLocale: 'en' | 'ja';
+  currentSlug: string;
+}
+
+const { currentLocale, currentSlug } = Astro.props;
+
+// Generate URLs for both languages
+const enUrl = currentLocale === 'en' ? Astro.url.pathname : `/${currentSlug}`;
+const jaUrl = currentLocale === 'ja' ? Astro.url.pathname : `/ja/${currentSlug}`;
+---
+
+<div class="language-switcher" style="
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  font-size: 0.75rem;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+">
+  <a 
+    href={enUrl}
+    class={`lang-btn ${currentLocale === 'en' ? 'active' : ''}`}
+    style="
+      padding: 2px 6px;
+      text-decoration: none;
+      font-size: 0.75rem;
+      font-weight: 400;
+      transition: all 0.2s ease;
+      color: #9ca3af;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    "
+  >
+    en
+  </a>
+  <span style="color: #d1d5db; font-size: 0.75rem;">/</span>
+  <a 
+    href={jaUrl}
+    class={`lang-btn ${currentLocale === 'ja' ? 'active' : ''}`}
+    style="
+      padding: 2px 6px;
+      text-decoration: none;
+      font-size: 0.75rem;
+      font-weight: 400;
+      transition: all 0.2s ease;
+      color: #9ca3af;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    "
+  >
+    ja
+  </a>
+</div>
+
+<style>
+  .language-switcher:hover {
+    opacity: 1;
+  }
+  
+  .lang-btn:hover {
+    color: #4b5563;
+  }
+  
+  .lang-btn.active {
+    color: #1f2937;
+    font-weight: 500;
+  }
+</style>

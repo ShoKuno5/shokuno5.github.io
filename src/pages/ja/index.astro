@@ -1,11 +1,11 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import PostLayout from '../layouts/PostLayout.astro';
+import Layout from '../../layouts/Layout.astro';
+import PostLayout from '../../layouts/PostLayout.astro';
 import { getCollection } from 'astro:content';
-import { getGitDatesForContent } from '../utils/gitDates';
-import { extractDateFromFilename } from '../utils/extractDateFromFilename';
+import { getGitDatesForContent } from '../../utils/gitDates';
+import { extractDateFromFilename } from '../../utils/extractDateFromFilename';
 
-const posts = await getCollection('posts', ({ id }) => id.startsWith('en/') || !id.includes('/'));
+const posts = await getCollection('posts', ({ id }) => id.startsWith('ja/'));
 const visiblePosts = posts.filter(post => !post.data.hidden);
 
 // Sort posts with proper date priority
@@ -18,7 +18,7 @@ const sortedPosts = visiblePosts.sort((a, b) => {
 });
 ---
 
-<Layout title="Sho Kuno" description="Personal blog about technology, research, and thoughts">
+<Layout title="久野翔" description="技術、研究、思考についての個人ブログ">
   <div style="display: flex; flex-direction: column; gap: 4rem; margin-top: 90px;">
     {sortedPosts.map(async (post) => {
       const { Content } = await post.render();
@@ -44,7 +44,7 @@ const sortedPosts = visiblePosts.sort((a, b) => {
             description={post.data.summary}
             content={post.body}
             mode="homepage"
-            slug={post.slug.startsWith('en/') ? post.slug.slice(3) : post.slug}
+            slug={post.slug.replace('ja/', '')}
             showMeta={true}
             showComments={false}
           >

@@ -1,19 +1,15 @@
 ---
 import { getCollection } from 'astro:content';
-import PostLayout from '../../layouts/PostLayout.astro';
-import { getGitDatesForContent } from '../../utils/gitDates';
-import { extractDateFromFilename } from '../../utils/extractDateFromFilename';
+import PostLayout from '../../../layouts/PostLayout.astro';
+import { getGitDatesForContent } from '../../../utils/gitDates';
+import { extractDateFromFilename } from '../../../utils/extractDateFromFilename';
 
 export async function getStaticPaths() {
-  const posts = await getCollection('posts');
-  return posts.map((post) => {
-    // Handle both old flat structure and new en/ja structure
-    const slug = post.slug.startsWith('en/') ? post.slug.slice(3) : post.slug;
-    return {
-      params: { slug },
-      props: { post },
-    };
-  });
+  const posts = await getCollection('posts', ({ id }) => id.startsWith('ja/'));
+  return posts.map((post) => ({
+    params: { slug: post.slug.slice(3) }, // Remove 'ja/' prefix
+    props: { post },
+  }));
 }
 
 const { post } = Astro.props;

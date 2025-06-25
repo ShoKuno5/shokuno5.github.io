@@ -1,10 +1,10 @@
 ---
-import Layout from '../../layouts/Layout.astro';
+import Layout from '../../../layouts/Layout.astro';
 import { getCollection } from 'astro:content';
-import { getGitDatesForContent } from '../../utils/gitDates';
-import { extractDateFromFilename } from '../../utils/extractDateFromFilename';
+import { getGitDatesForContent } from '../../../utils/gitDates';
+import { extractDateFromFilename } from '../../../utils/extractDateFromFilename';
 
-const posts = await getCollection('posts', ({ id }) => id.startsWith('en/') || !id.includes('/'));
+const posts = await getCollection('posts', ({ id }) => id.startsWith('ja/'));
 const visiblePosts = posts.filter(post => !post.data.hidden);
 
 // Collect all unique tags
@@ -37,13 +37,13 @@ sortedTags.forEach(([_, tagPosts]) => {
 });
 ---
 
-<Layout title="All Tags" description="Browse posts by tags">
+<Layout title="すべてのタグ" description="タグで投稿を探す">
   <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
-    <h1 class="text-4xl lg:text-5xl font-bold mb-12 bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">All Tags</h1>
+    <h1 class="text-4xl lg:text-5xl font-bold mb-12 bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">すべてのタグ</h1>
     
     <!-- Tag cloud -->
     <nav class="mb-16 p-8 bg-gradient-to-br from-primary-50 to-accent-purple/5 rounded-xl border border-primary-100">
-      <h2 class="text-xl font-semibold mb-6 text-gray-800">Jump to tag:</h2>
+      <h2 class="text-xl font-semibold mb-6 text-gray-800">タグにジャンプ:</h2>
       <div class="flex flex-wrap gap-3">
         {sortedTags.map(([tag, tagPosts]) => (
           <a 
@@ -62,13 +62,13 @@ sortedTags.forEach(([_, tagPosts]) => {
         <section id={`tag-${tag.replace(/\s+/g, '-')}`} class="scroll-mt-8">
           <h2 class="text-2xl font-semibold mb-6 text-gray-800 border-b border-gray-200 pb-3">
             <span class="bg-gradient-to-r from-primary-600 to-accent-purple bg-clip-text text-transparent">{tag}</span>
-            <span class="text-sm font-normal text-gray-500 ml-3">({tagPosts.length} posts)</span>
+            <span class="text-sm font-normal text-gray-500 ml-3">({tagPosts.length} 投稿)</span>
           </h2>
           <ul class="space-y-4">
             {tagPosts.map((post) => (
               <li class="group">
                 <a 
-                  href={`/posts/${post.slug.startsWith('en/') ? post.slug.slice(3) : post.slug}/`}
+                  href={`/ja/posts/${post.slug.replace('ja/', '')}/`}
                   class="flex items-start sm:items-center gap-4 p-4 rounded-lg hover:bg-gray-50 transition-colors"
                 >
                   <div class="flex-grow">
@@ -81,7 +81,7 @@ sortedTags.forEach(([_, tagPosts]) => {
                   </div>
                   <div class="flex flex-col items-end text-sm text-gray-500 font-medium flex-shrink-0">
                     <time>
-                      {(post.data.date || extractDateFromFilename(post.slug) || getGitDatesForContent('posts', post.slug)?.created || new Date()).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
+                      {(post.data.date || extractDateFromFilename(post.slug) || getGitDatesForContent('posts', post.slug)?.created || new Date()).toLocaleDateString('ja-JP', { year: 'numeric', month: 'short', day: 'numeric' })}
                     </time>
                     {(() => {
                       const gitDates = getGitDatesForContent('posts', post.slug);
@@ -95,7 +95,7 @@ sortedTags.forEach(([_, tagPosts]) => {
                       }
                       return modifiedDate && (
                         <time class="text-xs opacity-70">
-                          (upd: {modifiedDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })})
+                          (更新: {modifiedDate.toLocaleDateString('ja-JP', { year: 'numeric', month: 'short', day: 'numeric' })})
                         </time>
                       );
                     })()}
@@ -109,7 +109,7 @@ sortedTags.forEach(([_, tagPosts]) => {
               <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/>
               </svg>
-              Back to top
+              トップに戻る
             </a>
           </div>
         </section>

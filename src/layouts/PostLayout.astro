@@ -17,13 +17,10 @@ export interface Props {
 
 const { title, date, modified, tags, description, showMeta = true, showComments = true, content, mode = 'full', slug } = Astro.props;
 
-// Check if this is a hidden/static page based on title
-const isStaticPage = title === 'Research' || title === 'CV';
-
 // Adaptive display based on mode
 const isHomepageMode = mode === 'homepage';
-const actualShowMeta = isStaticPage ? false : (isHomepageMode ? showMeta : showMeta);
-const actualShowComments = isStaticPage ? false : (isHomepageMode ? false : showComments);
+const actualShowMeta = isHomepageMode ? showMeta : showMeta;
+const actualShowComments = isHomepageMode ? false : showComments;
 
 // Calculate reading time if content is provided
 const readingTimeData = content ? calculateReadingTime(content) : null;
@@ -241,11 +238,18 @@ const readingTimeData = content ? calculateReadingTime(content) : null;
             font-size: 0.9rem;
             flex-wrap: wrap;
           ">
-            {date && (
-              <time style="font-weight: 500;">
-                {date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
-              </time>
-            )}
+            <div style="display: flex; flex-direction: column; gap: 0.25rem;">
+              {date && (
+                <time style="font-weight: 500;">
+                  Published: {date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                </time>
+              )}
+              {modified && date && modified.getTime() !== date.getTime() && (
+                <time style="font-size: 0.85rem; opacity: 0.8;">
+                  Updated: {modified.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                </time>
+              )}
+            </div>
             {readingTimeData && (
               <div style="
                 display: flex;
@@ -336,7 +340,7 @@ const readingTimeData = content ? calculateReadingTime(content) : null;
   </Layout>
 )}
 
-{!isHomepageMode && !isStaticPage && (
+{!isHomepageMode && (
 <!-- Silent Reading Progress Script - Only for individual posts (not static pages) -->
 <script is:inline>
 (function() {

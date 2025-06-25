@@ -1,4 +1,6 @@
 ---
+import LanguageSwitcher from '../components/LanguageSwitcher.astro';
+
 export interface Props {
   title: string;
   description?: string;
@@ -6,38 +8,76 @@ export interface Props {
 
 const { title, description = '' } = Astro.props;
 
+// Detect current locale and slug
+const pathname = Astro.url.pathname;
+const isJapanese = pathname.startsWith('/ja/');
+const currentLocale = isJapanese ? 'ja' : 'en';
+const currentSlug = pathname.replace(/^\/ja\//, '').replace(/^\//, '').replace(/\/$/, '');
+
 interface NavItem {
   label: string;
   href?: string;
   external?: boolean;
-  submenu?: NavItem[];
+  submenu?: NavItemSubitem[];
 }
 
-const nav: NavItem[] = [
-  { label: 'Research', href: '/posts/2024-01-01-research/' },
-  { label: 'CV', href: '/posts/2024-01-02-cv/' },
-  { 
-    label: 'Posts', 
-    submenu: [
-      { label: 'All Posts', href: '/posts/all/' },
-      { label: 'All Tags', href: '/posts/tags/' },
-    ]
-  },
-  { label: 'Naive Hope', href: '/naive-hope/' },
-  { 
-    label: 'Contact', 
-    submenu: [
-      { label: 'Email', href: 'mailto:kunosho1225@g.ecc.u-tokyo.ac.jp', external: true },
-      { label: 'LinkedIn', href: 'https://www.linkedin.com/in/sho-kuno-828a0133a/', external: true },
-      { label: 'GitHub', href: 'https://github.com/ShoKuno5', external: true },
-      { label: 'X', href: 'https://twitter.com/ReplicaSQ', external: true },
-    ]
-  },
-];
+interface NavItemSubitem {
+  label: string;
+  href: string;
+  external?: boolean;
+}
+
+// Create language-aware navigation
+const createNav = (locale: 'en' | 'ja'): NavItem[] => {
+  const prefix = locale === 'ja' ? '/ja' : '';
+  const labels = locale === 'ja' ? {
+    research: '研究',
+    cv: '履歴書',
+    posts: '投稿',
+    allPosts: 'すべての投稿',
+    allTags: 'すべてのタグ',
+    naiveHope: 'Naive Hope',
+    contact: '連絡先',
+    email: 'メール',
+  } : {
+    research: 'Research',
+    cv: 'CV', 
+    posts: 'Posts',
+    allPosts: 'All Posts',
+    allTags: 'All Tags',
+    naiveHope: 'Naive Hope',
+    contact: 'Contact',
+    email: 'Email',
+  };
+
+  return [
+    { label: labels.research, href: `${prefix}/posts/2024-01-01-research/` },
+    { label: labels.cv, href: `${prefix}/posts/2024-01-02-cv/` },
+    { 
+      label: labels.posts, 
+      submenu: [
+        { label: labels.allPosts, href: `${prefix}/posts/all/` },
+        { label: labels.allTags, href: `${prefix}/posts/tags/` },
+      ]
+    },
+    { label: labels.naiveHope, href: `${prefix}/naive-hope/` },
+    { 
+      label: labels.contact, 
+      submenu: [
+        { label: labels.email, href: 'mailto:kunosho1225@g.ecc.u-tokyo.ac.jp', external: true },
+        { label: 'LinkedIn', href: 'https://www.linkedin.com/in/sho-kuno-828a0133a/', external: true },
+        { label: 'GitHub', href: 'https://github.com/ShoKuno5', external: true },
+        { label: 'X', href: 'https://twitter.com/ReplicaSQ', external: true },
+      ]
+    },
+  ];
+};
+
+const nav = createNav(currentLocale);
 ---
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang={currentLocale}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -99,6 +139,9 @@ const nav: NavItem[] = [
         
         <!-- Container for navigation and hamburger -->
         <div style="display: flex; align-items: center; gap: 2rem; flex-shrink: 0;">
+          <!-- Language Switcher -->
+          <LanguageSwitcher currentLocale={currentLocale} currentSlug={currentSlug} />
+          
           <!-- Desktop navigation -->
           <nav style="display: none;" id="desktop-nav">
             <ul style="display: flex; align-items: center; gap: 2rem; list-style: none; margin: 0; padding: 0;">
