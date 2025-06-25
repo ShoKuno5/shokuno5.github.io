@@ -79,9 +79,27 @@ sortedTags.forEach(([_, tagPosts]) => {
                       <p class="text-sm text-gray-600 mt-1">{post.data.summary}</p>
                     )}
                   </div>
-                  <time class="text-sm text-gray-500 font-medium flex-shrink-0">
-                    {(post.data.date || extractDateFromFilename(post.slug) || getGitDatesForContent('posts', post.slug)?.created || new Date()).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
-                  </time>
+                  <div class="flex flex-col items-end text-sm text-gray-500 font-medium flex-shrink-0">
+                    <time>
+                      {(post.data.date || extractDateFromFilename(post.slug) || getGitDatesForContent('posts', post.slug)?.created || new Date()).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
+                    </time>
+                    {(() => {
+                      const gitDates = getGitDatesForContent('posts', post.slug);
+                      const filenameDate = extractDateFromFilename(post.slug);
+                      const publishDate = post.data.date || filenameDate || gitDates?.created || new Date();
+                      let modifiedDate = post.data.modified;
+                      if (!modifiedDate && gitDates?.modified) {
+                        if (gitDates.modified.getTime() !== publishDate.getTime()) {
+                          modifiedDate = gitDates.modified;
+                        }
+                      }
+                      return modifiedDate && (
+                        <time class="text-xs opacity-70">
+                          (upd: {modifiedDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })})
+                        </time>
+                      );
+                    })()}
+                  </div>
                 </a>
               </li>
             ))}

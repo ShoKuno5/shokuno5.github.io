@@ -14,7 +14,14 @@ const postsWithDates = visiblePosts.map(post => {
   
   // Priority: frontmatter date > filename date > git created date
   const publishDate = post.data.date || filenameDate || gitDates?.created || new Date();
-  const modifiedDate = post.data.modified || gitDates?.modified || publishDate;
+  
+  // For modified date, always use git modified if it exists and is different
+  let modifiedDate = post.data.modified;
+  if (!modifiedDate && gitDates?.modified) {
+    if (gitDates.modified.getTime() !== publishDate.getTime()) {
+      modifiedDate = gitDates.modified;
+    }
+  }
   
   return {
     ...post,
@@ -64,7 +71,7 @@ const years = Object.keys(postsByYear).sort((a, b) => Number(b) - Number(a));
                   <time>
                     {post.computedDates.published.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
                   </time>
-                  {post.computedDates.modified.getTime() !== post.computedDates.published.getTime() && (
+                  {post.computedDates.modified && (
                     <time class="text-xs opacity-70">
                       (upd: {post.computedDates.modified.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })})
                     </time>

@@ -25,7 +25,14 @@ const sortedPosts = visiblePosts.sort((a, b) => {
       const gitDates = getGitDatesForContent('posts', post.slug);
       const filenameDate = extractDateFromFilename(post.slug);
       const publishDate = post.data.date || filenameDate || gitDates?.created;
-      const modifiedDate = post.data.modified || gitDates?.modified;
+      
+      // For modified date, always use git modified if it exists and is different
+      let modifiedDate = post.data.modified;
+      if (!modifiedDate && gitDates?.modified && publishDate) {
+        if (gitDates.modified.getTime() !== publishDate.getTime()) {
+          modifiedDate = gitDates.modified;
+        }
+      }
       
       return (
         <div style="border-bottom: 1px solid rgba(0, 0, 0, 0.06); padding-bottom: 3rem;">
