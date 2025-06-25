@@ -9,8 +9,9 @@ if (!naiveHope) {
 }
 const { Content } = await naiveHope.render();
 
-// Password for the page - change this to your desired password
-const PASSWORD = 'changeme';
+// The key to the labyrinth - SHA-256 iterated 5000 times with salt
+// Riddle: "In the maze of hopes, what guides the naive wanderer?"
+const PASSWORD = '28a82c65c48eac2543d574773b4f5a55be259fcbde219f534df8dac2605aafb6';
 ---
 
 <PostLayout 
