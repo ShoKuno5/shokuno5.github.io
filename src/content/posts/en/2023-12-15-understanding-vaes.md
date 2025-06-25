@@ -1,5 +1,6 @@
 ---
 title: "Understanding Variational Autoencoders"
+date: 2023-12-15
 tags: ["machine learning", "deep learning", "generative models"]
 summary: "A deep dive into the mathematics and implementation of VAEs"
 ---

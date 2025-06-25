@@ -1,5 +1,6 @@
 ---
 title: "変分オートエンコーダの理解"
+date: 2023-12-15
 tags: ["machine learning", "deep learning", "generative models"]
 summary: "VAEの数学と実装への深い洞察"
 ---
