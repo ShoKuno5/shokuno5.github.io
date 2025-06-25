@@ -1,5 +1,6 @@
 ---
 import PostLayout from '../layouts/PostLayout.astro';
+import PasswordProtect from '../components/PasswordProtect.astro';
 import { getEntry } from 'astro:content';
 
 const naiveHope = await getEntry('naive-hope', 'naive-hope');
@@ -7,6 +8,9 @@ if (!naiveHope) {
   throw new Error('Naive Hope page not found');
 }
 const { Content } = await naiveHope.render();
+
+// Get password from environment variable
+const PASSWORD = import.meta.env.NAIVE_HOPE_PASSWORD || 'default-password';
 ---
 
 <PostLayout 
@@ -17,6 +21,7 @@ const { Content } = await naiveHope.render();
   showComments={false}
   content={naiveHope.body}
 >
-  <Content />
-
+  <PasswordProtect correctPassword={PASSWORD}>
+    <Content />
+  </PasswordProtect>
 </PostLayout>
