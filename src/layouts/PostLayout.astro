@@ -82,10 +82,12 @@ const readingTimeData = content ? calculateReadingTime(content) : null;
           flex-wrap: wrap;
         ">
           <div style="display: flex; flex-direction: column; gap: 0.25rem;">
-            <time style="font-weight: 500;">
-              Published: {date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
-            </time>
-            {modified && modified.getTime() !== date.getTime() && (
+            {date && (
+              <time style="font-weight: 500;">
+                Published: {date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+              </time>
+            )}
+            {modified && date && modified.getTime() !== date.getTime() && (
               <time style="font-size: 0.85rem; opacity: 0.8;">
                 Updated: {modified.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
               </time>
@@ -239,9 +241,11 @@ const readingTimeData = content ? calculateReadingTime(content) : null;
             font-size: 0.9rem;
             flex-wrap: wrap;
           ">
-            <time style="font-weight: 500;">
-              {date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
-            </time>
+            {date && (
+              <time style="font-weight: 500;">
+                {date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+              </time>
+            )}
             {readingTimeData && (
               <div style="
                 display: flex;

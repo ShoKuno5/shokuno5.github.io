@@ -1,6 +1,7 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import { getCollection } from 'astro:content';
+import { getGitDatesForContent } from '../../utils/gitDates';
 
 const posts = await getCollection('posts');
 const visiblePosts = posts.filter(post => !post.data.hidden);
@@ -23,9 +24,13 @@ visiblePosts.forEach(post => {
 // Sort tags alphabetically
 const sortedTags = Array.from(tagMap.entries()).sort((a, b) => a[0].localeCompare(b[0]));
 
-// Sort posts within each tag by date
+// Sort posts within each tag by date with git fallback
 sortedTags.forEach(([_, tagPosts]) => {
-  tagPosts.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+  tagPosts.sort((a, b) => {
+    const aDate = a.data.date || getGitDatesForContent('posts', a.slug)?.created || new Date(0);
+    const bDate = b.data.date || getGitDatesForContent('posts', b.slug)?.created || new Date(0);
+    return bDate.getTime() - aDate.getTime();
+  });
 });
 ---
 
@@ -72,7 +77,7 @@ sortedTags.forEach(([_, tagPosts]) => {
                     )}
                   </div>
                   <time class="text-sm text-gray-500 font-medium flex-shrink-0">
-                    {post.data.date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
+                    {(post.data.date || getGitDatesForContent('posts', post.slug)?.created || new Date()).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
                   </time>
                 </a>
               </li>

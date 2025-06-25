@@ -2,21 +2,33 @@
 import Layout from '../layouts/Layout.astro';
 import PostLayout from '../layouts/PostLayout.astro';
 import { getCollection } from 'astro:content';
+import { getGitDatesForContent } from '../utils/gitDates';
 
 const posts = await getCollection('posts');
 const visiblePosts = posts.filter(post => !post.data.hidden);
-const sortedPosts = visiblePosts.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+
+// Sort posts with git dates fallback
+const sortedPosts = visiblePosts.sort((a, b) => {
+  const aDate = a.data.date || getGitDatesForContent('posts', a.slug)?.created || new Date(0);
+  const bDate = b.data.date || getGitDatesForContent('posts', b.slug)?.created || new Date(0);
+  return bDate.getTime() - aDate.getTime();
+});
 ---
 
 <Layout title="Sho Kuno" description="Personal blog about technology, research, and thoughts">
   <div style="display: flex; flex-direction: column; gap: 4rem; margin-top: 90px;">
     {sortedPosts.map(async (post) => {
       const { Content } = await post.render();
+      const gitDates = getGitDatesForContent('posts', post.slug);
+      const publishDate = post.data.date || gitDates?.created;
+      const modifiedDate = post.data.modified || gitDates?.modified;
+      
       return (
         <div style="border-bottom: 1px solid rgba(0, 0, 0, 0.06); padding-bottom: 3rem;">
           <PostLayout 
             title={post.data.title}
-            date={post.data.date}
+            date={publishDate}
+            modified={modifiedDate}
             tags={post.data.tags}
             description={post.data.summary}
             content={post.body}
