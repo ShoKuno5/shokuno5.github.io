@@ -22,13 +22,11 @@ const filenameDate = extractDateFromFilename(post.slug);
 // Priority: frontmatter date > filename date > git created date
 const publishDate = post.data.date || filenameDate || gitDates?.created || new Date();
 
-// For modified date, use git modified if it's different from published date
+// For modified date, always use git modified if it exists and is different
 let modifiedDate = post.data.modified;
 if (!modifiedDate && gitDates?.modified) {
-  // Only use git modified date if it's significantly different (more than 1 day)
-  const timeDiff = Math.abs(gitDates.modified.getTime() - publishDate.getTime());
-  const oneDayInMs = 24 * 60 * 60 * 1000;
-  if (timeDiff > oneDayInMs) {
+  // Always show git modified date if it's different from published date
+  if (gitDates.modified.getTime() !== publishDate.getTime()) {
     modifiedDate = gitDates.modified;
   }
 }
