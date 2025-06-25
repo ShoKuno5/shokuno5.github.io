@@ -1,18 +1,35 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import { getCollection } from 'astro:content';
+import { getGitDatesForContent } from '../../utils/gitDates';
 
 const posts = await getCollection('posts');
 const visiblePosts = posts.filter(post => !post.data.hidden);
-const sortedPosts = visiblePosts.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+
+// Enhance posts with git dates
+const postsWithDates = visiblePosts.map(post => {
+  const gitDates = getGitDatesForContent('posts', post.slug);
+  const publishDate = post.data.date || gitDates?.created || new Date();
+  const modifiedDate = post.data.modified || gitDates?.modified || publishDate;
+  
+  return {
+    ...post,
+    computedDates: {
+      published: publishDate,
+      modified: modifiedDate
+    }
+  };
+});
+
+const sortedPosts = postsWithDates.sort((a, b) => b.computedDates.published.getTime() - a.computedDates.published.getTime());
 
 // Group posts by year
 const postsByYear = sortedPosts.reduce((acc, post) => {
-  const year = post.data.date.getFullYear();
+  const year = post.computedDates.published.getFullYear();
   if (!acc[year]) acc[year] = [];
   acc[year].push(post);
   return acc;
-}, {} as Record<number, typeof posts>);
+}, {} as Record<number, typeof postsWithDates>);
 
 const years = Object.keys(postsByYear).sort((a, b) => Number(b) - Number(a));
 ---
@@ -39,9 +56,16 @@ const years = Object.keys(postsByYear).sort((a, b) => Number(b) - Number(a));
                     <p class="text-sm text-gray-600 mt-1">{post.data.summary}</p>
                   )}
                 </div>
-                <time class="text-sm text-gray-500 font-medium flex-shrink-0">
-                  {post.data.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                </time>
+                <div class="flex flex-col items-end text-sm text-gray-500 font-medium flex-shrink-0">
+                  <time>
+                    {post.computedDates.published.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                  </time>
+                  {post.computedDates.modified.getTime() !== post.computedDates.published.getTime() && (
+                    <time class="text-xs opacity-70">
+                      (upd: {post.computedDates.modified.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })})
+                    </time>
+                  )}
+                </div>
               </a>
             </li>
           ))}

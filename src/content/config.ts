@@ -10,7 +10,8 @@ export const collections = {
     type: 'content',
     schema: z.object({
       title: z.string(),
-      date: z.date(),
+      date: z.date().optional(),
+      modified: z.date().optional(),
       tags: z.array(z.string()).optional(),
       summary: z.string().optional(),
       hidden: z.boolean().optional(),
