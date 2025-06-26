@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://shokuno5.github.io/sitemap-index.xml
