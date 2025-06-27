@@ -64,3 +64,36 @@ Japanese versions already exist for all static pages:
 - Development: `npm run dev`
 - Build: `npm run build`
 - Preview: `npm run preview`
+
+## Research Automation
+Automated ML research and blog improvement system using Claude AI agents.
+
+### Quick Start
+```bash
+./research parallel     # Full parallel research with real-time dashboard
+./research status       # Check current status
+./research logs         # View recent logs
+```
+
+### Available Commands
+- `./research parallel` - 🚀 Full parallel deep research (3 AI agents with dashboard)
+- `./research simple` - 📝 Basic parallel research
+- `./research nightly` - 🌙 Enhanced nightly improvements
+- `./research schedule 02:00` - ⏰ Schedule daily research at 2 AM
+- `./research status` - 📊 Check running processes
+- `./research logs` - 📋 View recent logs
+- `./research clean` - 🧹 Clean up old files
+
+### Research Features
+- **Parallel Processing**: 3 specialized AI agents (Content, Citations, Code)
+- **Real-time Dashboard**: Live progress monitoring with colored status
+- **System Monitoring**: CPU/memory usage tracking
+- **Auto-logging**: All output saved to `logs/` directory
+- **Git Integration**: Creates branches and analysis reports
+- **No Extra Billing**: Uses Claude Max plan session
+
+### Scripts Organization
+All research scripts moved to `scripts/` directory with clear naming:
+- `scripts/parallel-research.sh` - Main parallel research
+- `scripts/parallel-simple.sh` - Simple version
+- `scripts/nightly-*.sh` - Various nightly improvement modes
