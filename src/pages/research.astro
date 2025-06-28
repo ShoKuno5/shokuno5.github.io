@@ -3,6 +3,7 @@ import { getEntry } from 'astro:content';
 import PostLayout from '../layouts/PostLayout.astro';
 
 const entry = await getEntry('research', 'research');
+if (!entry) throw new Error('Research page content not found');
 const { Content } = await entry.render();
 ---
 

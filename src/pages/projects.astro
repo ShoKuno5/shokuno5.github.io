@@ -3,6 +3,7 @@ import { getEntry } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
 
 const entry = await getEntry('projects-page', 'projects');
+if (!entry) throw new Error('Projects page content not found');
 const { Content } = await entry.render();
 const projects = entry.data.projects;
 ---
