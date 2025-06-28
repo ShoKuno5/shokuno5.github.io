@@ -46,19 +46,6 @@ Comprehensive investigation of optimal transport theory and its applications in 
 
 ## Publications & Presentations
 
-Research manuscripts are currently in preparation for submission to top-tier conferences and journals in machine learning and computer vision.
-
-> **Upcoming Submissions:** Papers on graph variational autoencoders and animation frame interpolation are being prepared for submission to ICML 2024 and CVPR 2024.
-
-## Research Philosophy
-
-I believe in pursuing research that bridges theoretical understanding with practical impact. My approach combines rigorous mathematical analysis with empirical validation, always keeping in mind the potential for real-world applications and societal benefit.
-
-### Core Principles
-- **Theoretical Rigor:** Developing mathematically sound foundations for new methods
-- **Practical Impact:** Ensuring research translates to meaningful applications
-- **Reproducibility:** Maintaining high standards for experimental validation
-- **Interdisciplinary Collaboration:** Engaging with researchers across diverse fields
 
 ## Research Environment
 
