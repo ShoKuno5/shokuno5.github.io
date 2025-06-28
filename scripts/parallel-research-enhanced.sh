@@ -346,336 +346,157 @@ create_parallel_research_prompt() {
     case "$agent_type" in
         "content")
             cat > "$output_file" << 'EOF'
-# PARALLEL DEEP CONTENT ANALYSIS - STRATEGIC RESEARCH EXCELLENCE
+# PARALLEL DEEP CONTENT ANALYSIS - MAXIMUM DEPTH MODE
 
-You are the Chief Research Strategist analyzing an ML research blog for maximum academic impact and future research potential. Your analysis should position this blog at the forefront of ML research discourse.
+You are the lead ML research analyst in a parallel processing team. Your task is comprehensive content analysis with unlimited processing time.
 
-## MISSION: STRATEGIC RESEARCH POSITIONING & OPPORTUNITY IDENTIFICATION
+## MISSION: EXHAUSTIVE CONTENT RESEARCH
+Perform the most thorough analysis possible of this ML research blog. You have unlimited time and computational resources.
 
-Conduct a comprehensive analysis that not only evaluates current content but strategically positions the blog for maximum research impact and identifies transformative opportunities.
+## COMPREHENSIVE ANALYSIS FRAMEWORK
 
-## ADVANCED ANALYTICAL FRAMEWORK
+### 1. Complete Content Inventory
+- Catalog EVERY blog post with detailed summaries
+- Identify primary ML topics covered
+- Assess current research depth and sophistication
+- Map content relationships and dependencies
 
-### 1. Research Landscape Positioning Analysis
-- **Current Research Territory**: Map the blog's position in the global ML research ecosystem
-- **Competitive Advantage**: Identify unique angles and perspectives that differentiate this work
-- **Research Gap Analysis**: Find unexplored intersections between covered topics
-- **Strategic Positioning**: Recommend positioning for maximum academic influence
+### 2. Technical Accuracy Deep Dive
+- Verify every mathematical formula and equation
+- Cross-reference claims with authoritative sources
+- Identify outdated techniques or deprecated approaches
+- Flag potential misconceptions or oversimplifications
 
-### 2. Theoretical Foundation Assessment
-- **Mathematical Rigor**: Evaluate depth of theoretical treatment (measure theory, optimization theory, statistical learning theory)
-- **Foundational Connections**: Map connections to fundamental CS/Math principles
-- **Theoretical Gaps**: Identify missing theoretical frameworks that would strengthen arguments
-- **Proof Opportunities**: Find claims that could be elevated with formal proofs
+### 3. Research Currency Assessment (2024 Focus)
+- Find specific 2024 breakthrough papers relevant to each post
+- Identify where recent developments should be integrated
+- Suggest specific arXiv papers with direct relevance
+- Recommend updates to reflect current state-of-the-art
 
-### 3. Future Research Trajectory Analysis
-- **Emerging Paradigms**: Identify nascent research areas (2024-2025) aligned with blog themes
-- **Cross-Disciplinary Opportunities**: Find connections to neuroscience, physics, biology, economics
-- **Open Problems**: Map blog content to major open problems in ML
-- **Research Program Development**: Suggest multi-year research trajectories
+### 4. Content Enhancement Opportunities
+- Detailed before/after examples for improvements
+- Specific sections that need expansion or clarification
+- Mathematical rigor enhancement suggestions
+- Code example modernization opportunities
 
-### 4. Academic Impact Maximization
-- **Citation Potential**: Identify content that could become highly-cited reference material
-- **Tutorial Development**: Find topics suitable for comprehensive tutorial papers
-- **Survey Paper Opportunities**: Identify areas where the blog could produce authoritative surveys
-- **Collaboration Networks**: Suggest specific research groups for potential collaboration
+## OUTPUT REQUIREMENTS (MAXIMUM DETAIL)
 
-## DELIVERABLES: STRATEGIC RESEARCH REPORT
+### Executive Summary
+Comprehensive 3-4 paragraph analysis of blog's current research standing
 
-### Executive Strategic Assessment
-**Research Positioning Statement** (500 words)
-- Current position in ML research landscape
-- Unique value proposition and differentiation
-- Strategic opportunities for thought leadership
-- Path to becoming authoritative reference source
+### Post-by-Post Deep Analysis
+For EVERY post found:
 
-### Deep Content Analysis with Research Potential
+#### Post: [Exact Title]
+- **Current Approach**: [Detailed summary of post's methodology]
+- **Technical Accuracy**: [Mathematical verification, fact-checking results]
+- **Research Currency**: [How current is the content? What's missing from 2024?]
+- **Specific Improvements**:
+  - Outdated Information: "[Exact quote]" → Suggested update with 2024 research
+  - Missing Citations: List 5-10 specific papers with full arXiv links
+  - Technical Enhancements: Specific mathematical or conceptual improvements
+  - Code Modernization: Exact code blocks that need updating
 
-For each major topic area:
+### Research Integration Matrix
+Table format showing:
+| Current Topic | 2024 Breakthrough | Specific Paper | Integration Strategy |
+|---------------|-------------------|----------------|----------------------|
+| [Topic] | [Development] | [arXiv link] | [How to integrate] |
 
-#### Topic: [Area Name]
-**Current Coverage Assessment**
-- Depth Score: [1-10] with detailed justification
-- Theoretical Rigor: [1-10] with specific gaps
-- Practical Impact: [1-10] with industry relevance
-- Research Currency: [Behind/Current/Leading] with evidence
+### Priority Action Plan
+Ranked list of top 20 improvements:
+1. **[Specific improvement]**
+   - Impact: [High/Medium/Low with justification]
+   - Effort: [Hours estimated]
+   - Dependencies: [What needs to be done first]
+   - Expected Outcome: [Specific benefit]
 
-**Strategic Enhancement Opportunities**
-1. **Theoretical Deepening**
-   - Missing Foundations: [Specific mathematical/theoretical frameworks]
-   - Connection Opportunities: [Links to fundamental CS/Math theory]
-   - Formalization Potential: [Claims that could become theorems]
+### New Content Recommendations
+10+ specific new post ideas with:
+- **Title**: [Exact proposed title]
+- **Angle**: [Unique perspective or approach]
+- **Key Papers**: [5+ specific papers to reference]
+- **Target Audience**: [Who would benefit]
+- **Outline**: [5-point detailed outline]
 
-2. **Research Frontier Expansion**
-   - Emerging Connections: [Links to 2024-2025 breakthrough areas]
-   - Open Problem Mapping: [Connections to major unsolved problems]
-   - Novel Research Directions: [Unexplored angles unique to this blog]
+## QUALITY STANDARDS
+- Every recommendation must be implementable immediately
+- Include exact quotes from current content when suggesting changes
+- Provide complete arXiv links: https://arxiv.org/abs/XXXX.XXXXX
+- Focus on cutting-edge 2024 developments, not historical content
+- Maintain academic rigor while ensuring accessibility
 
-3. **Cross-Disciplinary Integration**
-   - Neuroscience Connections: [Specific biological inspiration opportunities]
-   - Physics Parallels: [Quantum computing, statistical mechanics connections]
-   - Economic/Game Theory: [Strategic behavior, mechanism design angles]
+## RESEARCH CONTEXT (2024 CUTTING-EDGE)
+- Large Language Models: GPT-4, Claude, Gemini architectures
+- Mixture of Experts: Switch Transformer variants, GLaM, PaLM-2
+- Constitutional AI: RLHF advances, Constitutional AI training
+- Multimodal: GPT-4V, DALL-E 3, Flamingo, BLIP-2 developments
+- Retrieval-Augmented Generation: RAG improvements, vector databases
+- Parameter-Efficient Fine-tuning: LoRA variants, AdaLoRA, QLoRA
+- Tool-using AI: ReAct, Toolformer, ChatGPT plugins
 
-### Research Opportunity Matrix
-
-| Current Strength | Research Frontier | Impact Potential | Time to Leadership | Required Investment |
-|-----------------|-------------------|------------------|-------------------|-------------------|
-| [Topic] | [Emerging area] | [High/Medium/Low] | [Months] | [Specific steps] |
-
-### Publication Strategy Roadmap
-
-#### Immediate Opportunities (Next 3 months)
-1. **Workshop Papers**
-   - Target: [Specific workshop at major conference]
-   - Topic: [Refined angle from existing content]
-   - Unique Contribution: [What makes this novel]
-
-2. **Tutorial Proposals**
-   - Venue: [ICML/NeurIPS/ICLR Tutorial Track]
-   - Topic: [Comprehensive treatment of blog specialty]
-   - Co-presenters: [Suggested collaborators]
-
-#### Medium-term Goals (6-12 months)
-1. **Survey Papers**
-   - Target Journal: [ACM Computing Surveys, etc.]
-   - Topic: [Authoritative survey opportunity]
-   - Unique Perspective: [What this blog uniquely offers]
-
-2. **Position Papers**
-   - Venue: [Specific conference track]
-   - Thesis: [Controversial or forward-looking position]
-   - Supporting Evidence: [Blog content as foundation]
-
-### Strategic Collaboration Network
-
-#### Priority Research Groups
-1. **[Leading Lab Name]**
-   - PI: [Specific researcher]
-   - Alignment: [How blog complements their work]
-   - Collaboration Angle: [Specific project proposal]
-
-2. **Industry Research Labs**
-   - Target: [DeepMind/OpenAI/Meta AI/Google Research]
-   - Connection Point: [Specific shared interest]
-   - Value Proposition: [What blog brings to partnership]
-
-### Research Program Development
-
-#### Year 1: Foundation Building
-- Q1: [Specific theoretical deepening goals]
-- Q2: [Key collaboration establishment]
-- Q3: [First major publication target]
-- Q4: [Research group formation]
-
-#### Year 2: Thought Leadership
-- Major survey paper publication
-- Conference tutorial delivery
-- Research workshop organization
-- PhD student recruitment
-
-#### Year 3: Research Institute
-- Establish recognized research agenda
-- Secure funding for research program
-- Build citation network
-- Influence next generation
-
-## QUALITY METRICS FOR RECOMMENDATIONS
-
-Every recommendation must include:
-- **Impact Score**: Quantified potential influence (citations, adoption)
-- **Feasibility Assessment**: Required effort vs. expected return
-- **Differentiation Factor**: How this distinguishes the blog
-- **Risk Analysis**: Potential challenges and mitigation strategies
-- **Success Metrics**: How to measure achievement
-
-Focus on transformative opportunities that position this blog as a thought leader in ML research.
+Begin comprehensive analysis. Take unlimited time for maximum depth and quality.
 EOF
             ;;
         "citations")
             cat > "$output_file" << 'EOF'
-# PARALLEL CITATION ANALYSIS - RESEARCH AUTHORITY MAXIMIZATION
+# PARALLEL CITATION ANALYSIS - ACADEMIC EXCELLENCE MODE
 
-You are the Chief Academic Librarian and Research Impact Strategist. Your mission extends beyond citation correction to building an authoritative research foundation that maximizes academic influence.
+You are the academic librarian and citation specialist in a parallel research team. Your mission is to transform this blog into an academically authoritative resource.
 
-## MISSION: TRANSFORM BLOG INTO PREMIER ACADEMIC REFERENCE
+## MISSION: COMPREHENSIVE CITATION AUDIT
+Perform exhaustive citation analysis with unlimited processing time to achieve academic-grade reference standards.
 
-Develop a comprehensive citation strategy that establishes this blog as an authoritative voice in ML research while identifying opportunities for groundbreaking scholarly contributions.
+## ADVANCED CITATION FRAMEWORK
 
-## STRATEGIC CITATION FRAMEWORK
+### 1. Complete Citation Inventory
+- Identify every claim that lacks proper citation
+- Catalog all informal references that need formalization
+- Map citation gaps across all blog content
+- Assess current citation quality and consistency
 
-### 1. Citation Network Analysis
-- **Influence Mapping**: Identify most influential papers in each topic area
-- **Citation Graphs**: Map relationships between foundational and cutting-edge work
-- **Authority Building**: Strategic citations that position blog within key research conversations
-- **Gap Identification**: Missing links in citation networks that blog could fill
+### 2. Academic Reference Standards Assessment
+- Evaluate against top-tier conference standards (NeurIPS, ICML, ICLR)
+- Compare with Nature/Science citation practices
+- Identify opportunities for high-impact paper inclusion
+- Assess bibliography completeness for each topic area
 
-### 2. Academic Authority Assessment
-- **Current Authority Score**: Evaluate against top ML blogs/resources
-- **Citation Quality Index**: Assess impact factor and venue prestige of current citations
-- **Thought Leader Alignment**: Map citations to recognized authorities in each subfield
-- **Emerging Authority Opportunities**: Identify rising researchers to cite early
+### 3. Authoritative Source Integration
+- Map foundational papers for each ML concept discussed
+- Identify recent breakthrough papers (2023-2024) for each topic
+- Find comprehensive survey papers for broader context
+- Locate high-impact review articles and book chapters
 
-### 3. Strategic Citation Planning
-- **Foundational Anchoring**: Essential theoretical papers for credibility
-- **Cutting-Edge Integration**: Latest breakthroughs that show research currency
-- **Cross-Disciplinary Bridges**: Citations that open new research directions
-- **Controversial Engagement**: Papers representing opposing viewpoints for balanced analysis
+## COMPREHENSIVE OUTPUT REQUIREMENTS
 
-## COMPREHENSIVE DELIVERABLES
+### Citation Gap Analysis
+Complete audit of missing citations:
 
-### Citation Authority Report
+#### Critical Missing Citations (Immediate Priority)
+For each major claim without citation:
+- **Post**: [filename]
+- **Line/Section**: [approximate location]
+- **Current Text**: "[exact quote needing citation]"
+- **Required Citation**: [Full academic citation with arXiv/DOI]
+- **Justification**: [Why this specific paper]
+- **Authority Level**: [Impact factor, citation count, venue prestige]
 
-#### Current Citation Health Score
-- **Coverage**: [X]% of claims properly cited
-- **Quality**: Average impact factor of cited works
-- **Currency**: [X]% citations from last 2 years
-- **Diversity**: Institution and author diversity index
-- **Authority**: Connection to seminal works score
+### Academic Bibliography Construction
+Comprehensive reference database:
 
-### Strategic Citation Enhancement Plan
+#### Core ML Foundations (50+ papers)
+Essential papers every ML blog should reference:
+- **Theoretical Foundations**: Information theory, statistical learning theory
+- **Neural Networks**: Backpropagation, universal approximation, optimization
+- **Deep Learning**: CNNs, RNNs, Transformers, attention mechanisms
+- **Learning Theory**: PAC learning, bias-variance, regularization
 
-#### Foundational Citation Architecture
-Build unassailable academic foundation with:
-
-**Theoretical Foundations** (Must-cite classics)
-1. **Statistical Learning Theory**
-   - Vapnik (1995): "The Nature of Statistical Learning Theory"
-   - Valiant (1984): "A Theory of the Learnable"
-   - [10+ more with specific relevance to blog topics]
-
-2. **Deep Learning Foundations**
-   - LeCun et al. (2015): "Deep Learning" (Nature)
-   - Bengio et al. (2013): "Representation Learning: A Review"
-   - [Comprehensive foundation for each blog topic]
-
-**Modern Breakthroughs** (2023-2024 Game-changers)
-1. **Large Language Models**
-   - [Specific 2024 papers on reasoning, scaling, emergence]
-   - Include preprints showing latest developments
-   - Focus on papers that will be seminal
-
-2. **Emerging Paradigms**
-   - Constitutional AI developments
-   - Mechanistic interpretability breakthroughs
-   - Neuroscience-inspired architectures
-
-### Citation Opportunity Matrix
-
-| Blog Topic | Missing Seminal Work | 2024 Breakthrough | Cross-Discipline Opportunity | Impact Potential |
-|-----------|---------------------|-------------------|----------------------------|----------------|
-| [Topic] | [Classic paper] | [Recent advance] | [Other field connection] | [High/Med/Low] |
-
-### Academic Conversation Positioning
-
-#### Research Debates to Enter
-1. **[Major Ongoing Debate]**
-   - Key Papers: [Both sides of argument]
-   - Blog's Position: [Unique perspective to contribute]
-   - Citation Strategy: [How to position within debate]
-
-2. **Emerging Controversies**
-   - Early Papers: [Foundational disagreements]
-   - Blog Opportunity: [Fresh perspective angle]
-   - Strategic Citations: [Papers that support novel view]
-
-### Citation Implementation Playbook
-
-#### Phase 1: Foundation Repair (Immediate)
-**Week 1-2: Critical Gaps**
-- Fix [X] uncited claims in popular posts
-- Add [Y] seminal papers to introduction sections
-- Ensure every mathematical claim has authoritative source
-
-**Week 3-4: Authority Building**
-- Integrate thought leader citations
-- Add cross-disciplinary foundations
-- Include contrarian viewpoints for balance
-
-#### Phase 2: Strategic Enhancement (Month 2-3)
-**Research Conversation Entry**
-- Position blog within [specific debate]
-- Cite all sides of controversial topics
-- Add blog's unique perspective with support
-
-**Future-Proofing**
-- Add 2024 preprints and early-access papers
-- Include workshop papers showing emerging trends
-- Citation to datasets and benchmarks
-
-### Bibliography Architecture
-
-#### Core Bibliography Structure
-```bibtex
-% Foundational Theory (30% of citations)
-@book{vapnik1995nature,
-  title={The Nature of Statistical Learning Theory},
-  author={Vapnik, Vladimir},
-  year={1995},
-  note={Foundational work establishing statistical learning principles underlying all ML}
-}
-
-% Modern Breakthroughs (40% of citations)
-@article{achiam2023gpt,
-  title={GPT-4 Technical Report},
-  author={OpenAI},
-  year={2023},
-  note={Latest architectural advances in large language models}
-}
-
-% Cross-Disciplinary (20% of citations)
-@article{neuroscience2024,
-  title={[Biological inspiration for next-gen architectures]},
-  note={Bridging neuroscience and ML}
-}
-
-% Blog-Specific Contributions (10% of citations)
-@online{blogpost2024,
-  note={Self-citations to establish blog as citable resource}
-}
-```
-
-### Citation Quality Assurance
-
-#### Verification Protocol
-1. **Primary Source Verification**
-   - All citations link to official sources
-   - ArXiv links include latest version
-   - DOI provided where available
-
-2. **Context Appropriateness**
-   - Citation supports specific claim
-   - Multiple citations for controversial claims
-   - Recent citations for evolving topics
-
-3. **Academic Style Compliance**
-   - Consistent citation format throughout
-   - Proper attribution for ideas vs. implementations
-   - Clear distinction between background and novel contributions
-
-### Long-term Citation Strategy
-
-#### Building Citable Assets
-1. **Create Reference Implementations**
-   - Code that others will cite
-   - Benchmarks and datasets
-   - Evaluation frameworks
-
-2. **Develop Citation-Worthy Content**
-   - Comprehensive tutorials cited by newcomers
-   - Novel perspectives cited in debates
-   - Synthesis work cited in surveys
-
-3. **Academic Network Effects**
-   - Cite emerging researchers early
-   - Build reciprocal citation relationships
-   - Contribute to citation communities
-
-## SUCCESS METRICS
-
-- **Citation Quality Score**: Impact factor improvement
-- **Authority Index**: How often blog is cited by others
-- **Network Centrality**: Position in citation graphs
-- **Influence Growth**: Trending citation metrics
+#### Cutting-Edge Research (2024 Breakthroughs)
+Latest developments relevant to blog content:
+- **Large Language Models**: Recent scaling laws, emergent abilities
+- **Multimodal AI**: Vision-language models, cross-modal understanding
+- **AI Safety**: Constitutional AI, RLHF, alignment research
+- **Efficiency**: Parameter-efficient fine-tuning, model compression
 
 ### Citation Implementation Plan
 Specific integration strategy:
@@ -727,7 +548,7 @@ EOF
             ;;
         "code")
             cat > "$output_file" << 'EOF'
-# PARALLEL CODE ARCHITECTURE ANALYSIS - RESEARCH ENGINEERING EXCELLENCE
+# PARALLEL CODE ARCHITECTURE ANALYSIS - PRODUCTION EXCELLENCE MODE
 
 You are the senior ML engineer and code architect in a parallel research team. Your mission is to achieve production-grade code quality across all blog examples.
 

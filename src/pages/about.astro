@@ -1,42 +1,13 @@
 ---
+import { getEntry } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
+
+const entry = await getEntry('about', 'about');
+const { Content } = await entry.render();
 ---
 
 <Layout title="About - Sho Kuno">
   <div class="prose">
-    <h1>About</h1>
-    <p class="text-lg text-gray-600">
-      Researcher and developer focused on machine learning and creative technologies.
-    </p>
-    
-    <section class="mt-12">
-      <h2>Background</h2>
-      <p>
-        I work at the intersection of research and engineering, exploring novel applications
-        of machine learning in creative domains. My interests span from theoretical aspects
-        of deep learning to practical implementations in production systems.
-      </p>
-    </section>
-    
-    <section class="mt-12">
-      <h2>Current Focus</h2>
-      <ul class="space-y-2">
-        <li>Generative models for creative applications</li>
-        <li>Optimization techniques in deep learning</li>
-        <li>Human-AI collaboration interfaces</li>
-      </ul>
-    </section>
-    
-    <section class="mt-12">
-      <h2>Contact</h2>
-      <p>
-        Feel free to reach out for collaborations or discussions about research.
-      </p>
-      <ul class="list-none space-y-2 pl-0">
-        <li><a href="mailto:contact@example.com" class="text-[#007aff] hover:underline">Email</a></li>
-        <li><a href="https://github.com" class="text-[#007aff] hover:underline">GitHub</a></li>
-        <li><a href="https://twitter.com" class="text-[#007aff] hover:underline">Twitter</a></li>
-      </ul>
-    </section>
+    <Content />
   </div>
 </Layout>

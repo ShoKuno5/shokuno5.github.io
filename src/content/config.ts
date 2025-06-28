@@ -5,6 +5,17 @@ const staticPageSchema = z.object({
   description: z.string(),
 });
 
+const projectsPageSchema = z.object({
+  title: z.string(),
+  description: z.string(),
+  projects: z.array(z.object({
+    title: z.string(),
+    description: z.string(),
+    tags: z.array(z.string()),
+    link: z.string(),
+  })),
+});
+
 export const collections = {
   posts: defineCollection({
     type: 'content',
@@ -30,5 +41,21 @@ export const collections = {
   'naive-hope': defineCollection({
     type: 'content',
     schema: staticPageSchema,
+  }),
+  persona: defineCollection({
+    type: 'content',
+    schema: staticPageSchema,
+  }),
+  research: defineCollection({
+    type: 'content',
+    schema: staticPageSchema,
+  }),
+  about: defineCollection({
+    type: 'content',
+    schema: staticPageSchema,
+  }),
+  'projects-page': defineCollection({
+    type: 'content',
+    schema: projectsPageSchema,
   }),
 };

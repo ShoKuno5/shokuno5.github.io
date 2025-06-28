@@ -1,34 +1,15 @@
 ---
+import { getEntry } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
 
-const projects = [
-  {
-    title: "GraphVAE",
-    description: "グラフ構造データのための変分オートエンコーダ",
-    tags: ["機械学習", "PyTorch", "グラフニューラルネットワーク"],
-    link: "/ja/projects/graphvae"
-  },
-  {
-    title: "AnimeInbet", 
-    description: "深層学習を用いたアニメーションのフレーム補間",
-    tags: ["コンピュータビジョン", "アニメーション", "深層学習"],
-    link: "/ja/projects/animeinbet"
-  },
-  {
-    title: "最適輸送理論ノート",
-    description: "最適輸送理論のインタラクティブな可視化とノート",
-    tags: ["理論", "可視化", "数学"],
-    link: "/ja/projects/optimal-transport"
-  }
-];
+const entry = await getEntry('projects-page', 'projects-ja');
+const { Content } = await entry.render();
+const projects = entry.data.projects;
 ---
 
 <Layout title="プロジェクト - 久野翔">
   <div class="prose">
-    <h1>プロジェクト</h1>
-    <p class="text-lg text-gray-600">
-      研究プロジェクトと技術的探求の一部をご紹介します。
-    </p>
+    <Content />
   </div>
   
   <div class="mt-12 space-y-6">

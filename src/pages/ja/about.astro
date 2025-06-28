@@ -1,41 +1,13 @@
 ---
+import { getEntry } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
+
+const entry = await getEntry('about', 'about-ja');
+const { Content } = await entry.render();
 ---
 
 <Layout title="について - 久野翔">
   <div class="prose">
-    <h1>について</h1>
-    <p class="text-lg text-gray-600">
-      機械学習と創造技術に焦点を当てた研究者・開発者です。
-    </p>
-    
-    <section class="mt-12">
-      <h2>背景</h2>
-      <p>
-        研究とエンジニアリングの交差点で活動し、創造的分野における機械学習の新しい応用を探求しています。
-        深層学習の理論的側面から本番システムでの実用的な実装まで、幅広い関心を持っています。
-      </p>
-    </section>
-    
-    <section class="mt-12">
-      <h2>現在の焦点</h2>
-      <ul class="space-y-2">
-        <li>創造的応用のための生成モデル</li>
-        <li>深層学習における最適化技術</li>
-        <li>人間とAIの協働インターフェース</li>
-      </ul>
-    </section>
-    
-    <section class="mt-12">
-      <h2>連絡先</h2>
-      <p>
-        研究についての共同研究や議論は、お気軽にお声がけください。
-      </p>
-      <ul class="list-none space-y-2 pl-0">
-        <li><a href="mailto:kunosho1225@g.ecc.u-tokyo.ac.jp" class="text-[#007aff] hover:underline">メール</a></li>
-        <li><a href="https://github.com/ShoKuno5" class="text-[#007aff] hover:underline">GitHub</a></li>
-        <li><a href="https://twitter.com/ReplicaSQ" class="text-[#007aff] hover:underline">X (Twitter)</a></li>
-      </ul>
-    </section>
+    <Content />
   </div>
 </Layout>

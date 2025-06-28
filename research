@@ -44,7 +44,7 @@ run_parallel() {
     echo -e "${BLUE}🚀 Starting enhanced parallel deep research...${NC}"
     echo -e "${YELLOW}Note: Using enhanced prompts for deeper insights${NC}"
     cd "$SCRIPT_DIR"
-    ./scripts/parallel-research-enhanced-v2.sh
+    ./scripts/parallel-research-enhanced.sh
 }
 
 run_simple() {

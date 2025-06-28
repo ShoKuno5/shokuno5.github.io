@@ -31,8 +31,8 @@ interface NavItemSubitem {
 const createNav = (locale: 'en' | 'ja'): NavItem[] => {
   const prefix = locale === 'ja' ? '/ja' : '';
   const labels = locale === 'ja' ? {
+    persona: 'ペルソナ',
     research: '研究',
-    cv: '履歴書',
     posts: '投稿',
     allPosts: 'すべての投稿',
     allTags: 'すべてのタグ',
@@ -40,8 +40,8 @@ const createNav = (locale: 'en' | 'ja'): NavItem[] => {
     contact: '連絡先',
     email: 'メール',
   } : {
+    persona: 'Persona',
     research: 'Research',
-    cv: 'CV', 
     posts: 'Posts',
     allPosts: 'All Posts',
     allTags: 'All Tags',
@@ -51,8 +51,6 @@ const createNav = (locale: 'en' | 'ja'): NavItem[] => {
   };
 
   return [
-    { label: labels.research, href: `${prefix}/posts/2024-01-01-research/` },
-    { label: labels.cv, href: `${prefix}/posts/2024-01-02-cv/` },
     { 
       label: labels.posts, 
       submenu: [
@@ -60,6 +58,8 @@ const createNav = (locale: 'en' | 'ja'): NavItem[] => {
         { label: labels.allTags, href: `${prefix}/posts/tags/` },
       ]
     },
+    { label: labels.research, href: `${prefix}/research/` },
+    { label: labels.persona, href: `${prefix}/persona/` },
     { label: labels.naiveHope, href: `${prefix}/naive-hope/` },
     { 
       label: labels.contact, 

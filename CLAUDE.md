@@ -60,6 +60,40 @@ Japanese versions already exist for all static pages:
 - Git dates: fallback to original file paths for history
 - Modified dates: working correctly on all pages
 
+## Content Management Policy
+
+### Markdown-First Approach
+ALL website content should be stored as markdown files in the content collections, NOT hardcoded in Astro components.
+
+**Implemented Collections:**
+- `content/posts/` - Blog posts (en/ja)
+- `content/persona/` - Persona page content
+- `content/research/` - Research page content
+- `content/about/` - About page content (en/ja)
+- `content/projects-page/` - Projects page content with data (en/ja)
+- `content/naive-hope/` - Protected page content
+- `content/projects/` - Individual project details
+
+**Benefits:**
+- Easy content editing without touching code
+- Consistent bilingual content management
+- Separation of content from presentation
+- Better maintainability and version control
+
+**Implementation Pattern:**
+```astro
+---
+import { getEntry } from 'astro:content';
+const entry = await getEntry('collection-name', 'entry-slug');
+const { Content } = await entry.render();
+---
+<Layout title={entry.data.title}>
+  <Content />
+</Layout>
+```
+
+**Rule:** If adding new static pages, create markdown content first, then build Astro templates around them.
+
 ## Build/Test Commands
 - Development: `npm run dev`
 - Build: `npm run build`
@@ -93,7 +127,19 @@ Automated ML research and blog improvement system using Claude AI agents.
 - **No Extra Billing**: Uses Claude Max plan session
 
 ### Scripts Organization
-All research scripts moved to `scripts/` directory with clear naming:
-- `scripts/parallel-research.sh` - Main parallel research
-- `scripts/parallel-simple.sh` - Simple version
-- `scripts/nightly-*.sh` - Various nightly improvement modes
+All research scripts organized in `scripts/` directory:
+
+#### Core Research Scripts
+- `scripts/parallel-research.sh` - Original parallel research implementation
+- `scripts/parallel-research-enhanced.sh` - Enhanced prompts for strategic insights (default)
+- `scripts/parallel-simple.sh` - Simple parallel research version
+
+#### Nightly Improvement Scripts
+- `scripts/nightly-basic.sh` - Basic automated improvements
+- `scripts/nightly-deep.sh` - Deep overnight analysis
+- `scripts/nightly-enhanced.sh` - Enhanced ML-focused improvements
+
+#### Documentation
+- `scripts/README.md` - Scripts documentation
+- `scripts/enhanced-prompts.md` - Enhanced prompt templates
+- `scripts/enhancement-summary.md` - Enhancement details and improvements

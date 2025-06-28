@@ -1,34 +1,15 @@
 ---
+import { getEntry } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
 
-const projects = [
-  {
-    title: "GraphVAE",
-    description: "Variational autoencoders for graph-structured data",
-    tags: ["Machine Learning", "PyTorch", "Graph Neural Networks"],
-    link: "/projects/graphvae"
-  },
-  {
-    title: "AnimeInbet", 
-    description: "Frame interpolation for anime using deep learning",
-    tags: ["Computer Vision", "Animation", "Deep Learning"],
-    link: "/projects/animeinbet"
-  },
-  {
-    title: "Optimal Transport Notes",
-    description: "Interactive visualizations and notes on optimal transport theory",
-    tags: ["Theory", "Visualization", "Mathematics"],
-    link: "/projects/optimal-transport"
-  }
-];
+const entry = await getEntry('projects-page', 'projects');
+const { Content } = await entry.render();
+const projects = entry.data.projects;
 ---
 
 <Layout title="Projects - Sho Kuno">
   <div class="prose">
-    <h1>Projects</h1>
-    <p class="text-lg text-gray-600">
-      A selection of research projects and technical explorations.
-    </p>
+    <Content />
   </div>
   
   <div class="mt-12 space-y-6">
