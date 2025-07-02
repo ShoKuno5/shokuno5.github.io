@@ -37,9 +37,11 @@ if (!modifiedDate && gitDates?.modified) {
   }
 }
 
-// Determine which layout to use based on frontmatter
+// Determine which layout to use based on frontmatter and content
 const useAcademicLayout = post.data.type === 'academic';
-const useCitationsLayout = post.data.layout?.includes('PostLayoutWithCitations');
+// Check if post content contains citations
+const contentHasCitations = post.body.includes('\\cite{');
+const useCitationsLayout = contentHasCitations || post.data.layout?.includes('PostLayoutWithCitations');
 
 let LayoutComponent = PostLayout;
 if (useAcademicLayout) {
