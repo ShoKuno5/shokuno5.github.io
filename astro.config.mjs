@@ -1,6 +1,5 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
-import remarkCite from '@benrbray/remark-cite';
 
 import mdx from '@astrojs/mdx';
 import tailwind from '@astrojs/tailwind';
@@ -16,21 +15,8 @@ export default defineConfig({
       prefixDefaultLocale: false
     }
   },
-  markdown: {
-    remarkPlugins: [
-      [remarkCite, {
-        bibliography: 'src/content/bibliography.bib'
-      }]
-    ]
-  },
   integrations: [
-    mdx({
-      remarkPlugins: [
-        [remarkCite, {
-          bibliography: 'src/content/bibliography.bib'
-        }]
-      ]
-    }),
+    mdx(),
     tailwind()
   ]
 });

@@ -1,0 +1,364 @@
+---
+import Layout from './Layout.astro';
+import { calculateReadingTime } from '../utils/readingTime';
+import { readFileSync } from 'fs';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+
+export interface Props {
+  title: string;
+  date?: Date;
+  modified?: Date;
+  tags?: string[];
+  description?: string;
+  showMeta?: boolean;
+  showComments?: boolean;
+  content?: string;
+  mode?: 'homepage' | 'full';
+  slug?: string;
+}
+
+const { title, date, modified, tags, description, showMeta = true, showComments = true, content, mode = 'full', slug } = Astro.props;
+
+// Read bibliography file
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const bibPath = join(__dirname, '..', 'content', 'bibliography.bib');
+let bibContent = '';
+
+try {
+  bibContent = readFileSync(bibPath, 'utf-8');
+} catch (error) {
+  console.error('Error reading bibliography file:', error);
+}
+
+// Adaptive display based on mode
+const isHomepage = mode === 'homepage';
+const readingTime = content ? calculateReadingTime(content) : 0;
+
+function formatDate(date: Date) {
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long', 
+    day: 'numeric'
+  });
+}
+---
+
+<Layout title={title} description={description}>
+  <main class="max-w-4xl mx-auto px-4 py-8">
+    <article class="sophisticated-markdown">
+      {showMeta && (
+        <header class="mb-8 border-b border-gray-200 pb-6">
+          <h1 class="text-4xl font-bold mb-4 text-gray-900">{title}</h1>
+          {description && <p class="text-xl text-gray-600 mb-4">{description}</p>}
+          
+          <div class="flex flex-wrap items-center gap-6 text-sm text-gray-500 mb-4">
+            {date && <time datetime={date.toISOString()}>{formatDate(date)}</time>}
+            {modified && (
+              <span>Updated: <time datetime={modified.toISOString()}>{formatDate(modified)}</time></span>
+            )}
+            {content && <span>{readingTime} min read</span>}
+          </div>
+          
+          {tags && tags.length > 0 && (
+            <div class="flex flex-wrap gap-2">
+              {tags.map(tag => (
+                <a 
+                  href={`/posts/tags/${tag}/`}
+                  class="tag-link bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm hover:bg-blue-200 transition-colors"
+                >
+                  {tag}
+                </a>
+              ))}
+            </div>
+          )}
+        </header>
+      )}
+
+      <div class="content prose prose-lg max-w-none" id="content">
+        <slot />
+      </div>
+    </article>
+  </main>
+</Layout>
+
+<script is:inline define:vars={{ bibContent }}>
+// Modern Citation.js implementation
+document.addEventListener('DOMContentLoaded', async function() {
+  try {
+    // Dynamically import Citation.js modules
+    const { Cite } = await import('@citation-js/core');
+    await import('@citation-js/plugin-bibtex');
+    await import('@citation-js/plugin-csl');
+    
+    // Get content element
+    const content = document.getElementById('content');
+    if (!content) return;
+    
+    // Load bibliography
+    const bibliography = new Cite(bibContent);
+    const citations = new Map();
+    
+    // Create citation lookup map
+    for (let item of bibliography.data) {
+      if (item.id) {
+        citations.set(item.id, item);
+      }
+    }
+    
+    // Find all citations in content
+    const contentText = content.innerHTML;
+    const usedCitations = new Set();
+    const citeRegex = /\\cite\{([^}]+)\}/g;
+    let match;
+    
+    while ((match = citeRegex.exec(contentText)) !== null) {
+      const key = match[1];
+      if (citations.has(key)) {
+        usedCitations.add(key);
+      }
+    }
+    
+    if (usedCitations.size === 0) return;
+    
+    // Sort citations for consistent numbering
+    const sortedCitations = Array.from(usedCitations).sort();
+    
+    // Replace citations with numbered links
+    let processedContent = contentText;
+    sortedCitations.forEach((key, index) => {
+      const citationNumber = index + 1;
+      const regex = new RegExp(`\\\\cite\\{${key}\\}`, 'g');
+      processedContent = processedContent.replace(
+        regex, 
+        `<a href="#ref-${key}" class="citation-link">[${citationNumber}]</a>`
+      );
+    });
+    
+    content.innerHTML = processedContent;
+    
+    // Generate bibliography using Citation.js
+    const usedItems = sortedCitations
+      .map(key => citations.get(key))
+      .filter(item => item !== undefined);
+    
+    const usedBibliography = new Cite(usedItems);
+    
+    // Generate APA style bibliography
+    const bibliographyEntries = usedBibliography.format('bibliography', {
+      format: 'html',
+      template: 'apa',
+      lang: 'en-US'
+    });
+    
+    // Create styled bibliography HTML
+    let bibliographyHtml = `
+      <div class="bibliography">
+        <h2 class="bibliography-title">References</h2>
+        <div class="bibliography-list">
+    `;
+    
+    // Parse the Citation.js output and add numbers
+    const parser = new DOMParser();
+    const bibDoc = parser.parseFromString(bibliographyEntries, 'text/html');
+    const entries = bibDoc.querySelectorAll('.csl-entry');
+    
+    entries.forEach((entry, index) => {
+      const key = sortedCitations[index];
+      const citationNumber = index + 1;
+      
+      bibliographyHtml += `
+        <div class="bibliography-entry" id="ref-${key}">
+          <div class="citation-layout">
+            <span class="citation-number">[${citationNumber}]</span>
+            <div class="citation-content">
+              ${entry.innerHTML}
+            </div>
+          </div>
+        </div>
+      `;
+    });
+    
+    bibliographyHtml += '</div></div>';
+    
+    // Append bibliography to content
+    content.insertAdjacentHTML('afterend', bibliographyHtml);
+    
+  } catch (error) {
+    console.error('Error processing citations:', error);
+  }
+});
+</script>
+
+<style is:global>
+  /* Citation link styles */
+  .citation-link {
+    color: #2563eb;
+    text-decoration: none;
+    font-weight: 500;
+    padding: 0.1em 0.2em;
+    border-radius: 0.2em;
+    transition: background-color 0.2s ease;
+  }
+  
+  .citation-link:hover {
+    background-color: #e0e7ff;
+    text-decoration: none;
+  }
+  
+  /* Bibliography styles */
+  .bibliography {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid #e5e7eb;
+  }
+  
+  .bibliography-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    color: #1f2937;
+  }
+  
+  .bibliography-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .bibliography-entry {
+    padding: 1rem;
+    background-color: #ffffff;
+    border-radius: 0.75rem;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    line-height: 1.6;
+    transition: all 0.2s ease-in-out;
+  }
+  
+  .bibliography-entry:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  }
+  
+  .citation-layout {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+  
+  .citation-number {
+    font-weight: 600;
+    color: #3b82f6;
+    flex-shrink: 0;
+    min-width: 2rem;
+    text-align: left;
+  }
+  
+  .citation-content {
+    flex: 1;
+    line-height: 1.6;
+  }
+  
+  /* Dark mode support */
+  @media (prefers-color-scheme: dark) {
+    .citation-link:hover {
+      background-color: #1e3a8a;
+    }
+    
+    .bibliography {
+      border-top-color: #374151;
+    }
+    
+    .bibliography-title {
+      color: #f9fafb;
+    }
+    
+    .bibliography-entry {
+      background-color: #1f2937;
+      border-color: #374151;
+      color: #f3f4f6;
+    }
+    
+    .citation-number {
+      color: #60a5fa;
+    }
+  }
+  
+  /* Enhanced markdown styling */
+  .sophisticated-markdown {
+    font-family: 'Inter', 'Noto Sans JP', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    font-size: 1.125rem;
+    line-height: 1.8;
+    color: #374151;
+    letter-spacing: -0.011em;
+  }
+  
+  .sophisticated-markdown h1 {
+    font-size: 2.25rem;
+    font-weight: 800;
+    line-height: 1.2;
+    margin-bottom: 1.5rem;
+    color: #1f2937;
+  }
+  
+  .sophisticated-markdown h2 {
+    font-size: 1.875rem;
+    font-weight: 700;
+    line-height: 1.3;
+    margin-top: 2.5rem;
+    margin-bottom: 1rem;
+    color: #1f2937;
+  }
+  
+  .sophisticated-markdown h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    line-height: 1.4;
+    margin-top: 2rem;
+    margin-bottom: 0.75rem;
+    color: #374151;
+  }
+  
+  .sophisticated-markdown p {
+    margin-bottom: 1.5rem;
+  }
+  
+  .sophisticated-markdown a {
+    color: #2563eb;
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
+    transition: all 0.2s ease;
+  }
+  
+  .sophisticated-markdown a:hover {
+    color: #1d4ed8;
+    text-decoration-thickness: 2px;
+  }
+  
+  /* Dark mode for content */
+  @media (prefers-color-scheme: dark) {
+    .sophisticated-markdown {
+      color: #e5e7eb;
+    }
+    
+    .sophisticated-markdown h1,
+    .sophisticated-markdown h2 {
+      color: #f9fafb;
+    }
+    
+    .sophisticated-markdown h3 {
+      color: #d1d5db;
+    }
+    
+    .sophisticated-markdown a {
+      color: #60a5fa;
+    }
+    
+    .sophisticated-markdown a:hover {
+      color: #93c5fd;
+    }
+  }
+</style>
