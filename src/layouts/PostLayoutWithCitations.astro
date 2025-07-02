@@ -494,7 +494,8 @@ const readingTimeData = content ? calculateReadingTime(content) : null;
 function processCitationsInContent(content, bibliography) {
   // First pass: extract all citation keys to assign numbers
   const usedCitations = new Set();
-  const citeRegex = /\\?cite\{([^}]+)\}/g;
+  // Handle both escaped and HTML-encoded braces: \cite{}, cite{}, cite&#123;&#125;
+  const citeRegex = /\\?cite(?:&#123;|\{)([^}&#]+)(?:&#125;|\})/g;
   let match;
   while ((match = citeRegex.exec(content)) !== null) {
     usedCitations.add(match[1]);
@@ -507,8 +508,8 @@ function processCitationsInContent(content, bibliography) {
     citationNumbers.set(key, index + 1);
   });
   
-  // Replace \cite{key} or cite{key} with numbered citations
-  return content.replace(/\\?cite\{([^}]+)\}/g, function(match, key) {
+  // Replace all citation formats with numbered citations
+  return content.replace(/\\?cite(?:&#123;|\{)([^}&#]+)(?:&#125;|\})/g, function(match, key) {
     if (bibliography.has(key)) {
       const citationNumber = citationNumbers.get(key);
       return '<cite data-cite="' + key + '"><a href="#ref-' + key + '" class="citation-link">[' + citationNumber + ']</a></cite>';
@@ -637,7 +638,8 @@ document.addEventListener('DOMContentLoaded', async function() {
   console.log('Citation processor: Content length:', contentText.length);
   console.log('Citation processor: Has \\cite{:', contentText.includes('\\cite{'));
   console.log('Citation processor: Has cite{:', contentText.includes('cite{'));
-  if (!contentText.includes('\\cite{') && !contentText.includes('cite{')) {
+  console.log('Citation processor: Has cite&#123;:', contentText.includes('cite&#123;'));
+  if (!contentText.includes('\\cite{') && !contentText.includes('cite{') && !contentText.includes('cite&#123;')) {
     console.log('Citation processor: No citations found, exiting');
     return;
   }
@@ -654,16 +656,16 @@ document.addEventListener('DOMContentLoaded', async function() {
     const processedContent = processCitationsInContent(contentText, bibliography);
     content.innerHTML = processedContent;
     
-    // Extract used citations
+    // Extract used citations with robust pattern matching
     const usedCitations = new Set();
-    const citeRegex = /\\?cite\{([^}]+)\}/g;
+    const citeRegex = /\\?cite(?:&#123;|\{)([^}&#]+)(?:&#125;|\})/g;
     let match;
     while ((match = citeRegex.exec(contentText)) !== null) {
       usedCitations.add(match[1]);
     }
     
-    // Generate and append bibliography if citations exist
-    if (usedCitations.size > 0) {
+    // Generate and append bibliography if citations exist (avoid duplicates)
+    if (usedCitations.size > 0 && !document.querySelector('.bibliography')) {
       const bibliographyHtml = generateBibliographyHtml(bibliography, usedCitations);
       content.insertAdjacentHTML('afterend', bibliographyHtml);
     }
@@ -815,6 +817,41 @@ document.addEventListener('DOMContentLoaded', async function() {
     .bibliography-entry .citation-number {
       color: #60a5fa;
     }
+  }
+
+  /* Enhanced Math Styling for KaTeX */
+  .sophisticated-markdown .katex {
+    font-size: 1.1em !important;
+  }
+
+  .sophisticated-markdown .katex-display {
+    margin: 2.5rem 0 !important;
+    text-align: center !important;
+    background: linear-gradient(135deg, #f8fafc, #f1f5f9) !important;
+    padding: 1.5rem !important;
+    border-radius: 8px !important;
+    border-left: 4px solid #3b82f6 !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
+    position: relative !important;
+  }
+
+  .sophisticated-markdown .katex-display::before {
+    content: "" !important;
+    position: absolute !important;
+    top: 12px !important;
+    right: 12px !important;
+    width: 8px !important;
+    height: 8px !important;
+    background: #3b82f6 !important;
+    border-radius: 50% !important;
+  }
+
+  .sophisticated-markdown .math.inline {
+    background: rgba(59, 130, 246, 0.08) !important;
+    padding: 0.2em 0.4em !important;
+    border-radius: 4px !important;
+    margin: 0 0.1em !important;
+    font-weight: 500 !important;
   }
 
   /* Enhanced markdown styling for sophisticated typography */

@@ -93,6 +93,25 @@ const nav = createNav(currentLocale);
     <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
     <!-- KaTeX CSS for math rendering -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css" integrity="sha384-ViRYZ70/JRNFM/sw6H1y6Ec/WiGIfAb/dAs7x4HDdyYC1KC9Fkj9cBmtXYJQC5Gy" crossorigin="anonymous">
+    
+    <!-- Prevent flash of unstyled math content -->
+    <style>
+      /* Hide math content until KaTeX is loaded */
+      .katex-mathml { display: none; }
+      .katex-html { visibility: visible; }
+      
+      /* Ensure display math equations are properly centered */
+      .katex-display {
+        display: block !important;
+        text-align: center !important;
+        margin: 1.5rem 0 !important;
+      }
+      
+      /* Prevent raw LaTeX from showing during loading */
+      p:has(.katex-display) {
+        min-height: 3rem;
+      }
+    </style>
     <title>{title}</title>
   </head>
   <body>

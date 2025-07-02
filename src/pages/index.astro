@@ -35,8 +35,8 @@ const sortedPosts = visiblePosts.sort((a, b) => {
         }
       }
       
-      // Determine if we should use citations layout
-      const contentHasCitations = post.body.includes('\\cite{');
+      // Determine if we should use citations layout (check raw markdown)
+      const contentHasCitations = post.body.includes('cite{') || post.body.includes('\\cite{');
       const useCitationsLayout = contentHasCitations || post.data.layout?.includes('PostLayoutWithCitations');
       const LayoutComponent = useCitationsLayout ? PostLayoutWithCitations : PostLayout;
       
