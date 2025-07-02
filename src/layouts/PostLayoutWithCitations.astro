@@ -508,14 +508,137 @@ function processCitationsInContent(content, bibliography) {
     citationNumbers.set(key, index + 1);
   });
   
-  // Replace all citation formats with numbered citations
-  return content.replace(/\\?cite(?:&#123;|\{)([^}&#]+)(?:&#125;|\})/g, function(match, key) {
+  // CRITICAL: Preserve KaTeX content by protecting it during regex processing
+  // Store KaTeX spans temporarily with more robust matching
+  const katexPlaceholders = [];
+  let processedContent = content;
+  
+  // Replace KaTeX spans with placeholders - handle nested spans and complex structure
+  processedContent = processedContent.replace(/<span class="katex"[^>]*>[\s\S]*?<\/span>/g, function(katexSpan) {
+    const placeholder = `__KATEX_PLACEHOLDER_${katexPlaceholders.length}__`;
+    katexPlaceholders.push(katexSpan);
+    return placeholder;
+  });
+  
+  // Also protect any standalone math expressions that might not be fully processed yet
+  processedContent = processedContent.replace(/\$\$[\s\S]*?\$\$/g, function(mathBlock) {
+    const placeholder = `__MATH_BLOCK_PLACEHOLDER_${katexPlaceholders.length}__`;
+    katexPlaceholders.push(mathBlock);
+    return placeholder;
+  });
+  
+  processedContent = processedContent.replace(/\$[^$]+\$/g, function(mathInline) {
+    const placeholder = `__MATH_INLINE_PLACEHOLDER_${katexPlaceholders.length}__`;
+    katexPlaceholders.push(mathInline);
+    return placeholder;
+  });
+  
+  // Now process citations on the content without KaTeX
+  processedContent = processedContent.replace(/\\?cite(?:&#123;|\{)([^}&#]+)(?:&#125;|\})/g, function(match, key) {
     if (bibliography.has(key)) {
       const citationNumber = citationNumbers.get(key);
       return '<cite data-cite="' + key + '"><a href="#ref-' + key + '" class="citation-link">[' + citationNumber + ']</a></cite>';
     }
     return '<span class="citation-error">[' + key + '?]</span>';
   });
+  
+  // Restore KaTeX content with all placeholder types
+  katexPlaceholders.forEach(function(katexSpan, index) {
+    const katexPlaceholder = `__KATEX_PLACEHOLDER_${index}__`;
+    const mathBlockPlaceholder = `__MATH_BLOCK_PLACEHOLDER_${index}__`;
+    const mathInlinePlaceholder = `__MATH_INLINE_PLACEHOLDER_${index}__`;
+    
+    processedContent = processedContent.replace(katexPlaceholder, katexSpan);
+    processedContent = processedContent.replace(mathBlockPlaceholder, katexSpan);
+    processedContent = processedContent.replace(mathInlinePlaceholder, katexSpan);
+  });
+  
+  return processedContent;
+}
+
+// NEW: Process citations directly in DOM to preserve KaTeX elements
+function processCitationsInDOM(contentElement, bibliography) {
+  // Get all text nodes that might contain citations (excluding KaTeX elements)
+  const walker = document.createTreeWalker(
+    contentElement,
+    NodeFilter.SHOW_TEXT,
+    {
+      acceptNode: function(node) {
+        // Skip text nodes that are inside KaTeX elements
+        let parent = node.parentElement;
+        while (parent) {
+          if (parent.classList && parent.classList.contains('katex')) {
+            return NodeFilter.FILTER_REJECT;
+          }
+          parent = parent.parentElement;
+        }
+        // Only process text nodes that contain citation patterns
+        if (node.textContent.includes('\\cite{') || node.textContent.includes('cite{')) {
+          return NodeFilter.FILTER_ACCEPT;
+        }
+        return NodeFilter.FILTER_REJECT;
+      }
+    }
+  );
+
+  const textNodes = [];
+  let node;
+  while (node = walker.nextNode()) {
+    textNodes.push(node);
+  }
+
+  // First pass: collect all citations to assign numbers
+  const usedCitations = new Set();
+  textNodes.forEach(function(textNode) {
+    const text = textNode.textContent;
+    const citeRegex = /\\?cite(?:&#123;|\{)([^}&#]+)(?:&#125;|\})/g;
+    let match;
+    while ((match = citeRegex.exec(text)) !== null) {
+      usedCitations.add(match[1]);
+    }
+  });
+
+  // Sort citations and assign numbers
+  const sortedKeys = Array.from(usedCitations).sort();
+  const citationNumbers = new Map();
+  sortedKeys.forEach(function(key, index) {
+    citationNumbers.set(key, index + 1);
+  });
+
+  // Second pass: replace citations in text nodes
+  textNodes.forEach(function(textNode) {
+    const text = textNode.textContent;
+    const citeRegex = /\\?cite(?:&#123;|\{)([^}&#]+)(?:&#125;|\})/g;
+    
+    if (citeRegex.test(text)) {
+      // Create a temporary element to parse the replacement HTML
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = text.replace(/\\?cite(?:&#123;|\{)([^}&#]+)(?:&#125;|\})/g, function(match, key) {
+        if (bibliography.has(key)) {
+          const citationNumber = citationNumbers.get(key);
+          return '<cite data-cite="' + key + '"><a href="#ref-' + key + '" class="citation-link">[' + citationNumber + ']</a></cite>';
+        }
+        return '<span class="citation-error">[' + key + '?]</span>';
+      });
+      
+      // Replace the text node with the new content
+      const parent = textNode.parentNode;
+      while (tempDiv.firstChild) {
+        parent.insertBefore(tempDiv.firstChild, textNode);
+      }
+      parent.removeChild(textNode);
+    }
+  });
+}
+
+// Extract citations from processed DOM
+function extractCitationsFromDOM(contentElement) {
+  const usedCitations = new Set();
+  const citeElements = contentElement.querySelectorAll('cite[data-cite]');
+  citeElements.forEach(function(cite) {
+    usedCitations.add(cite.getAttribute('data-cite'));
+  });
+  return usedCitations;
 }
 
 function generateBibliographyHtml(bibliography, usedCitations) {
@@ -652,17 +775,11 @@ document.addEventListener('DOMContentLoaded', async function() {
     const bibliographyData = await response.json();
     const bibliography = new Map(bibliographyData);
     
-    // Process citations in content
-    const processedContent = processCitationsInContent(contentText, bibliography);
-    content.innerHTML = processedContent;
+    // Process citations directly in the DOM without destroying innerHTML
+    processCitationsInDOM(content, bibliography);
     
-    // Extract used citations with robust pattern matching
-    const usedCitations = new Set();
-    const citeRegex = /\\?cite(?:&#123;|\{)([^}&#]+)(?:&#125;|\})/g;
-    let match;
-    while ((match = citeRegex.exec(contentText)) !== null) {
-      usedCitations.add(match[1]);
-    }
+    // Extract used citations from the now-processed DOM
+    const usedCitations = extractCitationsFromDOM(content);
     
     // Generate and append bibliography if citations exist (avoid duplicates)
     if (usedCitations.size > 0 && !document.querySelector('.bibliography')) {

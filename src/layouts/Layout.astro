@@ -94,17 +94,101 @@ const nav = createNav(currentLocale);
     <!-- KaTeX CSS for math rendering -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css" integrity="sha384-ViRYZ70/JRNFM/sw6H1y6Ec/WiGIfAb/dAs7x4HDdyYC1KC9Fkj9cBmtXYJQC5Gy" crossorigin="anonymous">
     
-    <!-- Prevent flash of unstyled math content -->
-    <style>
-      /* Hide math content until KaTeX is loaded */
-      .katex-mathml { display: none; }
-      .katex-html { visibility: visible; }
+    <!-- AGGRESSIVE: Force KaTeX to work properly -->
+    <style is:global>
+      /* NUCLEAR OPTION: Completely hide mathml and force html to show */
+      .katex .katex-mathml,
+      span.katex .katex-mathml,
+      div .katex-mathml,
+      * .katex-mathml,
+      .katex-mathml {
+        display: none !important;
+        visibility: hidden !important;
+        position: absolute !important;
+        left: -9999px !important;
+        width: 0 !important;
+        height: 0 !important;
+        overflow: hidden !important;
+        clip: rect(0, 0, 0, 0) !important;
+      }
       
-      /* Ensure display math equations are properly centered */
-      .katex-display {
-        display: block !important;
-        text-align: center !important;
+      /* Force HTML to be the only visible part */
+      .katex .katex-html,
+      span.katex .katex-html,
+      div .katex-html,
+      * .katex-html,
+      .katex-html { 
+        display: inline !important;
+        visibility: visible !important;
+        position: relative !important;
+        left: auto !important;
+        width: auto !important;
+        height: auto !important;
+        overflow: visible !important;
+        clip: auto !important;
+      }
+      
+      /* Ensure block equations work */
+      .katex-display,
+      span.katex-display { 
+        display: block !important; 
+        text-align: center !important; 
         margin: 1.5rem 0 !important;
+      }
+      
+      .katex-display .katex-html {
+        display: block !important;
+      }
+      
+      /* Basic katex styling */
+      .katex,
+      span.katex {
+        font-size: inherit !important;
+        background: transparent !important;
+        border: none !important;
+      }
+    </style>
+    
+    <!-- Enhanced math styling -->
+    <style>
+      /* Enhanced display math styling */
+      .katex-display {
+        margin: 1.5rem 0 !important;
+      }
+      
+      /* Enhanced Math Styling for PostLayoutWithCitations */
+      .sophisticated-markdown .katex {
+        font-size: 1.1em !important;
+      }
+
+      .sophisticated-markdown .katex-display {
+        margin: 2.5rem 0 !important;
+        text-align: center !important;
+        background: linear-gradient(135deg, #f8fafc, #f1f5f9) !important;
+        padding: 1.5rem !important;
+        border-radius: 8px !important;
+        border-left: 4px solid #3b82f6 !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
+        position: relative !important;
+      }
+
+      .sophisticated-markdown .katex-display::before {
+        content: "" !important;
+        position: absolute !important;
+        top: 12px !important;
+        right: 12px !important;
+        width: 8px !important;
+        height: 8px !important;
+        background: #3b82f6 !important;
+        border-radius: 50% !important;
+      }
+
+      .sophisticated-markdown .math.inline {
+        background: rgba(59, 130, 246, 0.08) !important;
+        padding: 0.2em 0.4em !important;
+        border-radius: 4px !important;
+        margin: 0 0.1em !important;
+        font-weight: 500 !important;
       }
       
       /* Prevent raw LaTeX from showing during loading */
