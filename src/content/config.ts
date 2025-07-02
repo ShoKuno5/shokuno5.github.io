@@ -63,4 +63,8 @@ export const collections = {
     type: 'content',
     schema: projectsPageSchema,
   }),
+  refs: defineCollection({
+    type: 'data',
+    schema: z.any(), // BibTeX files don't have a specific schema
+  }),
 };

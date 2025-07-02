@@ -37,19 +37,33 @@ if (!modifiedDate && gitDates?.modified) {
   }
 }
 
-// Determine which layout to use based on frontmatter
+// Determine which layout to use based on frontmatter and content
 const useAcademicLayout = post.data.type === 'academic';
-const useCitationsLayout = post.data.layout?.includes('PostLayoutWithCitations');
+// Check if post content contains citations (check raw markdown)
+const contentHasCitations = post.body.includes('cite{') || post.body.includes('\\cite{');
+const useCitationsLayout = contentHasCitations || post.data.layout?.includes('PostLayoutWithCitations');
 
 let LayoutComponent = PostLayout;
-if (useAcademicLayout) {
-  LayoutComponent = AcademicLayout;
-} else if (useCitationsLayout) {
+if (useCitationsLayout) {
+  // Citations take priority over academic layout for proper processing
   LayoutComponent = PostLayoutWithCitations;
+} else if (useAcademicLayout) {
+  LayoutComponent = AcademicLayout;
 }
 ---
 
-{useAcademicLayout ? (
+{useCitationsLayout ? (
+  <PostLayoutWithCitations
+    title={post.data.title} 
+    date={publishDate}
+    modified={modifiedDate}
+    tags={post.data.tags}
+    description={post.data.description || post.data.summary}
+    content={post.body}
+  >
+    <Content />
+  </PostLayoutWithCitations>
+) : useAcademicLayout ? (
   <AcademicLayout
     title={post.data.title}
     description={post.data.description || post.data.summary}
@@ -60,14 +74,13 @@ if (useAcademicLayout) {
     <Content />
   </AcademicLayout>
 ) : (
-  <LayoutComponent
+  <PostLayout
     title={post.data.title} 
     date={publishDate}
     modified={modifiedDate}
     tags={post.data.tags}
     description={post.data.description || post.data.summary}
-    content={post.body}
   >
     <Content />
-  </LayoutComponent>
+  </PostLayout>
 )}
