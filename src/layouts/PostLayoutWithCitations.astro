@@ -494,7 +494,7 @@ const readingTimeData = content ? calculateReadingTime(content) : null;
 function processCitationsInContent(content, bibliography) {
   // First pass: extract all citation keys to assign numbers
   const usedCitations = new Set();
-  const citeRegex = /\\cite\{([^}]+)\}/g;
+  const citeRegex = /\\?cite\{([^}]+)\}/g;
   let match;
   while ((match = citeRegex.exec(content)) !== null) {
     usedCitations.add(match[1]);
@@ -507,8 +507,8 @@ function processCitationsInContent(content, bibliography) {
     citationNumbers.set(key, index + 1);
   });
   
-  // Replace \cite{key} with numbered citations
-  return content.replace(/\\cite\{([^}]+)\}/g, function(match, key) {
+  // Replace \cite{key} or cite{key} with numbered citations
+  return content.replace(/\\?cite\{([^}]+)\}/g, function(match, key) {
     if (bibliography.has(key)) {
       const citationNumber = citationNumbers.get(key);
       return '<cite data-cite="' + key + '"><a href="#ref-' + key + '" class="citation-link">[' + citationNumber + ']</a></cite>';
@@ -625,12 +625,22 @@ function formatPagesAPA(pages) {
 
 // Initialize citation processing on page load
 document.addEventListener('DOMContentLoaded', async function() {
+  console.log('Citation processor: DOMContentLoaded fired');
   // Check if this page has citations
   const content = document.querySelector('.sophisticated-markdown');
-  if (!content) return;
+  if (!content) {
+    console.log('Citation processor: No .sophisticated-markdown found');
+    return;
+  }
   
   const contentText = content.innerHTML;
-  if (!contentText.includes('\\cite{')) return;
+  console.log('Citation processor: Content length:', contentText.length);
+  console.log('Citation processor: Has \\cite{:', contentText.includes('\\cite{'));
+  console.log('Citation processor: Has cite{:', contentText.includes('cite{'));
+  if (!contentText.includes('\\cite{') && !contentText.includes('cite{')) {
+    console.log('Citation processor: No citations found, exiting');
+    return;
+  }
   
   try {
     // Load bibliography data from the server
@@ -646,7 +656,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     
     // Extract used citations
     const usedCitations = new Set();
-    const citeRegex = /\\cite\{([^}]+)\}/g;
+    const citeRegex = /\\?cite\{([^}]+)\}/g;
     let match;
     while ((match = citeRegex.exec(contentText)) !== null) {
       usedCitations.add(match[1]);

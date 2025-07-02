@@ -75,5 +75,3 @@ The field is rapidly evolving, with new applications emerging in areas such as f
 
 The mathematical foundations of discrete diffusion models and flow matching provide a rich framework for understanding and developing new generative models. As we continue to explore these techniques, we can expect to see further advances in both theoretical understanding and practical applications.
 
----
-*References are automatically generated from the bibliography.*
