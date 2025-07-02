@@ -1,6 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import PostLayout from '../../layouts/PostLayout.astro';
+import PostLayoutWithCitations from '../../layouts/PostLayoutWithCitations.astro';
 import { getGitDatesForContent } from '../../utils/gitDates';
 import { extractDateFromFilename } from '../../utils/extractDateFromFilename';
 
@@ -23,8 +24,8 @@ const { Content } = await post.render();
 const gitDates = getGitDatesForContent('posts', post.slug);
 const filenameDate = extractDateFromFilename(post.slug);
 
-// Priority: frontmatter date > filename date > git created date
-const publishDate = post.data.date || filenameDate || gitDates?.created || new Date();
+// Priority: frontmatter pubDate/date > filename date > git created date
+const publishDate = post.data.pubDate || post.data.date || filenameDate || gitDates?.created || new Date();
 
 // For modified date, always use git modified if it exists and is different
 let modifiedDate = post.data.modified;
@@ -34,15 +35,19 @@ if (!modifiedDate && gitDates?.modified) {
     modifiedDate = gitDates.modified;
   }
 }
+
+// Determine if we should use citations layout
+const useCitationsLayout = post.data.layout?.includes('PostLayoutWithCitations');
+const LayoutComponent = useCitationsLayout ? PostLayoutWithCitations : PostLayout;
 ---
 
-<PostLayout 
+<LayoutComponent
   title={post.data.title} 
   date={publishDate}
   modified={modifiedDate}
   tags={post.data.tags}
-  description={post.data.summary}
+  description={post.data.description || post.data.summary}
   content={post.body}
 >
   <Content />
-</PostLayout>
+</LayoutComponent>

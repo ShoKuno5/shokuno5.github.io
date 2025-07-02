@@ -2,6 +2,9 @@
 title: "Naive Hope"
 description: "Thoughts on optimism in technology and research"
 ---
+
+Owing everything to time is a blunt guess. 
+
 # Facade of Farce
 
 ### Remain an ape at the Primal Times.

@@ -1,0 +1,38 @@
+---
+export interface Props {
+  key: string;
+  entry?: any;
+}
+
+const { key, entry } = Astro.props;
+---
+
+<cite data-cite={key} class="citation">
+  <a href={`#ref-${key}`} class="citation-link">[{key}]</a>
+</cite>
+
+<style>
+  .citation {
+    font-style: normal;
+    font-size: 0.9em;
+    color: #2563eb;
+  }
+  
+  .citation-link {
+    text-decoration: none;
+    color: inherit;
+    padding: 0.1em 0.2em;
+    border-radius: 0.2em;
+    transition: background-color 0.2s ease;
+  }
+  
+  .citation-link:hover {
+    background-color: #e0e7ff;
+    text-decoration: underline;
+  }
+  
+  .citation-error {
+    color: #dc2626;
+    font-weight: bold;
+  }
+</style>

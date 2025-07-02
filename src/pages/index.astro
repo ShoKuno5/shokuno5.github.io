@@ -1,6 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import PostLayout from '../layouts/PostLayout.astro';
+import PostLayoutWithCitations from '../layouts/PostLayoutWithCitations.astro';
 import { getCollection } from 'astro:content';
 import { getGitDatesForContent } from '../utils/gitDates';
 import { extractDateFromFilename } from '../utils/extractDateFromFilename';
@@ -34,14 +35,18 @@ const sortedPosts = visiblePosts.sort((a, b) => {
         }
       }
       
+      // Determine if we should use citations layout
+      const useCitationsLayout = post.data.layout?.includes('PostLayoutWithCitations');
+      const LayoutComponent = useCitationsLayout ? PostLayoutWithCitations : PostLayout;
+      
       return (
         <div style="border-bottom: 1px solid rgba(0, 0, 0, 0.06); padding-bottom: 3rem;">
-          <PostLayout 
+          <LayoutComponent
             title={post.data.title}
             date={publishDate}
             modified={modifiedDate}
             tags={post.data.tags}
-            description={post.data.summary}
+            description={post.data.description || post.data.summary}
             content={post.body}
             mode="homepage"
             slug={post.slug.startsWith('en/') ? post.slug.slice(3) : post.slug}
@@ -49,7 +54,7 @@ const sortedPosts = visiblePosts.sort((a, b) => {
             showComments={false}
           >
             <Content />
-          </PostLayout>
+          </LayoutComponent>
         </div>
       );
     })}

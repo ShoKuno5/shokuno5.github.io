@@ -21,11 +21,15 @@ export const collections = {
     type: 'content',
     schema: z.object({
       title: z.string(),
+      pubDate: z.date(),
       date: z.date().optional(),
       modified: z.date().optional(),
+      description: z.string().optional(),
+      author: z.string().optional(),
       tags: z.array(z.string()).optional(),
       summary: z.string().optional(),
       hidden: z.boolean().optional(),
+      layout: z.string().optional(),
     }),
   }),
   projects: defineCollection({
