@@ -94,58 +94,19 @@ const nav = createNav(currentLocale);
     <!-- KaTeX CSS for math rendering -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css" integrity="sha384-ViRYZ70/JRNFM/sw6H1y6Ec/WiGIfAb/dAs7x4HDdyYC1KC9Fkj9cBmtXYJQC5Gy" crossorigin="anonymous">
     
-    <!-- AGGRESSIVE: Force KaTeX to work properly -->
+    <!-- KaTeX CSS fixes for proper math rendering -->
     <style is:global>
-      /* NUCLEAR OPTION: Completely hide mathml and force html to show */
-      .katex .katex-mathml,
-      span.katex .katex-mathml,
-      div .katex-mathml,
-      * .katex-mathml,
-      .katex-mathml {
-        display: none !important;
-        visibility: hidden !important;
-        position: absolute !important;
-        left: -9999px !important;
-        width: 0 !important;
-        height: 0 !important;
-        overflow: hidden !important;
-        clip: rect(0, 0, 0, 0) !important;
+      /* Hide KaTeX mathml accessibility annotations that show raw LaTeX */
+      .katex-mathml { 
+        display: none !important; 
       }
-      
-      /* Force HTML to be the only visible part */
-      .katex .katex-html,
-      span.katex .katex-html,
-      div .katex-html,
-      * .katex-html,
       .katex-html { 
-        display: inline !important;
-        visibility: visible !important;
-        position: relative !important;
-        left: auto !important;
-        width: auto !important;
-        height: auto !important;
-        overflow: visible !important;
-        clip: auto !important;
+        display: inline !important; 
       }
-      
-      /* Ensure block equations work */
-      .katex-display,
-      span.katex-display { 
+      .katex-display { 
         display: block !important; 
         text-align: center !important; 
         margin: 1.5rem 0 !important;
-      }
-      
-      .katex-display .katex-html {
-        display: block !important;
-      }
-      
-      /* Basic katex styling */
-      .katex,
-      span.katex {
-        font-size: inherit !important;
-        background: transparent !important;
-        border: none !important;
       }
     </style>
     
