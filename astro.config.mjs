@@ -3,6 +3,9 @@ import { defineConfig } from 'astro/config';
 
 import mdx from '@astrojs/mdx';
 import tailwind from '@astrojs/tailwind';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import rehypeCitation from 'rehype-citation';
 
 // https://astro.build/config
 export default defineConfig({
@@ -16,7 +19,28 @@ export default defineConfig({
     }
   },
   integrations: [
-    mdx(),
+    mdx({
+      remarkPlugins: [remarkMath],
+      rehypePlugins: [
+        rehypeKatex,
+        [rehypeCitation, {
+          bibliography: './src/content/refs/library.bib',
+          csl: 'vancouver',
+          linkCitations: true
+        }]
+      ]
+    }),
     tailwind()
-  ]
+  ],
+  markdown: {
+    remarkPlugins: [remarkMath],
+    rehypePlugins: [
+      rehypeKatex,
+      [rehypeCitation, {
+        bibliography: './src/content/refs/library.bib',
+        csl: 'vancouver',
+        linkCitations: true
+      }]
+    ]
+  }
 });

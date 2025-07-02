@@ -30,6 +30,7 @@ export const collections = {
       summary: z.string().optional(),
       hidden: z.boolean().optional(),
       layout: z.string().optional(),
+      type: z.string().optional(),
     }),
   }),
   projects: defineCollection({

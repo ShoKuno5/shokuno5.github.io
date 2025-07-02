@@ -1,0 +1,55 @@
+---
+// Component to post-process citations for better visual appearance
+---
+
+<script>
+  // Process citations on page load
+  document.addEventListener('DOMContentLoaded', function() {
+    // Find all citation links
+    const citations = document.querySelectorAll('a[href^="#ref-"]');
+    
+    citations.forEach(citation => {
+      // Clean up the citation text
+      let text = citation.textContent;
+      
+      if (text) {
+        // Remove markdown formatting: [**[1]**] -> 1
+        text = text.replace(/\[\*\*\[(\d+)\]\*\*\]/g, '$1');
+        
+        // Also handle: [1] -> 1
+        text = text.replace(/\[(\d+)\]/g, '$1');
+        
+        // Update the citation text
+        citation.textContent = text;
+      }
+      
+      // Add enhanced styling class
+      citation.classList.add('citation-enhanced');
+    });
+
+    // Process bibliography entries
+    const bibEntries = document.querySelectorAll('span[id^="ref-"]');
+    bibEntries.forEach((entry, index) => {
+      // Add numbering to bibliography entries
+      const number = index + 1;
+      entry.setAttribute('data-number', number.toString());
+    });
+
+    // Process math equations for better spacing
+    const mathDisplays = document.querySelectorAll('.katex-display');
+    mathDisplays.forEach(display => {
+      display.classList.add('math-enhanced');
+    });
+
+    // Process inline math
+    const mathInline = document.querySelectorAll('.katex:not(.katex-display)');
+    mathInline.forEach(math => {
+      math.classList.add('math-inline-enhanced');
+    });
+  });
+</script>
+
+<style>
+  /* Enhanced citation styling is already in AcademicLayout.astro */
+  /* This component just handles the JavaScript processing */
+</style>

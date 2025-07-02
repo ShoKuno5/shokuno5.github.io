@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import PostLayout from '../../layouts/PostLayout.astro';
 import PostLayoutWithCitations from '../../layouts/PostLayoutWithCitations.astro';
+import AcademicLayout from '../../layouts/AcademicLayout.astro';
 import { getGitDatesForContent } from '../../utils/gitDates';
 import { extractDateFromFilename } from '../../utils/extractDateFromFilename';
 
@@ -36,18 +37,37 @@ if (!modifiedDate && gitDates?.modified) {
   }
 }
 
-// Determine if we should use citations layout
+// Determine which layout to use based on frontmatter
+const useAcademicLayout = post.data.type === 'academic';
 const useCitationsLayout = post.data.layout?.includes('PostLayoutWithCitations');
-const LayoutComponent = useCitationsLayout ? PostLayoutWithCitations : PostLayout;
+
+let LayoutComponent = PostLayout;
+if (useAcademicLayout) {
+  LayoutComponent = AcademicLayout;
+} else if (useCitationsLayout) {
+  LayoutComponent = PostLayoutWithCitations;
+}
 ---
 
-<LayoutComponent
-  title={post.data.title} 
-  date={publishDate}
-  modified={modifiedDate}
-  tags={post.data.tags}
-  description={post.data.description || post.data.summary}
-  content={post.body}
->
-  <Content />
-</LayoutComponent>
+{useAcademicLayout ? (
+  <AcademicLayout
+    title={post.data.title}
+    description={post.data.description || post.data.summary}
+    date={publishDate}
+    tags={post.data.tags}
+    author={post.data.author}
+  >
+    <Content />
+  </AcademicLayout>
+) : (
+  <LayoutComponent
+    title={post.data.title} 
+    date={publishDate}
+    modified={modifiedDate}
+    tags={post.data.tags}
+    description={post.data.description || post.data.summary}
+    content={post.body}
+  >
+    <Content />
+  </LayoutComponent>
+)}
