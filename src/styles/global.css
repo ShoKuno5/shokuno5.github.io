@@ -352,6 +352,7 @@ p {
   scrollbar-width: none;
 }
 
+
 /* Mobile Navigation Toggle - Simplified for Maximum Compatibility */
 
 /* Hamburger menu button - guaranteed visibility */
@@ -493,4 +494,13 @@ p {
   .mobile-menu-button {
     display: none !important;
   }
+}
+
+/* Minimal KaTeX overrides to ensure visibility */
+.katex-html {
+  display: inline !important;
+}
+
+.katex-display .katex-html {
+  display: block !important;
 }

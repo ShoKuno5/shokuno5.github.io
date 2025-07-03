@@ -92,7 +92,8 @@ const nav = createNav(currentLocale);
     <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-core.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
     <!-- KaTeX CSS for math rendering -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css" integrity="sha384-ViRYZ70/JRNFM/sw6H1y6Ec/WiGIfAb/dAs7x4HDdyYC1KC9Fkj9cBmtXYJQC5Gy" crossorigin="anonymous">
+    <link rel="stylesheet" href="/katex.min.css">
+    
     
     <!-- KaTeX CSS fixes for proper math rendering -->
     <style is:global>
@@ -100,61 +101,10 @@ const nav = createNav(currentLocale);
       .katex-mathml { 
         display: none !important; 
       }
-      .katex-html { 
-        display: inline !important; 
-      }
-      .katex-display { 
-        display: block !important; 
-        text-align: center !important; 
-        margin: 1.5rem 0 !important;
-      }
-    </style>
-    
-    <!-- Enhanced math styling -->
-    <style>
-      /* Enhanced display math styling */
-      .katex-display {
-        margin: 1.5rem 0 !important;
-      }
       
-      /* Enhanced Math Styling for PostLayoutWithCitations */
-      .sophisticated-markdown .katex {
-        font-size: 1.1em !important;
-      }
-
-      .sophisticated-markdown .katex-display {
-        margin: 2.5rem 0 !important;
-        text-align: center !important;
-        background: linear-gradient(135deg, #f8fafc, #f1f5f9) !important;
-        padding: 1.5rem !important;
-        border-radius: 8px !important;
-        border-left: 4px solid #3b82f6 !important;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
-        position: relative !important;
-      }
-
-      .sophisticated-markdown .katex-display::before {
-        content: "" !important;
-        position: absolute !important;
-        top: 12px !important;
-        right: 12px !important;
-        width: 8px !important;
-        height: 8px !important;
-        background: #3b82f6 !important;
-        border-radius: 50% !important;
-      }
-
-      .sophisticated-markdown .math.inline {
-        background: rgba(59, 130, 246, 0.08) !important;
-        padding: 0.2em 0.4em !important;
-        border-radius: 4px !important;
-        margin: 0 0.1em !important;
-        font-weight: 500 !important;
-      }
-      
-      /* Prevent raw LaTeX from showing during loading */
-      p:has(.katex-display) {
-        min-height: 3rem;
+      /* Reset equation counter at the start of each post */
+      .markdown-body {
+        counter-reset: equation;
       }
     </style>
     <title>{title}</title>

@@ -17,7 +17,7 @@ Recent advances in generative modeling have seen significant developments in dis
 
 ## Mathematical Framework of Discrete Diffusion
 
-The discrete diffusion process can be formulated as a Markov chain over discrete states. For a discrete state space $\mathcal{X} = \{1, 2, \ldots, K\}$, the forward diffusion process is defined by transition probabilities $Q_t(x_{t+1}|x_t)$.
+The discrete diffusion process can be formulated as a Markov chain over discrete states. For a discrete state space $$\mathcal{X} = \{1, 2, \ldots, K\}$$, the forward diffusion process is defined by transition probabilities $$Q_t(x_{t+1}|x_t)$$.
 
 The key insight from \cite{louDiscreteDiffusionModeling2024} is that we can estimate the ratios of the data distribution rather than the distribution itself. The score function in discrete space is defined as:
 

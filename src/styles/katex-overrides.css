@@ -1,0 +1,33 @@
+/* KaTeX Typography Overrides - Minimal fixes only */
+
+/* Ensure math displays properly without conflicting with base KaTeX styles */
+.sophisticated-markdown .katex,
+.sophisticated-markdown .katex-display {
+  background: transparent !important;
+  border: none !important;
+}
+
+/* Hide MathML fallback */
+.katex-mathml {
+  display: none !important;
+}
+
+/* Ensure proper display math centering */
+.katex-display {
+  display: block !important;
+  text-align: center !important;
+  margin: 1.5em auto !important;
+  width: 100% !important;
+}
+
+.katex-display .katex {
+  display: inline-block !important;
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+  .katex-display {
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+}
