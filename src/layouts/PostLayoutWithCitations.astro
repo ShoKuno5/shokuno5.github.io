@@ -534,12 +534,10 @@ function processCitationsInContent(content, bibliography) {
   });
   
   // Now process citations on the content without KaTeX
-  processedContent = processedContent.replace(/\\?cite\{([^}]+)\}/g, function(match, key) {
-    console.log('Citation processor: Processing citation', key, 'Number:', citationNumbers.get(key), 'Has in bib:', bibliography.has(key));
+  processedContent = processedContent.replace(/\\?cite\{([^}]+)\}/g, function(_, key) {
     if (bibliography.has(key)) {
       const citationNumber = citationNumbers.get(key);
       const replacement = '<cite data-cite="' + key + '"><a href="#ref-' + key + '" class="citation-link">[' + citationNumber + ']</a></cite>';
-      console.log('Citation processor: Replacement for', key, ':', replacement);
       return replacement;
     }
     return '<span class="citation-error">[' + key + '?]</span>';
@@ -561,7 +559,6 @@ function processCitationsInContent(content, bibliography) {
 
 // NEW: Process citations directly in DOM to preserve KaTeX elements
 function processCitationsInDOM(contentElement, bibliography) {
-  console.log('Citation processor: Starting DOM processing');
   // Get all text nodes that might contain citations (excluding KaTeX elements)
   const walker = document.createTreeWalker(
     contentElement,
@@ -579,9 +576,7 @@ function processCitationsInDOM(contentElement, bibliography) {
         // Only process text nodes that contain citation patterns
         const hasBackslashCite = node.textContent.includes('\\cite{');
         const hasCite = node.textContent.includes('cite{');
-        console.log('Citation processor: Checking text node:', JSON.stringify(node.textContent.substring(0, 100)), 'hasBackslashCite:', hasBackslashCite, 'hasCite:', hasCite);
         if (hasBackslashCite || hasCite) {
-          console.log('Citation processor: ACCEPTED text node:', JSON.stringify(node.textContent));
           return NodeFilter.FILTER_ACCEPT;
         }
         return NodeFilter.FILTER_REJECT;
@@ -595,8 +590,6 @@ function processCitationsInDOM(contentElement, bibliography) {
     textNodes.push(node);
   }
   
-  console.log('Citation processor: Found', textNodes.length, 'text nodes with citations');
-
   // First pass: collect all citations to assign numbers
   const usedCitations = new Set();
   textNodes.forEach(function(textNode) {
@@ -623,7 +616,7 @@ function processCitationsInDOM(contentElement, bibliography) {
     if (citeRegex.test(text)) {
       // Create a temporary element to parse the replacement HTML
       const tempDiv = document.createElement('div');
-      tempDiv.innerHTML = text.replace(/\\?cite\{([^}]+)\}/g, function(match, key) {
+      tempDiv.innerHTML = text.replace(/\\?cite\{([^}]+)\}/g, function(_, key) {
         if (bibliography.has(key)) {
           const citationNumber = citationNumbers.get(key);
           return '<cite data-cite="' + key + '"><a href="#ref-' + key + '" class="citation-link">[' + citationNumber + ']</a></cite>';
@@ -661,7 +654,6 @@ function generateBibliographyHtml(bibliography, usedCitations, articleId = '') {
     const entry = bibliography.get(key);
     if (!entry) continue;
     
-    const citationNumber = i + 1;
     const refId = articleId ? `ref-${articleId}-${key}` : `ref-${key}`;
     
     // APA 7th edition formatting
@@ -674,9 +666,6 @@ function generateBibliographyHtml(bibliography, usedCitations, articleId = '') {
                  .trim();
     const year = entry.entryTags.year || 'n.d.';
     const journal = entry.entryTags.journal || '';
-    const volume = entry.entryTags.volume || '';
-    const number = entry.entryTags.number || '';
-    const pages = entry.entryTags.pages || '';
     const doi = entry.entryTags.doi || '';
     const url = entry.entryTags.url || 
                 (doi ? 'https://doi.org/' + doi : '') ||
@@ -750,14 +739,6 @@ function getInitials(names) {
     .join(' ');
 }
 
-function formatPagesAPA(pages) {
-  if (pages.includes('-') || pages.includes('–')) {
-    const parts = pages.split(/[-–]/).map(function(p) { return p.trim(); });
-    return parts[0] + '–' + parts[1];
-  }
-  return pages;
-}
-
 // Initialize citation processing with better scoping for homepage mode
 async function processCitationsInArticle(articleElement) {
   try {
@@ -771,7 +752,7 @@ async function processCitationsInArticle(articleElement) {
     if (!contentText.includes('\\cite{')) return;
     
     // Generate unique article ID for this article
-    const articleId = Math.random().toString(36).substr(2, 9);
+    const articleId = Math.random().toString(36).substring(2, 9);
     
     // Load bibliography data
     const response = await fetch('/api/bibliography.json');
@@ -817,7 +798,7 @@ async function processCitationsInArticle(articleElement) {
     // Mark as processed
     content.dataset.citationsProcessed = 'true';
   } catch (error) {
-    console.error('Error processing citations:', error);
+    // Silent error handling - don't log in production
   }
 }
 

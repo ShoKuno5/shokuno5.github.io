@@ -15,7 +15,7 @@ export async function GET() {
       }
     });
   } catch (error) {
-    console.error('Error loading bibliography:', error);
+    // Silent error handling - return empty array
     return new Response(JSON.stringify([]), {
       status: 200,
       headers: {

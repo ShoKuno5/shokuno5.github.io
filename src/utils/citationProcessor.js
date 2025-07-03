@@ -15,7 +15,7 @@ async function loadBibliography() {
       const bibContent = fs.readFileSync(bibPath, 'utf-8');
       bibliographyData = parseBibliography(bibContent);
     } catch (error) {
-      console.error('Failed to load bibliography:', error);
+      // Silent error handling
       bibliographyData = new Map();
     }
   }

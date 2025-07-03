@@ -1,7 +1,6 @@
 ---
 import Layout from './Layout.astro';
 import { calculateReadingTime } from '../utils/readingTime';
-import CitationProcessor from '../components/CitationProcessor.astro';
 
 export interface Props {
   title: string;
@@ -166,7 +165,9 @@ const readingTimeData = content ? calculateReadingTime(content) : null;
     </header>
     
     <!-- Enhanced markdown content with citation processing -->
-    <CitationProcessor content={content || ''} />
+    <div class="sophisticated-markdown citations-enabled">
+      <slot />
+    </div>
   </article>
 ) : (
   <!-- Full layout mode -->
@@ -289,10 +290,9 @@ const readingTimeData = content ? calculateReadingTime(content) : null;
       </header>
       
       <!-- Enhanced markdown content with citation processing -->
-      <CitationProcessor content={content || ''} />
-      
-      <!-- Optional slot for additional content -->
-      <slot />
+      <div class="sophisticated-markdown citations-enabled">
+        <slot />
+      </div>
     </article>
   </Layout>
 )}

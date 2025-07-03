@@ -50,7 +50,7 @@ export async function loadBibliography() {
     const content = await fs.readFile(bibPath, 'utf-8');
     return parseBibTeX(content);
   } catch (error) {
-    console.error('Error loading bibliography:', error);
+    // Silent error handling
     return new Map();
   }
 }

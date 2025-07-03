@@ -44,7 +44,6 @@ const contentHasCitations = post.body.includes('cite{') || post.body.includes('\
 // Use citations layout when citations are detected
 const useCitationsLayout = contentHasCitations;
 
-
 let LayoutComponent = PostLayout;
 if (useCitationsLayout) {
   // Citations take priority over academic layout for proper processing
