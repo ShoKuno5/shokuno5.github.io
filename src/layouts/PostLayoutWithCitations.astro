@@ -651,7 +651,7 @@ function extractCitationsFromDOM(contentElement) {
   return usedCitations;
 }
 
-function generateBibliographyHtml(bibliography, usedCitations) {
+function generateBibliographyHtml(bibliography, usedCitations, articleId = '') {
   const sortedKeys = Array.from(usedCitations).sort();
   
   let html = '<div class="bibliography"><h2 class="bibliography-title" style="color: #1f2937 !important;">References</h2><div class="bibliography-list">';
@@ -662,6 +662,7 @@ function generateBibliographyHtml(bibliography, usedCitations) {
     if (!entry) continue;
     
     const citationNumber = i + 1;
+    const refId = articleId ? `ref-${articleId}-${key}` : `ref-${key}`;
     
     // APA 7th edition formatting
     const authors = formatAuthorsAPA(entry.entryTags.author || 'Unknown Author');
@@ -681,7 +682,7 @@ function generateBibliographyHtml(bibliography, usedCitations) {
                 (doi ? 'https://doi.org/' + doi : '') ||
                 (entry.entryTags.eprint ? 'https://arxiv.org/abs/' + entry.entryTags.eprint : '');
 
-    html += '<div class="bibliography-entry" id="ref-' + key + '">';
+    html += '<div class="bibliography-entry" id="' + refId + '">';
     html += '<div class="citation-layout">';
     
     // Add citation number
@@ -757,14 +758,20 @@ function formatPagesAPA(pages) {
   return pages;
 }
 
-// Initialize citation processing on page load
-document.addEventListener('DOMContentLoaded', async function() {
+// Initialize citation processing with better scoping for homepage mode
+async function processCitationsInArticle(articleElement) {
   try {
-    const content = document.querySelector('.sophisticated-markdown');
+    const content = articleElement.querySelector('.sophisticated-markdown');
     if (!content) return;
+    
+    // Check if this content has already been processed
+    if (content.dataset.citationsProcessed === 'true') return;
     
     const contentText = content.innerHTML;
     if (!contentText.includes('\\cite{')) return;
+    
+    // Generate unique article ID for this article
+    const articleId = Math.random().toString(36).substr(2, 9);
     
     // Load bibliography data
     const response = await fetch('/api/bibliography.json');
@@ -792,21 +799,43 @@ document.addEventListener('DOMContentLoaded', async function() {
     for (let i = 0; i < foundCitations.length; i++) {
       const key = foundCitations[i];
       const citationNumber = i + 1;
+      const refId = `ref-${articleId}-${key}`;
       const regex = new RegExp('\\\\cite\\{' + key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\}', 'g');
-      const replacement = '<cite data-cite="' + key + '"><a href="#ref-' + key + '" class="citation-link">[' + citationNumber + ']</a></cite>';
+      const replacement = '<cite data-cite="' + key + '"><a href="#' + refId + '" class="citation-link">[' + citationNumber + ']</a></cite>';
       html = html.replace(regex, replacement);
     }
     
     content.innerHTML = html;
     
-    // Generate bibliography
-    if (!document.querySelector('.bibliography')) {
+    // Generate bibliography (only if not already present in this article)
+    if (!articleElement.querySelector('.bibliography')) {
       const usedCitationsSet = new Set(foundCitations);
-      const bibliographyHtml = generateBibliographyHtml(bibliography, usedCitationsSet);
+      const bibliographyHtml = generateBibliographyHtml(bibliography, usedCitationsSet, articleId);
       content.insertAdjacentHTML('afterend', bibliographyHtml);
     }
+    
+    // Mark as processed
+    content.dataset.citationsProcessed = 'true';
   } catch (error) {
     console.error('Error processing citations:', error);
+  }
+}
+
+// Initialize citation processing on page load
+document.addEventListener('DOMContentLoaded', async function() {
+  // For homepage: process all articles
+  const articles = document.querySelectorAll('article');
+  if (articles.length > 1) {
+    // Homepage mode: process each article separately
+    for (const article of articles) {
+      await processCitationsInArticle(article);
+    }
+  } else {
+    // Single article mode: process the single article
+    const article = document.querySelector('article');
+    if (article) {
+      await processCitationsInArticle(article);
+    }
   }
 });
 </script>

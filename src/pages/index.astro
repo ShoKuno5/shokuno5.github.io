@@ -13,8 +13,8 @@ const visiblePosts = posts.filter(post => !post.data.hidden);
 const sortedPosts = visiblePosts.sort((a, b) => {
   const aFilenameDate = extractDateFromFilename(a.slug);
   const bFilenameDate = extractDateFromFilename(b.slug);
-  const aDate = a.data.date || aFilenameDate || getGitDatesForContent('posts', a.slug)?.created || new Date(0);
-  const bDate = b.data.date || bFilenameDate || getGitDatesForContent('posts', b.slug)?.created || new Date(0);
+  const aDate = a.data.pubDate || a.data.date || aFilenameDate || getGitDatesForContent('posts', a.slug)?.created || new Date(0);
+  const bDate = b.data.pubDate || b.data.date || bFilenameDate || getGitDatesForContent('posts', b.slug)?.created || new Date(0);
   return bDate.getTime() - aDate.getTime();
 });
 ---
@@ -25,7 +25,7 @@ const sortedPosts = visiblePosts.sort((a, b) => {
       const { Content } = await post.render();
       const gitDates = getGitDatesForContent('posts', post.slug);
       const filenameDate = extractDateFromFilename(post.slug);
-      const publishDate = post.data.date || filenameDate || gitDates?.created;
+      const publishDate = post.data.pubDate || post.data.date || filenameDate || gitDates?.created;
       
       // For modified date, always use git modified if it exists and is different
       let modifiedDate = post.data.modified;
