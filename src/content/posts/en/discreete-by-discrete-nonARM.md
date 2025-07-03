@@ -15,3 +15,5 @@ type: academic
 # Graph Generators
 
 ## Deep Graph Generators
+
+\cite{babaProverAgentAgentbased2025}
