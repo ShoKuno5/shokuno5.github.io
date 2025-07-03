@@ -5,6 +5,7 @@ import mdx from '@astrojs/mdx';
 import tailwind from '@astrojs/tailwind';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
+import { rehypeLazyImages } from './src/utils/rehype-lazy-images.js';
 // import rehypeCitation from 'rehype-citation'; // Disabled - using client-side citations
 
 // https://astro.build/config
@@ -22,7 +23,8 @@ export default defineConfig({
     mdx({
       remarkPlugins: [remarkMath],
       rehypePlugins: [
-        rehypeKatex
+        rehypeKatex,
+        rehypeLazyImages
         // [rehypeCitation, { ... }] // Disabled - using client-side citations
       ]
     }),
@@ -31,7 +33,8 @@ export default defineConfig({
   markdown: {
     remarkPlugins: [remarkMath],
     rehypePlugins: [
-      rehypeKatex
+      rehypeKatex,
+      rehypeLazyImages
       // [rehypeCitation, { ... }] // Disabled - using client-side citations
     ]
   }
