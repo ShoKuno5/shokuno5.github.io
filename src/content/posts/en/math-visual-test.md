@@ -99,7 +99,21 @@ $$\neg (P \land Q) \equiv (\neg P) \lor (\neg Q)$$
 ## Complex Mathematical Structures
 
 ### Fourier Transform
-$$\mathcal{F}\{f(t)\} = F(\omega) = \int_{-\infty}^{\infty} f(t) e^{-i\omega t} dt$$
+The Fourier Transform reveals the frequency content of a signal by decomposing it into its constituent sinusoidal components:
+
+$$
+\mathcal{F}\{f(t)\} = F(\omega) = \int_{-\infty}^{\infty} f(t) e^{-i\omega t} dt
+$$
+
+![Fourier Transform Animation](/images/fourier-transform-animated.gif)
+
+This animated visualization shows the intuitive understanding of the Fourier Transform:
+- **Top Left**: The combined time-domain signal being built up
+- **Top Right**: Rotating phasors representing each frequency component
+- **Bottom Left**: Individual sinusoidal components with different frequencies
+- **Bottom Right**: The frequency spectrum showing the magnitude of each component
+
+The rotating phasors demonstrate how each frequency component contributes to the overall signal, with the rotation speed corresponding to the frequency and the radius corresponding to the amplitude.
 
 ### Taylor Series
 $$f(x) = \sum_{n=0}^{\infty} \frac{f^{(n)}(a)}{n!}(x-a)^n$$
