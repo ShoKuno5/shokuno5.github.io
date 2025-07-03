@@ -70,14 +70,20 @@
   note = {Comment: This paper is a technical version of an article in The Gradient at https://thegradient.pub/transformers-are-graph-neural-networks/}
 }
 
-@misc{louDiscreteDiffusionModeling2024,
+@inproceedings{louDiscreteDiffusionModeling2024,
   title = {Discrete {{Diffusion Modeling}} by {{Estimating}} the {{Ratios}} of the {{Data Distribution}}},
-  author = {Lou, Aaron and Meng, Chenlin and Ermon, Stefano},
+  booktitle = {Proceedings of the 41st {{International Conference}} on {{Machine Learning}}},
+  author = {Lou, Aaron and Lim, Chenlin and Katariya, Isay and Ermon, Stefano},
   year = {2024},
-  publisher = {arXiv},
-  doi = {10.48550/arXiv.2310.16834},
-  note = {Comment: ICML 2024 Oral. Code at https://github.com/louaaron/Score-Entropy-Discrete-Diffusion}
+  series = {{{PMLR}}},
+  volume = {235},
+  pages = {32103--32138},
+  publisher = {{PMLR}},
+  address = {{Vienna, Austria}},
+  abstract = {Despite their groundbreaking performance for many generative modeling tasks, diffusion models have fallen short on discrete data domains such as natural language. Crucially, standard diffusion models rely on the well-established theory of score matching, but efforts to generalize this to discrete structures have not yielded the same empirical gains. In this work, we bridge this gap by proposing score entropy, a novel loss that naturally extends score matching to discrete spaces, modeled by estimating the ratios of the data distribution. We test our method on a suite of tasks including ordinal regression, pixel-level image modeling, and natural language generation. Across all tasks, we find improvements over existing discrete diffusion models and achieve new state-of-the-art results on several benchmarks.},
+  url = {https://proceedings.mlr.press/v235/lou24a.html}
 }
+
 
 @misc{nieLargeLanguageDiffusion2025,
   title = {Large {{Language Diffusion Models}}},

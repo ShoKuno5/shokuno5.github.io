@@ -535,9 +535,12 @@ function processCitationsInContent(content, bibliography) {
   
   // Now process citations on the content without KaTeX
   processedContent = processedContent.replace(/\\?cite\{([^}]+)\}/g, function(match, key) {
+    console.log('Citation processor: Processing citation', key, 'Number:', citationNumbers.get(key), 'Has in bib:', bibliography.has(key));
     if (bibliography.has(key)) {
       const citationNumber = citationNumbers.get(key);
-      return '<cite data-cite="' + key + '"><a href="#ref-' + key + '" class="citation-link">[' + citationNumber + ']</a></cite>';
+      const replacement = '<cite data-cite="' + key + '"><a href="#ref-' + key + '" class="citation-link">[' + citationNumber + ']</a></cite>';
+      console.log('Citation processor: Replacement for', key, ':', replacement);
+      return replacement;
     }
     return '<span class="citation-error">[' + key + '?]</span>';
   });
@@ -558,6 +561,7 @@ function processCitationsInContent(content, bibliography) {
 
 // NEW: Process citations directly in DOM to preserve KaTeX elements
 function processCitationsInDOM(contentElement, bibliography) {
+  console.log('Citation processor: Starting DOM processing');
   // Get all text nodes that might contain citations (excluding KaTeX elements)
   const walker = document.createTreeWalker(
     contentElement,
@@ -573,7 +577,11 @@ function processCitationsInDOM(contentElement, bibliography) {
           parent = parent.parentElement;
         }
         // Only process text nodes that contain citation patterns
-        if (node.textContent.includes('\\cite{') || node.textContent.includes('cite{')) {
+        const hasBackslashCite = node.textContent.includes('\\cite{');
+        const hasCite = node.textContent.includes('cite{');
+        console.log('Citation processor: Checking text node:', JSON.stringify(node.textContent.substring(0, 100)), 'hasBackslashCite:', hasBackslashCite, 'hasCite:', hasCite);
+        if (hasBackslashCite || hasCite) {
+          console.log('Citation processor: ACCEPTED text node:', JSON.stringify(node.textContent));
           return NodeFilter.FILTER_ACCEPT;
         }
         return NodeFilter.FILTER_REJECT;
@@ -586,6 +594,8 @@ function processCitationsInDOM(contentElement, bibliography) {
   while (node = walker.nextNode()) {
     textNodes.push(node);
   }
+  
+  console.log('Citation processor: Found', textNodes.length, 'text nodes with citations');
 
   // First pass: collect all citations to assign numbers
   const usedCitations = new Set();
@@ -749,40 +759,50 @@ function formatPagesAPA(pages) {
 
 // Initialize citation processing on page load
 document.addEventListener('DOMContentLoaded', async function() {
-  console.log('Citation processor: DOMContentLoaded fired');
-  // Check if this page has citations
-  const content = document.querySelector('.sophisticated-markdown');
-  if (!content) {
-    console.log('Citation processor: No .sophisticated-markdown found');
-    return;
-  }
-  
-  const contentText = content.innerHTML;
-  console.log('Citation processor: Processing citations in content');
-  // Check for citation patterns more broadly
-  const hasCitations = contentText.includes('cite{') || contentText.includes('\\cite{') || contentText.includes('cite&#123;');
-  if (!hasCitations) {
-    console.log('Citation processor: No citations found, exiting');
-    return;
-  }
-  
   try {
-    // Load bibliography data from the server
+    const content = document.querySelector('.sophisticated-markdown');
+    if (!content) return;
+    
+    const contentText = content.innerHTML;
+    if (!contentText.includes('\\cite{')) return;
+    
+    // Load bibliography data
     const response = await fetch('/api/bibliography.json');
     if (!response.ok) return;
     
     const bibliographyData = await response.json();
     const bibliography = new Map(bibliographyData);
     
-    // Process citations directly in the DOM without destroying innerHTML
-    processCitationsInDOM(content, bibliography);
+    // Find all citations
+    let html = content.innerHTML;
+    const citeRegex = /\\cite\{([^}]+)\}/g;
+    const foundCitations = [];
+    let match;
+    while ((match = citeRegex.exec(html)) !== null) {
+      if (bibliography.has(match[1]) && foundCitations.indexOf(match[1]) === -1) {
+        foundCitations.push(match[1]);
+      }
+    }
     
-    // Extract used citations from the now-processed DOM
-    const usedCitations = extractCitationsFromDOM(content);
+    if (foundCitations.length === 0) return;
     
-    // Generate and append bibliography if citations exist (avoid duplicates)
-    if (usedCitations.size > 0 && !document.querySelector('.bibliography')) {
-      const bibliographyHtml = generateBibliographyHtml(bibliography, usedCitations);
+    foundCitations.sort();
+    
+    // Replace citations with numbered links
+    for (let i = 0; i < foundCitations.length; i++) {
+      const key = foundCitations[i];
+      const citationNumber = i + 1;
+      const regex = new RegExp('\\\\cite\\{' + key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\}', 'g');
+      const replacement = '<cite data-cite="' + key + '"><a href="#ref-' + key + '" class="citation-link">[' + citationNumber + ']</a></cite>';
+      html = html.replace(regex, replacement);
+    }
+    
+    content.innerHTML = html;
+    
+    // Generate bibliography
+    if (!document.querySelector('.bibliography')) {
+      const usedCitationsSet = new Set(foundCitations);
+      const bibliographyHtml = generateBibliographyHtml(bibliography, usedCitationsSet);
       content.insertAdjacentHTML('afterend', bibliographyHtml);
     }
   } catch (error) {

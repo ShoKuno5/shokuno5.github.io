@@ -41,7 +41,9 @@ if (!modifiedDate && gitDates?.modified) {
 const useAcademicLayout = post.data.type === 'academic';
 // Check if post content contains citations (check raw markdown)
 const contentHasCitations = post.body.includes('cite{') || post.body.includes('\\cite{');
-const useCitationsLayout = contentHasCitations || post.data.layout?.includes('PostLayoutWithCitations');
+// Use citations layout when citations are detected
+const useCitationsLayout = contentHasCitations;
+
 
 let LayoutComponent = PostLayout;
 if (useCitationsLayout) {

@@ -13,11 +13,26 @@ function parseBibTeX(content) {
     const [, entryType, key, content] = match;
     
     const entryTags = {};
-    // Parse key-value pairs
-    const tagRegex = /(\w+)\s*=\s*\{([^}]*)\}/g;
+    // Parse key-value pairs with proper brace handling
+    const tagRegex = /(\w+)\s*=\s*\{/g;
     let tagMatch;
     while ((tagMatch = tagRegex.exec(content)) !== null) {
-      entryTags[tagMatch[1]] = tagMatch[2];
+      const fieldName = tagMatch[1];
+      const startPos = tagMatch.index + tagMatch[0].length;
+      
+      // Find the matching closing brace
+      let braceCount = 1;
+      let endPos = startPos;
+      while (endPos < content.length && braceCount > 0) {
+        if (content[endPos] === '{') braceCount++;
+        else if (content[endPos] === '}') braceCount--;
+        endPos++;
+      }
+      
+      if (braceCount === 0) {
+        const fieldValue = content.slice(startPos, endPos - 1);
+        entryTags[fieldName] = fieldValue;
+      }
     }
     
     bibliography.set(key, {
