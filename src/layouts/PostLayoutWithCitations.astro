@@ -494,8 +494,8 @@ const readingTimeData = content ? calculateReadingTime(content) : null;
 function processCitationsInContent(content, bibliography) {
   // First pass: extract all citation keys to assign numbers
   const usedCitations = new Set();
-  // Handle both escaped and HTML-encoded braces: \cite{}, cite{}, cite&#123;&#125;
-  const citeRegex = /\\?cite(?:&#123;|\{)([^}&#]+)(?:&#125;|\})/g;
+  // Handle citation patterns: \cite{}, cite{}, cite&#123;&#125;
+  const citeRegex = /\\?cite\{([^}]+)\}/g;
   let match;
   while ((match = citeRegex.exec(content)) !== null) {
     usedCitations.add(match[1]);
@@ -534,7 +534,7 @@ function processCitationsInContent(content, bibliography) {
   });
   
   // Now process citations on the content without KaTeX
-  processedContent = processedContent.replace(/\\?cite(?:&#123;|\{)([^}&#]+)(?:&#125;|\})/g, function(match, key) {
+  processedContent = processedContent.replace(/\\?cite\{([^}]+)\}/g, function(match, key) {
     if (bibliography.has(key)) {
       const citationNumber = citationNumbers.get(key);
       return '<cite data-cite="' + key + '"><a href="#ref-' + key + '" class="citation-link">[' + citationNumber + ']</a></cite>';
@@ -591,7 +591,7 @@ function processCitationsInDOM(contentElement, bibliography) {
   const usedCitations = new Set();
   textNodes.forEach(function(textNode) {
     const text = textNode.textContent;
-    const citeRegex = /\\?cite(?:&#123;|\{)([^}&#]+)(?:&#125;|\})/g;
+    const citeRegex = /\\?cite\{([^}]+)\}/g;
     let match;
     while ((match = citeRegex.exec(text)) !== null) {
       usedCitations.add(match[1]);
@@ -608,12 +608,12 @@ function processCitationsInDOM(contentElement, bibliography) {
   // Second pass: replace citations in text nodes
   textNodes.forEach(function(textNode) {
     const text = textNode.textContent;
-    const citeRegex = /\\?cite(?:&#123;|\{)([^}&#]+)(?:&#125;|\})/g;
+    const citeRegex = /\\?cite\{([^}]+)\}/g;
     
     if (citeRegex.test(text)) {
       // Create a temporary element to parse the replacement HTML
       const tempDiv = document.createElement('div');
-      tempDiv.innerHTML = text.replace(/\\?cite(?:&#123;|\{)([^}&#]+)(?:&#125;|\})/g, function(match, key) {
+      tempDiv.innerHTML = text.replace(/\\?cite\{([^}]+)\}/g, function(match, key) {
         if (bibliography.has(key)) {
           const citationNumber = citationNumbers.get(key);
           return '<cite data-cite="' + key + '"><a href="#ref-' + key + '" class="citation-link">[' + citationNumber + ']</a></cite>';
@@ -758,11 +758,10 @@ document.addEventListener('DOMContentLoaded', async function() {
   }
   
   const contentText = content.innerHTML;
-  console.log('Citation processor: Content length:', contentText.length);
-  console.log('Citation processor: Has \\cite{:', contentText.includes('\\cite{'));
-  console.log('Citation processor: Has cite{:', contentText.includes('cite{'));
-  console.log('Citation processor: Has cite&#123;:', contentText.includes('cite&#123;'));
-  if (!contentText.includes('\\cite{') && !contentText.includes('cite{') && !contentText.includes('cite&#123;')) {
+  console.log('Citation processor: Processing citations in content');
+  // Check for citation patterns more broadly
+  const hasCitations = contentText.includes('cite{') || contentText.includes('\\cite{') || contentText.includes('cite&#123;');
+  if (!hasCitations) {
     console.log('Citation processor: No citations found, exiting');
     return;
   }
