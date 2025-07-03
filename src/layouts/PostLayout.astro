@@ -146,7 +146,7 @@ const readingTimeData = content ? calculateReadingTime(content) : null;
     </header>
     
     <!-- Enhanced markdown content with sophisticated typography -->
-    <div class="sophisticated-markdown">
+    <div class="sophisticated-markdown markdown-body">
       <slot />
     </div>
     
@@ -306,7 +306,7 @@ const readingTimeData = content ? calculateReadingTime(content) : null;
       </header>
       
       <!-- Enhanced markdown content with sophisticated typography -->
-      <div class="sophisticated-markdown">
+      <div class="sophisticated-markdown markdown-body">
         <slot />
       </div>
       
@@ -621,6 +621,42 @@ const readingTimeData = content ? calculateReadingTime(content) : null;
     padding-left: 2rem;
   }
   
+  .sophisticated-markdown ol {
+    list-style-type: decimal;
+    counter-reset: item;
+  }
+  
+  .sophisticated-markdown ol li {
+    counter-increment: item;
+    list-style-type: decimal;
+    display: list-item;
+  }
+  
+  .sophisticated-markdown ol li::marker {
+    color: #0066cc;
+    font-weight: 600;
+  }
+  
+  /* Ensure ordered lists show numbers */
+  .sophisticated-markdown.markdown-body ol {
+    list-style-type: decimal !important;
+  }
+  
+  .sophisticated-markdown.markdown-body ol li {
+    list-style-type: decimal !important;
+    display: list-item !important;
+  }
+  
+  /* Alternative approach: force list style */
+  .sophisticated-markdown ol {
+    list-style: decimal outside !important;
+  }
+  
+  .sophisticated-markdown ol li {
+    list-style: decimal outside !important;
+    display: list-item !important;
+  }
+  
   .sophisticated-markdown li {
     margin: 0.75rem 0;
     line-height: 1.7;
@@ -638,19 +674,6 @@ const readingTimeData = content ? calculateReadingTime(content) : null;
     position: absolute;
     left: -1.5rem;
     font-size: 1.2rem;
-  }
-  
-  .sophisticated-markdown ol li {
-    counter-increment: item;
-  }
-  
-  .sophisticated-markdown ol {
-    counter-reset: item;
-  }
-  
-  .sophisticated-markdown ol li::marker {
-    color: #0066cc;
-    font-weight: 600;
   }
   
   /* Code blocks */

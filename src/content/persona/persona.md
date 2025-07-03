@@ -3,6 +3,8 @@ title: "Persona"
 description: "About me - researcher and developer passionate about AI creativity"
 ---
 
+# Sho Kuno
+
 ## Education
 
 ## Skills & Tools
