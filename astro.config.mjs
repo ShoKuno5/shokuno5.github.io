@@ -9,7 +9,7 @@ import { rehypeLazyImages } from './src/utils/rehype-lazy-images.js';
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://shokuno5.github.io/PrimalTimes.github.io',
+  site: 'https://shokuno5.github.io',
   output: 'static',
   compressHTML: true,
   i18n: {
