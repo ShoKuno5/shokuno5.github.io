@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" fill="none">
+  <!-- 地平線（静かな終端） -->
+  <path d="M180 620 Q400 600 620 620" stroke="#222" stroke-width="8" opacity="0.18" />
+
+  <!-- マネキンの抽象曲線（女性的な有機的ライン、地平へ還元） -->
+  <path d="M400 600 Q420 500 400 400 Q380 300 400 200 Q420 120 480 180 Q540 240 500 320 Q460 400 520 480 Q580 560 400 600" stroke="#111" stroke-width="7" fill="none" opacity="0.7" />
+
+  <!-- 存在の円（中央・小さめ、重なりを控えめに） -->
+  <circle cx="400" cy="400" r="12" fill="#111" opacity="0.5" />
+
+  <!-- Primal Times ロゴテキスト（ミニマルサンセリフ） -->
+  <text x="400" y="730" text-anchor="middle" font-size="48" font-family="'Inter', 'Helvetica Neue', Arial, sans-serif" font-weight="500" letter-spacing="0.08em" fill="#111">Primal Times</text>
+</svg>

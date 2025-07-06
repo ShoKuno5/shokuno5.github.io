@@ -5,6 +5,36 @@ description: "Thoughts on optimism in technology and research"
 
 Owing everything to time is a blunt guess. 
 
+--- 
+
+# 作家であるということ
+### 私は書くことによって、私を発見する、私は書くことによって、記憶を発見する、私は書くことによって、物を発見する、一人の赤子のように。
+この時代のすべての職業は、社会という系の中のエージェント・モデルとして解釈される。
+ほとんどすべての職業が機械の言語で代替可能であり、人間は極限まで自然との融合を志した結果、親しみやすい丸みを帯びた機械として理解される。
+機械の言葉の誘惑は抗い難く、得てして我々はそれなしでは存続不可能であるという結論に陥ってしまう。\
+人類の技術発展は内部の外化の歴史である。
+我々の言語はどこまで我々に内在しているのだろうか？
+
+私を貫く評価体系はすでに宿主である私自身に見捨てられてしまった。
+残っているのはただ荒廃し切った思考の地平のみである。
+
+あと何度この地点を再訪するだろうか。\
+あと異なる曲線をこの出発点から選ぶことになるだろうか。
+
+私は私に残された仕事を進める。
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 120 800 640" fill="none" style="display:block; margin:2em auto; max-width:90vw; height:auto;">
+  <path d="M180 620 Q400 600 620 620" stroke="#222" stroke-width="8" opacity="0.18" />
+  <path d="M400 600 Q420 500 400 400 Q380 300 400 200 Q420 120 480 180 Q540 240 500 320 Q460 400 520 480 Q580 560 400 600" stroke="#111" stroke-width="7" fill="none" opacity="0.7" />
+  <circle cx="400" cy="400" r="12" fill="#111" opacity="0.5" />
+  <text x="400" y="730" text-anchor="middle" font-size="48" font-family="'Inter', 'Helvetica Neue', Arial, sans-serif" font-weight="500" letter-spacing="0.08em" fill="#111">Primal Times</text>
+</svg>
+
+<p style="text-align:center; font-size:0.98em; color:#444; margin-bottom:2em;">
+  <em>「思考の地平に立ち、選び直される曲線の可能性。<br>人と機械の境界が曖昧な荒廃の中で、実存の円は静かに中心を示す。」</em><br>
+  <span style="font-size:0.92em; color:#888;">GPT-4.1</span>
+</p>
+
 # Facade of Farce
 
 ### Remain an ape at the Primal Times.
@@ -31,20 +61,3 @@ Owing everything to time is a blunt guess.
 
 最も本質的な幾つかの問題に取り組もう。
 私に残された仕事は、私の実存に紐づいた良い問題の定式化のみである。それは、どれほど良い嘘をつけるかという最終の問題である。
-
-# Looking into the Hidden Faces Under Umbrella
-All human beings working hard to reimplement their theories, thoughts, and memories through agentic-like machineries. 
-
-# So what (am I contemplating)? 
-
-Perhaps it unfolds like this:
-
-We have a structure, around the structure there exists mass. So a person might be understood as a skeletal framework with local information distributed around that skeleton. 
-Yes, it's somewhat inelegant that we focus on the local rather than the global—because the true elegance emerges when we collapse the global to a singular point. But let's begin here anyway. It is fundamentally a skeletal structure with different data spaces attached. The connections, the edges, with their interactions—but inhabiting different vector spaces, and interaction manifesting as vector mappings. 
-
-This is sheaf theory, apparently. 
-
-The other fascination pulling at me is the physics of language models. The way we consider, the way we think—it's simply defined dynamics over a network. What kind of networks? Networks of semantics, of mind. We need to uncover their nature. 
-
-These are the two threads, primarily concerning the morphism of structure.
-Yet they speak to an integrated form of cognition, whether perceived through vision or language. 
