@@ -6,36 +6,55 @@ export interface GitDates {
   modified: Date;
 }
 
+// Cache to avoid repeated git calls
+const gitDatesCache = new Map<string, GitDates | null>();
+
 /**
  * Get git dates for a file
  * @param filePath - Absolute path to the file
  * @returns Object with created and modified dates
  */
 export function getGitDates(filePath: string): GitDates | null {
+  // Check cache first
+  if (gitDatesCache.has(filePath)) {
+    return gitDatesCache.get(filePath)!;
+  }
+
   try {
     // Check if file exists
     if (!existsSync(filePath)) {
+      gitDatesCache.set(filePath, null);
       return null;
     }
 
-    // Get first commit date (creation)
-    const createdCommand = `git log --follow --format=%ai --diff-filter=A -- "${filePath}" | tail -1`;
-    const createdOutput = execSync(createdCommand, { encoding: 'utf8', cwd: process.cwd() }).trim();
+    // Use a single git command to get both dates more efficiently
+    const gitCommand = `git log --follow --format="%ai" --reverse -- "${filePath}"`;
+    const gitOutput = execSync(gitCommand, { 
+      encoding: 'utf8', 
+      cwd: process.cwd(),
+      timeout: 5000 // 5 second timeout
+    }).trim();
     
-    // Get last commit date (modification)
-    const modifiedCommand = `git log -1 --format=%ai -- "${filePath}"`;
-    const modifiedOutput = execSync(modifiedCommand, { encoding: 'utf8', cwd: process.cwd() }).trim();
-    
-    if (!createdOutput || !modifiedOutput) {
+    if (!gitOutput) {
+      gitDatesCache.set(filePath, null);
       return null;
     }
 
-    return {
-      created: new Date(createdOutput),
-      modified: new Date(modifiedOutput)
-    };
+    const lines = gitOutput.split('\n').filter(line => line.trim());
+    if (lines.length === 0) {
+      gitDatesCache.set(filePath, null);
+      return null;
+    }
+
+    const created = new Date(lines[0]); // First commit (oldest)
+    const modified = new Date(lines[lines.length - 1]); // Last commit (newest)
+
+    const result = { created, modified };
+    gitDatesCache.set(filePath, result);
+    return result;
   } catch (error) {
     console.warn(`Failed to get git dates for ${filePath}:`, error);
+    gitDatesCache.set(filePath, null);
     return null;
   }
 }
@@ -68,25 +87,40 @@ export function getGitDatesForContent(collectionName: string, slug: string): Git
  * This is useful for getting git history of moved files
  */
 function getGitDatesFromPath(filePath: string): GitDates | null {
+  // Check cache first
+  if (gitDatesCache.has(filePath)) {
+    return gitDatesCache.get(filePath)!;
+  }
+
   try {
-    // Get first commit date (creation) - don't check if file exists
-    const createdCommand = `git log --follow --format=%ai --diff-filter=A -- "${filePath}" | tail -1`;
-    const createdOutput = execSync(createdCommand, { encoding: 'utf8', cwd: process.cwd() }).trim();
+    // Use a single git command to get both dates more efficiently
+    const gitCommand = `git log --follow --format="%ai" --reverse -- "${filePath}"`;
+    const gitOutput = execSync(gitCommand, { 
+      encoding: 'utf8', 
+      cwd: process.cwd(),
+      timeout: 5000 // 5 second timeout
+    }).trim();
     
-    // Get last commit date (modification)
-    const modifiedCommand = `git log -1 --format=%ai -- "${filePath}"`;
-    const modifiedOutput = execSync(modifiedCommand, { encoding: 'utf8', cwd: process.cwd() }).trim();
-    
-    if (!createdOutput || !modifiedOutput) {
+    if (!gitOutput) {
+      gitDatesCache.set(filePath, null);
       return null;
     }
 
-    return {
-      created: new Date(createdOutput),
-      modified: new Date(modifiedOutput)
-    };
+    const lines = gitOutput.split('\n').filter(line => line.trim());
+    if (lines.length === 0) {
+      gitDatesCache.set(filePath, null);
+      return null;
+    }
+
+    const created = new Date(lines[0]); // First commit (oldest)
+    const modified = new Date(lines[lines.length - 1]); // Last commit (newest)
+
+    const result = { created, modified };
+    gitDatesCache.set(filePath, result);
+    return result;
   } catch (error) {
     console.warn(`Failed to get git dates for ${filePath}:`, error);
+    gitDatesCache.set(filePath, null);
     return null;
   }
 }

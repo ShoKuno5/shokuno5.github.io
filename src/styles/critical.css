@@ -1,0 +1,61 @@
+/* Critical CSS - Above the fold styles */
+.critical-styles {
+  font-family: 'Inter', 'Noto Sans JP', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+}
+
+/* Header styles */
+.auto-hide-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 20px rgba(0, 0, 0, 0.08);
+  -webkit-transform: translateZ(0);
+  transform: translateY(-100%) translateZ(0);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Main content */
+.main-content {
+  min-height: 100vh;
+  padding-top: 90px;
+}
+
+/* Typography */
+.gradient-title {
+  background: linear-gradient(135deg, #0066cc, #8b5cf6);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-weight: 700;
+  font-size: 1.5rem;
+  letter-spacing: -0.025em;
+}
+
+/* Tags page specific */
+.tags-container {
+  max-width: 64rem;
+  margin: 0 auto;
+  padding: 1.5rem 2rem 3rem 2rem;
+}
+
+.tags-title {
+  font-size: clamp(1.5rem, 4vw, 3rem);
+  font-weight: 800;
+  margin-bottom: 3rem;
+  color: #1f2937;
+  line-height: 1.1;
+}
+
+.tag-cloud {
+  margin-bottom: 4rem;
+  padding: 2rem;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(147, 51, 234, 0.05));
+  border-radius: 0.75rem;
+  border: 1px solid rgba(59, 130, 246, 0.1);
+}

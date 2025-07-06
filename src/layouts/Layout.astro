@@ -83,22 +83,28 @@ const nav = createNav(currentLocale);
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content={description} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <!-- Typography -->
+    
+    <!-- Critical CSS inlined -->
+    <style>
+      .critical-styles{font-family:'Inter','Noto Sans JP',-apple-system,BlinkMacSystemFont,system-ui,sans-serif}.auto-hide-header{position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(255,255,255,0.95);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid rgba(0,0,0,0.05);box-shadow:0 1px 20px rgba(0,0,0,0.08);-webkit-transform:translateZ(0);transform:translateY(-100%) translateZ(0);transition:transform 0.3s cubic-bezier(0.4,0,0.2,1)}.main-content{min-height:100vh;padding-top:90px}.gradient-title{background:linear-gradient(135deg,#0066cc,#8b5cf6);-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:700;font-size:1.5rem;letter-spacing:-0.025em}.tags-container{max-width:64rem;margin:0 auto;padding:1.5rem 2rem 3rem 2rem}.tags-title{font-size:clamp(1.5rem,4vw,3rem);font-weight:800;margin-bottom:3rem;color:#1f2937;line-height:1.1}.tag-cloud{margin-bottom:4rem;padding:2rem;background:linear-gradient(135deg,rgba(59,130,246,0.05),rgba(147,51,234,0.05));border-radius:0.75rem;border:1px solid rgba(59,130,246,0.1)}
+    </style>
+    
+    <!-- Typography - deferred loading -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <!-- Preload critical fonts for better performance -->
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+JP:wght@300;400;500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+JP:wght@300;400;500;600;700&display=swap"></noscript>
-    <!-- Syntax Highlighting -->
-    <link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-core.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
-    <!-- KaTeX CSS for math rendering -->
-    <link rel="stylesheet" href="/katex.min.css">
-    <!-- Preload critical KaTeX fonts -->
+    
+    <!-- Deferred resources -->
+    <link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.min.css" rel="stylesheet" media="print" onload="this.media='all'">
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-core.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js" defer></script>
+    
+    <!-- KaTeX - optimized loading -->
+    <link rel="preload" href="/katex.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="/katex.min.css"></noscript>
     <link rel="preload" href="/fonts/KaTeX_Main-Regular.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="/fonts/KaTeX_Math-Italic.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="preload" href="/fonts/KaTeX_Size1-Regular.woff2" as="font" type="font/woff2" crossorigin>
     
     
     <!-- KaTeX CSS fixes for proper math rendering -->

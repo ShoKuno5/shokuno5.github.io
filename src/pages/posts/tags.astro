@@ -1,45 +1,66 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import { getCollection } from 'astro:content';
-import { getGitDatesForContent } from '../../utils/gitDates';
+import { getGitDatesForContent } from '../../utils/gitDatesOptimized';
 import { extractDateFromFilename } from '../../utils/extractDateFromFilename';
 
+// Fetch and process all posts at build time
 const posts = await getCollection('posts', ({ id }) => id.startsWith('en/') || !id.includes('/'));
 const visiblePosts = posts.filter(post => !post.data.hidden);
 
-// Collect all unique tags
-const tagMap = new Map<string, typeof visiblePosts>();
-
-visiblePosts.forEach(post => {
-  if (post.data.tags) {
-    post.data.tags.forEach(tag => {
-      const normalizedTag = tag.toLowerCase();
-      if (!tagMap.has(normalizedTag)) {
-        tagMap.set(normalizedTag, []);
+// Pre-calculate everything at build time with minimal function calls
+const postsWithOptimizedData = await Promise.all(
+  visiblePosts.map(async (post) => {
+    // Single async call per post for git dates
+    const gitDates = await getGitDatesForContent('posts', post.slug);
+    const filenameDate = extractDateFromFilename(post.slug);
+    const publishDate = post.data.date || filenameDate || gitDates?.created || new Date(0);
+    
+    let modifiedDate = post.data.modified;
+    if (!modifiedDate && gitDates?.modified) {
+      if (gitDates.modified.getTime() !== publishDate.getTime()) {
+        modifiedDate = gitDates.modified;
       }
-      tagMap.get(normalizedTag)!.push(post);
-    });
-  }
-});
+    }
+    
+    return {
+      slug: post.slug,
+      title: post.data.title,
+      summary: post.data.summary,
+      tags: post.data.tags || [],
+      dates: {
+        publish: publishDate,
+        modified: modifiedDate
+      }
+    };
+  })
+);
 
-// Sort tags alphabetically
-const sortedTags = Array.from(tagMap.entries()).sort((a, b) => a[0].localeCompare(b[0]));
+// Ultra-fast tag processing with optimized data structures
+const tagMap = new Map<string, typeof postsWithOptimizedData>();
 
-// Sort posts within each tag by date with proper priority
-sortedTags.forEach(([_, tagPosts]) => {
-  tagPosts.sort((a, b) => {
-    const aFilenameDate = extractDateFromFilename(a.slug);
-    const bFilenameDate = extractDateFromFilename(b.slug);
-    const aDate = a.data.date || aFilenameDate || getGitDatesForContent('posts', a.slug)?.created || new Date(0);
-    const bDate = b.data.date || bFilenameDate || getGitDatesForContent('posts', b.slug)?.created || new Date(0);
-    return bDate.getTime() - aDate.getTime();
+postsWithOptimizedData.forEach(post => {
+  post.tags.forEach(tag => {
+    const normalizedTag = tag.toLowerCase();
+    if (!tagMap.has(normalizedTag)) {
+      tagMap.set(normalizedTag, []);
+    }
+    tagMap.get(normalizedTag)!.push(post);
   });
 });
+
+// Pre-sort everything at build time
+const sortedTags = Array.from(tagMap.entries())
+  .sort((a, b) => a[0].localeCompare(b[0]))
+  .map(([tag, tagPosts]) => [
+    tag,
+    tagPosts.sort((a, b) => b.dates.publish.getTime() - a.dates.publish.getTime())
+  ] as const);
 ---
 
 <Layout title="All Tags" description="Browse posts by tags">
-  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
-    <h1 class="text-4xl lg:text-5xl font-bold mb-12 bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">All Tags</h1>
+  <div class="max-w-4xl mx-auto px-6 sm:px-8 lg:px-10 py-12 lg:py-16">
+    <h1 class="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold mb-12 text-gray-900 break-words">All Tags</h1>
     
     <!-- Tag cloud -->
     <nav class="mb-16 p-8 bg-gradient-to-br from-primary-50 to-accent-purple/5 rounded-xl border border-primary-100">
@@ -73,32 +94,21 @@ sortedTags.forEach(([_, tagPosts]) => {
                 >
                   <div class="flex-grow">
                     <h3 class="font-medium text-gray-900 group-hover:text-primary-600 transition-colors">
-                      {post.data.title}
+                      {post.title}
                     </h3>
-                    {post.data.summary && (
-                      <p class="text-sm text-gray-600 mt-1">{post.data.summary}</p>
+                    {post.summary && (
+                      <p class="text-sm text-gray-600 mt-1">{post.summary}</p>
                     )}
                   </div>
                   <div class="flex flex-col items-end text-sm text-gray-500 font-medium flex-shrink-0">
                     <time>
-                      {(post.data.date || extractDateFromFilename(post.slug) || getGitDatesForContent('posts', post.slug)?.created || new Date()).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
+                      {post.dates.publish.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
                     </time>
-                    {(() => {
-                      const gitDates = getGitDatesForContent('posts', post.slug);
-                      const filenameDate = extractDateFromFilename(post.slug);
-                      const publishDate = post.data.date || filenameDate || gitDates?.created || new Date();
-                      let modifiedDate = post.data.modified;
-                      if (!modifiedDate && gitDates?.modified) {
-                        if (gitDates.modified.getTime() !== publishDate.getTime()) {
-                          modifiedDate = gitDates.modified;
-                        }
-                      }
-                      return modifiedDate && (
-                        <time class="text-xs opacity-70">
-                          (upd: {modifiedDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })})
-                        </time>
-                      );
-                    })()}
+                    {post.dates.modified && (
+                      <time class="text-xs opacity-70">
+                        (upd: {post.dates.modified.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })})
+                      </time>
+                    )}
                   </div>
                 </a>
               </li>

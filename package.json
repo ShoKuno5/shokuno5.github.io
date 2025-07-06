@@ -4,8 +4,9 @@
   "version": "0.0.1",
   "scripts": {
     "dev": "astro dev",
-    "build": "astro check && astro build",
-    "build:clean": "astro check && astro build",
+    "build": "npm run prebuild && astro check && astro build",
+    "build:clean": "npm run prebuild && astro check && astro build",
+    "prebuild": "node scripts/prebuild.js",
     "preview": "astro preview",
     "astro": "astro",
     "check": "astro check"
