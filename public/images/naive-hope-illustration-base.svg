@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Horizon (地平線) -->
+  <rect x="0" y="315" width="1200" height="2" fill="#222" />
+  <!-- Abstract curve (抽象曲線) -->
+  <path d="M 0 315 Q 400 300 600 400 Q 800 500 1200 315" stroke="#3af" stroke-width="3" fill="none" />
+  <!-- Existence circle (実存の円) -->
+  <circle cx="600" cy="315" r="24" fill="none" stroke="#3af" stroke-width="2.5" />
+  <!-- Logo text -->
+  <text x="50%" y="590" text-anchor="middle" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="48" fill="#222" letter-spacing="0.08em">Primal Times</text>
+</svg>
