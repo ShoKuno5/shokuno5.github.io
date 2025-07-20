@@ -7,6 +7,14 @@ Owing everything to time is a blunt guess.
 
 --- 
 
+These are fragments of my thoughts in progress.\
+My complete writings can be found [here]().
+
+But am I the right one to start this questoin?\
+Or, will anybody do after all?
+
+---
+
 # 作家であるということ
 ### 私は書くことによって、私を発見する、私は書くことによって、記憶を発見する、私は書くことによって、物を発見する、一人の赤子のように。
 この時代のすべての職業は、社会という系の中のエージェント・モデルとして解釈される。
