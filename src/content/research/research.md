@@ -5,7 +5,7 @@ description: "Research overview focusing on machine learning and creative AI sys
 
 My research explores the generation of discrete objects and the morphing of structures through the lens of machine learning. I focus on three interconnected areas that form the foundation of modern AI systems capable of understanding and creating complex patterns.
 
-**Key areas:** Geometric Deep Learning, Diffusion Model, Flow Matching, Generative Models, Graph Neural Networks
+**Key areas:** Geometric Generative Models (Diffusion Model, Flow Matching), Graph Neural Networks
 
 ## Geometric Deep Learning
 
