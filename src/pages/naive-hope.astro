@@ -3,14 +3,14 @@ import PostLayout from '../layouts/PostLayout.astro';
 import PasswordProtect from '../components/PasswordProtect.astro';
 import { getEntry } from 'astro:content';
 
-const naiveHope = await getEntry('naive-hope', 'naive-hope');
+// NOTE: The 'naive-hope' content collection was removed. Use 'research' content for now.
+const naiveHope = await getEntry('research', 'research');
 if (!naiveHope) {
-  throw new Error('Naive Hope page not found');
+  throw new Error('Naive Hope page content not found');
 }
 const { Content } = await naiveHope.render();
 
-// The key to the labyrinth - SHA-256 iterated 5000 times with salt
-// Riddle: "In the maze of hopes, what guides the naive wanderer?"
+// The key to the labyrinth - SHA-256 iterated 5000 times
 const PASSWORD = '05c7d1a436ba34c5f9cc56aeb17b9197c337bbb42accbd5775d22c12b406fd3d';
 ---
 
@@ -26,3 +26,4 @@ const PASSWORD = '05c7d1a436ba34c5f9cc56aeb17b9197c337bbb42accbd5775d22c12b406fd
     <Content />
   </PasswordProtect>
 </PostLayout>
+
