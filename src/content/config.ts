@@ -43,10 +43,6 @@ export const collections = {
       order: z.number(),
     }),
   }),
-  'naive-hope': defineCollection({
-    type: 'content',
-    schema: staticPageSchema,
-  }),
   persona: defineCollection({
     type: 'content',
     schema: staticPageSchema,
@@ -63,8 +59,15 @@ export const collections = {
     type: 'content',
     schema: projectsPageSchema,
   }),
-  refs: defineCollection({
+  media: defineCollection({
     type: 'data',
-    schema: z.any(), // BibTeX files don't have a specific schema
+    schema: z.object({
+      items: z.array(z.object({
+        src: z.string(),
+        title: z.string(),
+        caption: z.string().optional(),
+        alt: z.string().optional(),
+      }))
+    }),
   }),
 };

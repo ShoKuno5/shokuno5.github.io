@@ -50,7 +50,6 @@ The script will:
 Japanese versions already exist for all static pages:
 - `/ja/about.astro`
 - `/ja/projects.astro` 
-- `/ja/naive-hope.astro`
 - `/ja/posts/all.astro`
 - `/ja/posts/tags.astro`
 
@@ -71,7 +70,6 @@ ALL website content should be stored as markdown files in the content collection
 - `content/research/` - Research page content
 - `content/about/` - About page content (en/ja)
 - `content/projects-page/` - Projects page content with data (en/ja)
-- `content/naive-hope/` - Protected page content
 - `content/projects/` - Individual project details
 
 **Benefits:**

@@ -1,7 +1,7 @@
 ---
 import Layout from '../../../layouts/Layout.astro';
 import { getCollection } from 'astro:content';
-import { getGitDatesForContent } from '../../../utils/gitDates';
+import { getGitDatesForContentSync } from '../../../utils/gitDatesOptimized';
 import { extractDateFromFilename } from '../../../utils/extractDateFromFilename';
 
 const posts = await getCollection('posts', ({ id }) => id.startsWith('ja/'));
@@ -30,8 +30,8 @@ sortedTags.forEach(([_, tagPosts]) => {
   tagPosts.sort((a, b) => {
     const aFilenameDate = extractDateFromFilename(a.slug);
     const bFilenameDate = extractDateFromFilename(b.slug);
-    const aDate = a.data.date || aFilenameDate || getGitDatesForContent('posts', a.slug)?.created || new Date(0);
-    const bDate = b.data.date || bFilenameDate || getGitDatesForContent('posts', b.slug)?.created || new Date(0);
+    const aDate = a.data.date || aFilenameDate || getGitDatesForContentSync('posts', a.slug)?.created || new Date(0);
+    const bDate = b.data.date || bFilenameDate || getGitDatesForContentSync('posts', b.slug)?.created || new Date(0);
     return bDate.getTime() - aDate.getTime();
   });
 });
@@ -81,10 +81,10 @@ sortedTags.forEach(([_, tagPosts]) => {
                   </div>
                   <div class="flex flex-col items-end text-sm text-gray-500 font-medium flex-shrink-0">
                     <time>
-                      {(post.data.date || extractDateFromFilename(post.slug) || getGitDatesForContent('posts', post.slug)?.created || new Date()).toLocaleDateString('ja-JP', { year: 'numeric', month: 'short', day: 'numeric' })}
+                      {(post.data.date || extractDateFromFilename(post.slug) || getGitDatesForContentSync('posts', post.slug)?.created || new Date()).toLocaleDateString('ja-JP', { year: 'numeric', month: 'short', day: 'numeric' })}
                     </time>
                     {(() => {
-                      const gitDates = getGitDatesForContent('posts', post.slug);
+                      const gitDates = getGitDatesForContentSync('posts', post.slug);
                       const filenameDate = extractDateFromFilename(post.slug);
                       const publishDate = post.data.date || filenameDate || gitDates?.created || new Date();
                       let modifiedDate = post.data.modified;

@@ -1,7 +1,7 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import { getCollection } from 'astro:content';
-import { getGitDatesForContent } from '../../utils/gitDates';
+import { getGitDatesForContentSync } from '../../utils/gitDatesOptimized';
 import { extractDateFromFilename } from '../../utils/extractDateFromFilename';
 
 const posts = await getCollection('posts', ({ id }) => id.startsWith('en/') || !id.includes('/'));
@@ -9,7 +9,7 @@ const visiblePosts = posts.filter(post => !post.data.hidden);
 
 // Enhance posts with git dates
 const postsWithDates = visiblePosts.map(post => {
-  const gitDates = getGitDatesForContent('posts', post.slug);
+  const gitDates = getGitDatesForContentSync('posts', post.slug);
   const filenameDate = extractDateFromFilename(post.slug);
   
   // Priority: frontmatter date > filename date > git created date

@@ -64,6 +64,13 @@ export default defineConfig({
       rehypeKatex,
       rehypeLazyImages
       // [rehypeCitation, { ... }] // Disabled - using client-side citations
-    ]
+    ],
+    syntaxHighlight: 'shiki',
+    shikiConfig: {
+      themes: {
+        light: 'github-light',
+        dark: 'github-dark'
+      }
+    }
   }
 });

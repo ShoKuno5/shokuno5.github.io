@@ -60,22 +60,28 @@ src/content/
 ├── projects-page/     // Projects index content
 ├── research/          // Research page content
 ├── persona/           // Persona page content
-└── naive-hope/        // Protected content
+└── (removed)          // Naive Hope (deprecated)
 ```
 
 Each collection uses Zod schemas for type-safe frontmatter validation:
 
 ```typescript
-// Example schema from config.ts
-const postsCollection = defineCollection({
+// Example schema from src/content/config.ts
+const posts = defineCollection({
   type: 'content',
   schema: z.object({
     title: z.string(),
-    date: z.date(),
-    tags: z.array(z.string()),
-    lang: z.enum(['en', 'ja']),
-    // ... additional fields
-  })
+    pubDate: z.date(),
+    date: z.date().optional(),
+    modified: z.date().optional(),
+    description: z.string().optional(),
+    author: z.string().optional(),
+    tags: z.array(z.string()).optional(),
+    summary: z.string().optional(),
+    hidden: z.boolean().optional(),
+    layout: z.string().optional(),
+    type: z.string().optional(),
+  }),
 });
 ```
 

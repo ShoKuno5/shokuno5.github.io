@@ -1,0 +1,56 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import PostLayout from '../../../layouts/PostLayout.astro';
+import PostLayoutWithCitations from '../../../layouts/PostLayoutWithCitations.astro';
+import { getCollection } from 'astro:content';
+import { getGitDatesForContentSync } from '../../../utils/gitDatesOptimized';
+import { extractDateFromFilename } from '../../../utils/extractDateFromFilename';
+
+const posts = await getCollection('posts', ({ id }) => id.startsWith('ja/'));
+const visiblePosts = posts.filter((p) => !p.data.hidden);
+
+const sorted = visiblePosts
+  .map((post) => {
+    const git = getGitDatesForContentSync('posts', post.slug);
+    const fileDate = extractDateFromFilename(post.slug);
+    const published = post.data.pubDate || post.data.date || fileDate || git?.created || new Date(0);
+    const modified = git?.modified && git.modified.getTime() !== published.getTime() ? git.modified : post.data.modified;
+    return { post, published, modified };
+  })
+  .sort((a, b) => b.published.getTime() - a.published.getTime());
+---
+
+<Layout title="投稿 - Sho Kuno" description="新しい順の投稿を連続で読む">
+  <section class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="flex items-end justify-between mb-10">
+      <h1 class="text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">投稿</h1>
+      <div class="text-sm text-gray-600 space-x-4">
+        <a href="/ja/posts/all/" class="underline hover:text-primary-600">すべて</a>
+        <a href="/ja/posts/tags/" class="underline hover:text-primary-600">タグ</a>
+      </div>
+    </div>
+
+    <div class="space-y-16">
+      {sorted.map(async ({ post, published, modified }) => {
+        const { Content } = await post.render();
+        const contentHasCitations = post.body.includes('cite{') || post.body.includes('\\cite{');
+        const UseLayout = contentHasCitations ? PostLayoutWithCitations : PostLayout;
+        return (
+          <UseLayout
+            title={post.data.title}
+            date={published}
+            modified={modified}
+            tags={post.data.tags}
+            description={post.data.description || post.data.summary}
+            content={post.body}
+            mode="homepage"
+            showMeta={true}
+            showComments={false}
+          >
+            <Content />
+          </UseLayout>
+        );
+      })}
+    </div>
+  </section>
+</Layout>

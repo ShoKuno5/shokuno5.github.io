@@ -1,5 +1,7 @@
 ---
 import LanguageSwitcher from '../components/LanguageSwitcher.astro';
+import '../styles/global.css';
+import '../styles/markdown.css';
 
 export interface Props {
   title: string;
@@ -33,43 +35,31 @@ const createNav = (locale: 'en' | 'ja'): NavItem[] => {
   const labels = locale === 'ja' ? {
     persona: 'ペルソナ',
     research: '研究',
+    projects: 'プロジェクト',
     posts: '投稿',
     allPosts: 'すべての投稿',
     allTags: 'すべてのタグ',
-    naiveHope: 'Naive Hope',
+    media: 'メディア',
     contact: '連絡先',
     email: 'メール',
   } : {
     persona: 'Persona',
     research: 'Research',
+    projects: 'Projects',
     posts: 'Posts',
     allPosts: 'All Posts',
     allTags: 'All Tags',
-    naiveHope: 'Naive Hope',
+    media: 'Media',
     contact: 'Contact',
     email: 'Email',
   };
 
   return [
-    { 
-      label: labels.posts, 
-      submenu: [
-        { label: labels.allPosts, href: `${prefix}/posts/all/` },
-        { label: labels.allTags, href: `${prefix}/posts/tags/` },
-      ]
-    },
+    { label: labels.posts, href: `${prefix}/posts/` },
+    { label: labels.projects, href: `${prefix}/projects/` },
+    { label: labels.media, href: `${prefix}/media/` },
     { label: labels.research, href: `${prefix}/research/` },
-    { label: labels.persona, href: `${prefix}/persona/` },
-    { label: labels.naiveHope, href: `${prefix}/naive-hope/` },
-    { 
-      label: labels.contact, 
-      submenu: [
-        { label: labels.email, href: 'mailto:kunosho1225@g.ecc.u-tokyo.ac.jp', external: true },
-        { label: 'LinkedIn', href: 'https://www.linkedin.com/in/sho-kuno-828a0133a/', external: true },
-        { label: 'GitHub', href: 'https://github.com/ShoKuno5', external: true },
-        { label: 'X', href: 'https://twitter.com/ReplicaSQ', external: true },
-      ]
-    },
+    { label: labels.contact, href: 'mailto:kunosho1225@g.ecc.u-tokyo.ac.jp', external: true },
   ];
 };
 
@@ -82,11 +72,29 @@ const nav = createNav(currentLocale);
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content={description} />
+    {Astro.site && (
+      <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site).toString()} />
+    )}
+    <link rel="alternate" hreflang="en" href={`/${currentSlug}`} />
+    <link rel="alternate" hreflang="ja" href={`/ja/${currentSlug}`} />
+    
+    <!-- Open Graph / Twitter -->
+    <meta property="og:site_name" content="Sho Kuno" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    {Astro.site && (
+      <meta property="og:url" content={new URL(Astro.url.pathname, Astro.site).toString()} />
+    )}
+    <meta property="og:locale" content={currentLocale === 'ja' ? 'ja_JP' : 'en_US'} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     
     <!-- Critical CSS inlined -->
     <style>
-      .critical-styles{font-family:'Inter','Noto Sans JP',-apple-system,BlinkMacSystemFont,system-ui,sans-serif}.auto-hide-header{position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(255,255,255,0.95);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid rgba(0,0,0,0.05);box-shadow:0 1px 20px rgba(0,0,0,0.08);-webkit-transform:translateZ(0);transform:translateY(-100%) translateZ(0);transition:transform 0.3s cubic-bezier(0.4,0,0.2,1)}.main-content{min-height:100vh;padding-top:90px}.gradient-title{background:linear-gradient(135deg,#0066cc,#8b5cf6);-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:700;font-size:1.5rem;letter-spacing:-0.025em}.tags-container{max-width:64rem;margin:0 auto;padding:1.5rem 2rem 3rem 2rem}.tags-title{font-size:clamp(1.5rem,4vw,3rem);font-weight:800;margin-bottom:3rem;color:#1f2937;line-height:1.1}.tag-cloud{margin-bottom:4rem;padding:2rem;background:linear-gradient(135deg,rgba(59,130,246,0.05),rgba(147,51,234,0.05));border-radius:0.75rem;border:1px solid rgba(59,130,246,0.1)}
+      .critical-styles{font-family:'Inter','Noto Sans JP',-apple-system,BlinkMacSystemFont,system-ui,sans-serif}.auto-hide-header{position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(255,255,255,0.95);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid rgba(0,0,0,0.05);box-shadow:0 1px 20px rgba(0,0,0,0.08);-webkit-transform:translateZ(0);transform:translateY(0) translateZ(0);transition:transform 0.3s cubic-bezier(0.4,0,0.2,1)}.main-content{min-height:100vh;padding-top:90px}.gradient-title{background:linear-gradient(135deg,#0066cc,#8b5cf6);-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:700;font-size:1.5rem;letter-spacing:-0.025em}.tags-container{max-width:64rem;margin:0 auto;padding:1.5rem 2rem 3rem 2rem}.tags-title{font-size:clamp(1.5rem,4vw,3rem);font-weight:800;margin-bottom:3rem;color:#1f2937;line-height:1.1}.tag-cloud{margin-bottom:4rem;padding:2rem;background:linear-gradient(135deg,rgba(59,130,246,0.05),rgba(147,51,234,0.05));border-radius:0.75rem;border:1px solid rgba(59,130,246,0.1)}
     </style>
     
     <!-- Typography - deferred loading -->
@@ -95,10 +103,7 @@ const nav = createNav(currentLocale);
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+JP:wght@300;400;500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+JP:wght@300;400;500;600;700&display=swap"></noscript>
     
-    <!-- Deferred resources -->
-    <link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.min.css" rel="stylesheet" media="print" onload="this.media='all'">
-    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-core.min.js" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js" defer></script>
+    <!-- Removed Prism CDN (using static highlighting) -->
     
     <!-- KaTeX - optimized loading -->
     <link rel="preload" href="/katex.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
@@ -135,7 +140,7 @@ const nav = createNav(currentLocale);
       border-bottom: 1px solid rgba(0, 0, 0, 0.05);
       box-shadow: 0 1px 20px rgba(0, 0, 0, 0.08);
       -webkit-transform: translateZ(0);
-      transform: translateY(-100%) translateZ(0);
+      transform: translateY(0) translateZ(0);
       transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     ">
       <div style="
@@ -162,7 +167,7 @@ const nav = createNav(currentLocale);
           letter-spacing: -0.025em;
           flex-shrink: 0;
         ">
-          Primal Times
+          Sho Kuno
         </a>
         
         <!-- Container for navigation and hamburger -->
@@ -418,183 +423,6 @@ const nav = createNav(currentLocale);
     
     <script src="/nav-toggle.js?v=2025" defer is:inline></script>
     
-    <!-- Auto-hide Navigation Script -->
-    <script is:inline>
-    (function() {
-      'use strict';
-      
-      let lastScrollY = 0;
-      let isHeaderVisible = false;
-      let hideTimeout = null;
-      let scrollBuffer = []; // Track recent scroll positions
-      let scrollDirection = 'none';
-      
-      const header = document.getElementById('main-header');
-      if (!header) return;
-      
-      function showHeader() {
-        if (!isHeaderVisible) {
-          header.style.transform = 'translateY(0) translateZ(0)';
-          isHeaderVisible = true;
-        }
-        
-        // Clear existing timeout
-        if (hideTimeout) {
-          clearTimeout(hideTimeout);
-          hideTimeout = null;
-        }
-        
-        // Auto-hide after 3 seconds if not interacting
-        hideTimeout = setTimeout(() => {
-          if (window.pageYOffset > 100) { // Only auto-hide if scrolled down
-            hideHeader();
-          }
-        }, 3000);
-      }
-      
-      function hideHeader() {
-        if (isHeaderVisible) {
-          header.style.transform = 'translateY(-100%) translateZ(0)';
-          isHeaderVisible = false;
-        }
-        
-        if (hideTimeout) {
-          clearTimeout(hideTimeout);
-          hideTimeout = null;
-        }
-      }
-      
-      // Smart scroll behavior with proper direction detection
-      function handleScroll() {
-        const currentScrollY = window.pageYOffset;
-        const scrollDelta = currentScrollY - lastScrollY;
-        
-        // Add to scroll buffer (keep last 5 scroll events)
-        scrollBuffer.push(scrollDelta);
-        if (scrollBuffer.length > 5) {
-          scrollBuffer.shift();
-        }
-        
-        // Calculate overall scroll direction from buffer
-        const totalDelta = scrollBuffer.reduce((sum, delta) => sum + delta, 0);
-        const avgDelta = totalDelta / scrollBuffer.length;
-        
-        if (currentScrollY < 100) {
-          // Always show near top of page
-          showHeader();
-          scrollDirection = 'top';
-        } else {
-          const isAtBottom = (window.innerHeight + currentScrollY) >= document.documentElement.scrollHeight - 10;
-          
-          if (isAtBottom) {
-            // Show at bottom for easy navigation
-            showHeader();
-            scrollDirection = 'bottom';
-          } else if (Math.abs(avgDelta) > 5) {
-            // Determine direction based on consistent scrolling
-            if (avgDelta < -15 && scrollDirection !== 'up') {
-              // Deliberate scroll up (at least 15px average upward)
-              showHeader();
-              scrollDirection = 'up';
-            } else if (avgDelta > 10 && scrollDirection !== 'down') {
-              // Deliberate scroll down
-              if (isHeaderVisible) {
-                hideHeader();
-              }
-              scrollDirection = 'down';
-            }
-          }
-          // Ignore small scroll movements (reading micro-adjustments)
-        }
-        
-        lastScrollY = currentScrollY;
-      }
-      
-      // Show on mouse movement near top or deliberate seeking
-      function handleMouseMove(e) {
-        if (e.clientY < 120) { // Mouse in top 120px
-          showHeader();
-        }
-      }
-      
-      // Show on keyboard navigation
-      function handleKeyPress(e) {
-        // Show on common navigation keys
-        if (['Tab', 'Escape', 'Home', 'End', 'ArrowUp', 'ArrowDown'].includes(e.key)) {
-          showHeader();
-        }
-      }
-      
-      // Show after period of inactivity (user might want to navigate)
-      let inactivityTimer = null;
-      function resetInactivityTimer() {
-        if (inactivityTimer) clearTimeout(inactivityTimer);
-        
-        // Show menu after 10 seconds of no interaction (in case user wants to navigate)
-        inactivityTimer = setTimeout(() => {
-          if (window.pageYOffset > 200) { // Only if not near top
-            showHeader();
-          }
-        }, 10000);
-      }
-      
-      // Show on header hover
-      function handleHeaderHover() {
-        showHeader();
-      }
-      
-      // Throttle scroll events
-      let scrollTicking = false;
-      function throttledScroll() {
-        if (!scrollTicking) {
-          requestAnimationFrame(function() {
-            handleScroll();
-            scrollTicking = false;
-          });
-          scrollTicking = true;
-        }
-      }
-      
-      // Initialize when DOM is ready
-      function init() {
-        // Start with header hidden if not at top
-        if (window.pageYOffset > 50) {
-          hideHeader();
-        } else {
-          showHeader();
-        }
-        
-        // Event listeners
-        window.addEventListener('scroll', throttledScroll, { passive: true });
-        document.addEventListener('mousemove', handleMouseMove, { passive: true });
-        document.addEventListener('keydown', handleKeyPress, { passive: true });
-        header.addEventListener('mouseenter', handleHeaderHover);
-        
-        // Reset inactivity timer on any user interaction
-        ['scroll', 'mousemove', 'keydown', 'touchstart'].forEach(event => {
-          document.addEventListener(event, resetInactivityTimer, { passive: true });
-        });
-        
-        // Don't hide header when user is interacting with it
-        header.addEventListener('mouseleave', () => {
-          if (window.pageYOffset > 200) {
-            hideTimeout = setTimeout(hideHeader, 2000); // Longer delay
-          }
-        });
-        
-        // Start inactivity timer
-        resetInactivityTimer();
-      }
-      
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', init);
-      } else {
-        init();
-      }
-      
-    })();
-    </script>
-    
     <!-- Beautiful interactive styles -->
     <style>
       /* Auto-hide header styles */
@@ -715,23 +543,10 @@ const nav = createNav(currentLocale);
     
     <footer class="border-t border-gray-200 mt-24 bg-gray-50">
       <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-center">
-        <p class="text-sm text-gray-600">
-          © {new Date().getFullYear()} Primal Times. All rights reserved.
-        </p>
+        <p class="text-sm text-gray-600">© {new Date().getFullYear()} Sho Kuno</p>
       </div>
     </footer>
   </body>
 </html>
 
-<style>
-  /* Hide scrollbar for Chrome, Safari and Opera */
-  *::-webkit-scrollbar {
-    display: none;
-  }
-
-  /* Hide scrollbar for IE, Edge and Firefox */
-  * {
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
-  }
-</style>
+<!-- Removed global scrollbar suppression for accessibility -->

@@ -1,7 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import PostLayout from '../../../layouts/PostLayout.astro';
-import { getGitDatesForContent } from '../../../utils/gitDates';
+import { getGitDatesForContentSync } from '../../../utils/gitDatesOptimized';
 import { extractDateFromFilename } from '../../../utils/extractDateFromFilename';
 
 export async function getStaticPaths() {
@@ -16,7 +16,7 @@ const { post } = Astro.props;
 const { Content } = await post.render();
 
 // Get dates with proper priority
-const gitDates = getGitDatesForContent('posts', post.slug);
+const gitDates = getGitDatesForContentSync('posts', post.slug);
 const filenameDate = extractDateFromFilename(post.slug);
 
 // Priority: frontmatter date > filename date > git created date

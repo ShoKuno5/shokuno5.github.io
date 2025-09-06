@@ -128,3 +128,33 @@ export async function getGitDatesForContent(collectionName: string, slug: string
   const { getGitDates } = await import('./gitDates');
   return getGitDates(filePath);
 }
+
+/**
+ * Synchronous variant for use in Astro pages where async sorting is inconvenient.
+ * - In production: read from the prebuilt cache synchronously.
+ * - In development: fall back to the synchronous git lookup.
+ */
+export function getGitDatesForContentSync(collectionName: string, slug: string): GitDates | null {
+  const filePath = `src/content/${collectionName}/${slug}.md`;
+
+  // Use cache in production/build
+  if (process.env.NODE_ENV === 'production' || (typeof import.meta !== 'undefined' && (import.meta as any).env?.PROD)) {
+    let dates = getGitDatesFromCache(filePath);
+    if (!dates && (slug.startsWith('en/') || slug.startsWith('ja/'))) {
+      const originalSlug = slug.replace(/^(en|ja)\//, '');
+      const originalFilePath = `src/content/${collectionName}/${originalSlug}.md`;
+      dates = getGitDatesFromCache(originalFilePath);
+    }
+    return dates;
+  }
+
+  // Dev: fall back to direct git lookup
+  try {
+    // dynamic import to avoid ESM resolution at build time
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const { getGitDates } = require('./gitDates');
+    return getGitDates(filePath);
+  } catch {
+    return null;
+  }
+}
