@@ -1,9 +1,20 @@
 ---
-title: "Thoughts"
+title: "Notes"
 description: "Research overview focusing on machine learning and creative AI systems"
 ---
 
+## Table of Contents
+
+- [Naive Hope](#naive-hope)
+  - [The Second Birth of Early Human](#the-second-birth-of-early-human)
+- [Questions that Comprise One's Self](#questions-that-comprise-ones-self)
+
+---
+# Naive Hope
+## The Second Birth of Early Human
 --- 
+
+# Questions that Comprise One's Self
 
 The question that triggers me the most is: 
 
