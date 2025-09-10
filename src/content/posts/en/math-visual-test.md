@@ -1,5 +1,5 @@
 ---
-title: 'Mathematical Expressions and Visual Content Test (Gen. by Claude Code)'
+title: 'Mathematical Expressions and Visual Content Test'
 description: 'A comprehensive test post showcasing various mathematical expressions, images, and visual content capabilities'
 pubDate: 2025-07-03T15:25:00.000Z
 author: Sho Kuno

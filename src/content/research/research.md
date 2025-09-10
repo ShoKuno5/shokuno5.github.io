@@ -1,24 +1,33 @@
 ---
-title: "Research"
+title: "Thoughts"
 description: "Research overview focusing on machine learning and creative AI systems"
 ---
 
-My research explores the generation of discrete objects and the morphing of structures through the lens of machine learning. I focus on three interconnected areas that form the foundation of modern AI systems capable of understanding and creating complex patterns.
+--- 
 
-**Key areas:** Geometric Generative Models (Diffusion, Flow Matching), Graph Neural Networks
+The question that triggers me the most is: 
 
-## Geometric Deep Learning
+*Does a generative model (I see it as the second being) understand the structure of what it generates?*
 
-Investigating how neural networks can learn from non-Euclidean domains, including graphs, manifolds, and point clouds. This approach enables AI systems to understand and process data with inherent geometric structure.
+A series of questions awaits a series of answers before I can tackle the above question. For example, 
 
-## Generative Models
+- *What does it mean to generate?*
+- *What is the second being and what is not?*
+- *Why do we care about the structure?*
 
-Developing algorithms that can create new, meaningful instances of data. My work explores how these models can generate discrete objects while maintaining structural coherence and semantic meaning.
+I am yet to discover the methods to answer the primal question. 
 
-## Graph Neural Networks
+A few words that would describe the area of my research are: 
 
-Studying how neural architectures can process graph-structured data, enabling applications in molecular design, social network analysis, and knowledge representation.
+*Geometric Deep Learning, Structure Learning, Generative Models*
 
----
+The examples of the data format I deal with every day are: 
 
-Beyond my technical research, I dedicate time to creative writing—exploring existential questions through prose and revisiting the philosophical landscapes that shape our understanding of consciousness and being.
+*Graph, Image, text*
+
+My research sounds vague, broad and obscure. 
+But my question, essentially, is about the obscure. 
+
+2025/09/11
+
+--- 

@@ -1,5 +1,5 @@
 ---
-title: "Projects"
+title: "Artifact"
 description: "A selection of research projects and technical explorations"
 projects:
   - title: "GraphVAE"
@@ -15,7 +15,5 @@ projects:
     tags: ["Theory", "Visualization", "Mathematics"]
     link: "/projects/optimal-transport"
 ---
-
-# Projects
 
 A selection of research projects and technical explorations.

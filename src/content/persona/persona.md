@@ -6,7 +6,6 @@ description: "Algorithm Engineer & Machine Learning Researcher passionate about 
 Algorithm Engineer & Machine Learning Researcher
 
 ## Education
-
 ### Graduate Studies
 
 - **M.S. Mathematical Informatics** (2024–2026 Expected)
@@ -79,3 +78,4 @@ Algorithm Engineer & Machine Learning Researcher
 - **LinkedIn**: [Professional Profile](https://www.linkedin.com/in/sho-kuno-828a0133a/)
 - **GitHub**: [Code & Projects](https://github.com/ShoKuno5)
 - **X (Twitter)**: [Thoughts & Updates](https://twitter.com/ReplicaSQ)
+
