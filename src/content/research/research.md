@@ -1,5 +1,5 @@
 ---
-title: "Notes"
+title: "Salients"
 description: "Research overview focusing on machine learning and creative AI systems"
 ---
 
@@ -8,8 +8,10 @@ description: "Research overview focusing on machine learning and creative AI sys
 - [Naive Hope](#naive-hope)
   - [The Second Birth of Early Human](#the-second-birth-of-early-human)
 - [Questions that Comprise One's Self](#questions-that-comprise-ones-self)
+- [Notes](#notes)
+  - [2025](#2025)
+    - [September 2025](#september-2025)
 
----
 # Naive Hope
 ## The Second Birth of Early Human
 --- 
@@ -42,3 +44,15 @@ But my question, essentially, is about the obscure.
 2025/09/11
 
 --- 
+
+# Notes
+## 2025
+### September 2025
+
+**2025/09/11**
+- The definition of one's intelligence is the ability to cognize and localize one's self in the embedding context and act on the persona. 
+- For sure, I will only be resituated in the world reflecting my position in the stream of society, however implicitly.
+
+
+--- 
+
