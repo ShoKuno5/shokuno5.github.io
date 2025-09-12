@@ -15,7 +15,10 @@ description: "Research overview focusing on machine learning and creative AI sys
 # Naive Hope
 ## The Second Birth of Early Human
 
-Since the moment we observed the auto-reproduction of the Tower of Babel that we built while we ascended, and became convinced that we would never see the other end of its fate, we decided to descend. 
+Since the moment we observed the auto-reproduction of the Tower of Babel that we built while we ascended, and became convinced that we would never see the other end of its fate, we decided to descend.
+
+On the ground, we would find the locals, animals, and nature—things we had never been able to understand so well until then, by virture of the loss of words. 
+
 
 # Questions that Comprise One's Self
 
