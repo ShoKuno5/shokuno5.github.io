@@ -55,6 +55,7 @@ But my question, essentially, is about the obscure.
 
 **2025/09/13**
 - There is nothing happier than receiving money for the mathematics I do. 
+- All the assumption I had made to build a self image were to be discarded before the entry of the tower. 
 
 **2025/09/11**
 - The definition of one's intelligence is the ability to cognize and localize one's self in the embedding context and act on the persona. 
