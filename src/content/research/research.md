@@ -53,6 +53,9 @@ But my question, essentially, is about the obscure.
 ## 2025
 ### September 2025
 
+**2025/09/13**
+- There is nothing happier than receiving money for the mathematics I do. 
+
 **2025/09/11**
 - The definition of one's intelligence is the ability to cognize and localize one's self in the embedding context and act on the persona. 
 - For sure, I will only be resituated in the world reflecting my position in the stream of society, however implicitly.
