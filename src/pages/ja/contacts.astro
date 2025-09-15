@@ -1,0 +1,15 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { SITE, SECTIONS } from '../../config/site.js';
+---
+
+<Layout title={`${SECTIONS.contacts.labels['ja']} - Sho Kuno`} description="連絡方法">
+  <section class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <h1 class="text-4xl font-bold mb-6 bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">{SECTIONS.contacts.labels['ja']}</h1>
+    <p class="text-gray-700">
+      メール: <a class="text-blue-600 hover:underline" href={SITE.contact.emailHref}>{SITE.contact.emailHref.replace('mailto:', '')}</a>
+    </p>
+  </section>
+  
+</Layout>
+

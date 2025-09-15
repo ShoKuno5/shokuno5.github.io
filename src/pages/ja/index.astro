@@ -1,18 +1,8 @@
 ---
-import PostLayout from '../../layouts/PostLayout.astro';
-import { getEntry } from 'astro:content';
-
-const entry = await getEntry('persona', 'persona');
-if (!entry) throw new Error('Persona page content not found');
-const { Content } = await entry.render();
+import Layout from '../../layouts/Layout.astro';
+import { SECTIONS } from '../../config/site.js';
 ---
 
-<PostLayout 
-  title={entry.data.title}
-  showMeta={false}
-  showComments={false}
-  mode="full"
->
-  <Content />
-</PostLayout>
-
+<Layout title={`${SECTIONS.face.labels['ja']} - Face`}>
+  <!-- 空白ページ（後で追記） -->
+</Layout>

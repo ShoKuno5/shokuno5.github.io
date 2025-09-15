@@ -66,7 +66,7 @@ ALL website content should be stored as markdown files in the content collection
 
 **Implemented Collections:**
 - `content/posts/` - Blog posts (en/ja)
-- `content/persona/` - Persona page content
+- `content/profile/` - Profile page content
 - `content/research/` - Research page content
 - `content/about/` - About page content (en/ja)
 - `content/projects-page/` - Projects page content with data (en/ja)
@@ -91,6 +91,16 @@ const { Content } = await entry.render();
 ```
 
 **Rule:** If adding new static pages, create markdown content first, then build Astro templates around them.
+
+## Single Source of Truth
+
+- File: `src/config/site.js`
+- Purpose: Centralize section labels, routes, and site name
+- Consumers:
+  - Header nav: `src/layouts/Layout.astro`
+  - Sitemap: `src/pages/sitemap.xml.js`
+  - Home title: `src/pages/index.astro`, `src/pages/ja/index.astro`
+
 
 ## Build/Test Commands
 - Development: `npm run dev`

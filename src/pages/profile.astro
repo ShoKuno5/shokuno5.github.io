@@ -2,8 +2,8 @@
 import { getEntry } from 'astro:content';
 import PostLayout from '../layouts/PostLayout.astro';
 
-const entry = await getEntry('persona', 'persona');
-if (!entry) throw new Error('Persona page content not found');
+const entry = await getEntry('profile', 'profile');
+if (!entry) throw new Error('Profile page content not found');
 const { Content } = await entry.render();
 ---
 
@@ -15,3 +15,4 @@ const { Content } = await entry.render();
 >
   <Content />
 </PostLayout>
+

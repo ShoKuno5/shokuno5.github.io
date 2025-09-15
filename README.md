@@ -59,7 +59,7 @@ src/content/
 ├── projects/          // Project details
 ├── projects-page/     // Projects index content
 ├── research/          // Research page content
-├── persona/           // Persona page content
+├── profile/           // Profile page content
 └── (removed)          // Naive Hope (deprecated)
 ```
 
@@ -106,6 +106,13 @@ Language detection and routing logic:
 - Content collection filtering by language
 
 ### Performance Optimizations
+ 
+### Centralized Labels and Routes
+
+- Single source of truth: `src/config/site.js`
+- Defines site name, section labels (per locale), and canonical routes
+- Used by `src/layouts/Layout.astro` for nav, and `src/pages/sitemap.xml.js` for static paths
+- Renaming sections (e.g., profile → something else) requires changes in one file only
 
 #### 1. **Lazy Image Loading**
 Custom rehype plugin for automatic lazy loading:

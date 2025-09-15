@@ -1,7 +1,9 @@
 ---
-import LanguageSwitcher from '../components/LanguageSwitcher.astro';
+import SideMenu from '../components/SideMenu.astro';
 import '../styles/global.css';
 import '../styles/markdown.css';
+import { SITE, getNav } from '../config/site.js';
+type NavItem = { label: string; href: string; external?: boolean };
 
 export interface Props {
   title: string;
@@ -10,64 +12,12 @@ export interface Props {
 
 const { title, description = '' } = Astro.props;
 
-// Detect current locale and slug
-const pathname = Astro.url.pathname;
-const isJapanese = pathname.startsWith('/ja/');
-const currentLocale = isJapanese ? 'ja' : 'en';
-const currentSlug = pathname.replace(/^\/ja\//, '').replace(/^\//, '').replace(/\/$/, '');
-
-interface NavItem {
-  label: string;
-  href?: string;
-  external?: boolean;
-  submenu?: NavItemSubitem[];
-}
-
-interface NavItemSubitem {
-  label: string;
-  href: string;
-  external?: boolean;
-}
-
-// Create language-aware navigation
-const createNav = (locale: 'en' | 'ja'): NavItem[] => {
-  const prefix = locale === 'ja' ? '/ja' : '';
-  const labels = locale === 'ja' ? {
-    persona: 'ペルソナ',
-    research: '研究',
-    projects: 'プロジェクト',
-    posts: '投稿',
-    allPosts: 'すべての投稿',
-    allTags: 'すべてのタグ',
-    media: 'メディア',
-    contact: '連絡先',
-    email: 'メール',
-  } : {
-    persona: 'Persona',
-    research: 'Salients',
-    projects: 'Projects',
-    posts: 'Posts',
-    allPosts: 'All Posts',
-    allTags: 'All Tags',
-    media: 'Media',
-    contact: 'Contact',
-    email: 'Email',
-  };
-
-  return [
-    { label: labels.posts, href: `${prefix}/posts/` },
-    { label: labels.projects, href: `${prefix}/projects/` },
-    { label: labels.media, href: `${prefix}/media/` },
-    { label: labels.research, href: `${prefix}/research/` },
-    { label: labels.contact, href: 'mailto:kunosho1225@g.ecc.u-tokyo.ac.jp', external: true },
-  ];
-};
-
-const nav = createNav(currentLocale);
+// Single-language site (English)
+const nav: NavItem[] = getNav() as any;
 ---
 
 <!DOCTYPE html>
-<html lang={currentLocale}>
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -75,8 +25,7 @@ const nav = createNav(currentLocale);
     {Astro.site && (
       <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site).toString()} />
     )}
-    <link rel="alternate" hreflang="en" href={`/${currentSlug}`} />
-    <link rel="alternate" hreflang="ja" href={`/ja/${currentSlug}`} />
+    
     
     <!-- Open Graph / Twitter -->
     <meta property="og:site_name" content="Sho Kuno" />
@@ -86,7 +35,7 @@ const nav = createNav(currentLocale);
     {Astro.site && (
       <meta property="og:url" content={new URL(Astro.url.pathname, Astro.site).toString()} />
     )}
-    <meta property="og:locale" content={currentLocale === 'ja' ? 'ja_JP' : 'en_US'} />
+    <meta property="og:locale" content="en_US" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
@@ -127,6 +76,7 @@ const nav = createNav(currentLocale);
     <title>{title}</title>
   </head>
   <body>
+    <SideMenu />
     <!-- Auto-hide navigation header -->
     <header id="main-header" class="auto-hide-header" style="
       position: fixed;
@@ -155,114 +105,26 @@ const nav = createNav(currentLocale);
         width: 100%;
         box-sizing: border-box;
       ">
-        <!-- Elegant logo with gradient -->
-        <a href="/" style="
-          font-size: 1.5rem;
-          font-weight: 700;
-          background: linear-gradient(135deg, #0066cc, #8b5cf6);
-          -webkit-background-clip: text;
-          background-clip: text;
-          color: transparent;
-          text-decoration: none;
-          letter-spacing: -0.025em;
-          flex-shrink: 0;
-        ">
-          Sho Kuno
-        </a>
-        
         <!-- Container for navigation and hamburger -->
         <div style="display: flex; align-items: center; gap: 2rem; flex-shrink: 0;">
-          <!-- Language Switcher -->
-          <LanguageSwitcher currentLocale={currentLocale} currentSlug={currentSlug} />
-          
           <!-- Desktop navigation -->
           <nav style="display: none;" id="desktop-nav">
             <ul style="display: flex; align-items: center; gap: 2rem; list-style: none; margin: 0; padding: 0;">
-              {nav.map((item) => (
+              {nav.map((item: NavItem) => (
                 <li style="position: relative;">
-                  {item.submenu ? (
-                    <div style="position: relative;" class="dropdown-parent">
-                      <button style="
-                        color: #4b5563; 
-                        background: none;
-                        border: none;
-                        font-size: 0.95rem;
-                        font-weight: 500;
-                        cursor: pointer;
-                        display: flex; 
-                        align-items: center; 
-                        gap: 0.5rem;
-                        padding: 0.5rem 0;
-                        line-height: 1.5;
-                        margin: 0;
-                        height: auto;
-                        vertical-align: baseline;
-                        transition: color 0.2s ease;
-                      " class="dropdown-trigger">
-                        <span>{item.label}</span>
-                        <svg style="width: 1rem; height: 1rem; transition: transform 0.2s ease;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                        </svg>
-                      </button>
-                      <ul style="
-                        position: absolute;
-                        top: 100%;
-                        left: 0;
-                        min-width: 200px;
-                        background: white;
-                        border: 1px solid rgba(0, 0, 0, 0.08);
-                        border-radius: 12px;
-                        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
-                        padding: 0.5rem;
-                        margin: 0;
-                        list-style: none;
-                        opacity: 0;
-                        visibility: hidden;
-                        transform: translateY(-10px);
-                        transition: all 0.2s ease;
-                        z-index: 1001;
-                      " class="dropdown-menu">
-                        {item.submenu.map((subitem) => (
-                          <li>
-                            <a href={subitem.href} 
-                               target={subitem.external ? '_blank' : undefined}
-                               rel={subitem.external ? 'noopener noreferrer' : undefined}
-                               style="
-                              display: block;
-                              color: #374151;
-                              text-decoration: none;
-                              padding: 0.75rem 1rem;
-                              border-radius: 8px;
-                              font-size: 0.9rem;
-                              transition: all 0.2s ease;
-                              position: relative;
-                            " class="dropdown-item">
-                              <span>{subitem.label}</span>
-                              {subitem.external && (
-                                <svg style="width: 0.8rem; height: 0.8rem; margin-left: 0.5rem; opacity: 0.6;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                                </svg>
-                              )}
-                            </a>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  ) : (
-                    <a href={item.href} style="
-                      color: #4b5563;
-                      text-decoration: none;
-                      font-size: 0.95rem;
-                      font-weight: 500;
-                      padding: 0.5rem 0;
-                      line-height: 1.5;
-                      display: inline-flex;
-                      align-items: center;
-                      transition: color 0.2s ease;
-                    " class="nav-link">
-                      {item.label}
-                    </a>
-                  )}
+                  <a href={item.href} style="
+                    color: #4b5563;
+                    text-decoration: none;
+                    font-size: 0.95rem;
+                    font-weight: 500;
+                    padding: 0.5rem 0;
+                    line-height: 1.5;
+                    display: inline-flex;
+                    align-items: center;
+                    transition: color 0.2s ease;
+                  " class="nav-link">
+                    {item.label}
+                  </a>
                 </li>
               ))}
             </ul>
@@ -352,68 +214,20 @@ const nav = createNav(currentLocale);
           transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         " class="mobile-menu">
           <ul style="padding: 1.5rem; margin: 0; list-style: none;">
-            {nav.map((item) => (
+            {nav.map((item: NavItem) => (
               <li style="margin-bottom: 0.25rem;">
-                {item.submenu ? (
-                  <details style="margin-bottom: 0.5rem;" class="mobile-dropdown">
-                    <summary style="
-                      cursor: pointer; 
-                      color: #374151; 
-                      font-weight: 500;
-                      padding: 1rem 0; 
-                      display: flex; 
-                      align-items: center; 
-                      justify-content: space-between;
-                      border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-                      transition: color 0.2s ease;
-                    ">
-                      <span>{item.label}</span>
-                      <svg style="width: 1.25rem; height: 1.25rem; transition: transform 0.2s ease;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                      </svg>
-                    </summary>
-                    <ul style="margin-left: 1rem; margin-top: 0.5rem; margin-bottom: 1rem;">
-                      {item.submenu.map((subitem) => (
-                        <li>
-                          <a href={subitem.href} 
-                             target={subitem.external ? '_blank' : undefined}
-                             rel={subitem.external ? 'noopener noreferrer' : undefined}
-                             style="
-                            display: flex; 
-                            align-items: center;
-                            color: #6B7280; 
-                            text-decoration: none; 
-                            padding: 0.75rem 0;
-                            font-size: 0.95rem;
-                            transition: color 0.2s ease;
-                            border-left: 2px solid transparent;
-                            padding-left: 1rem;
-                          " class="mobile-sub-link">
-                            <span>{subitem.label}</span>
-                            {subitem.external && (
-                              <svg style="width: 0.8rem; height: 0.8rem; margin-left: 0.5rem; opacity: 0.6;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                              </svg>
-                            )}
-                          </a>
-                        </li>
-                      ))}
-                    </ul>
-                  </details>
-                ) : (
-                  <a href={item.href} style="
-                    display: block; 
-                    color: #374151; 
-                    text-decoration: none; 
-                    padding: 1rem 0;
-                    font-weight: 500;
-                    font-size: 1.05rem;
-                    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-                    transition: color 0.2s ease;
-                  " class="mobile-nav-link">
-                    {item.label}
-                  </a>
-                )}
+                <a href={item.href} style="
+                  display: block; 
+                  color: #374151; 
+                  text-decoration: none; 
+                  padding: 1rem 0;
+                  font-weight: 500;
+                  font-size: 1.05rem;
+                  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+                  transition: color 0.2s ease;
+                " class="mobile-nav-link">
+                  {item.label}
+                </a>
               </li>
             ))}
           </ul>
@@ -422,9 +236,35 @@ const nav = createNav(currentLocale);
     </header>
     
     <script src="/nav-toggle.js?v=2025" defer is:inline></script>
+    <script is:inline>
+      // Show the top header only when at the very top of the page
+      (function(){
+        const header = document.getElementById('main-header');
+        if (!header) return;
+        const update = () => {
+          const atTop = window.scrollY <= 0;
+          if (atTop) {
+            header.classList.add('visible');
+            header.classList.remove('hidden');
+          } else {
+            header.classList.add('hidden');
+            header.classList.remove('visible');
+          }
+        };
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', update, { once: true });
+        } else {
+          update();
+        }
+        window.addEventListener('scroll', update, { passive: true });
+      })();
+    </script>
     
     <!-- Beautiful interactive styles -->
     <style>
+      /* Always hide desktop top-nav; use left side menu instead */
+      #desktop-nav { display: none !important; }
+
       /* Auto-hide header styles */
       .auto-hide-header.visible {
         transform: translateY(0) translateZ(0) !important;

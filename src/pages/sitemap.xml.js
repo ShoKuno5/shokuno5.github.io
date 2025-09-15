@@ -1,38 +1,22 @@
 import { getCollection } from 'astro:content';
+import { STATIC_PATHS } from '../config/site.js';
 
 export async function GET({ site }) {
   const urls = [];
 
   // Static core pages
-  const staticPaths = [
-    '/',
-    '/about/',
-    '/projects/',
-    '/persona/',
-    '/posts/all/',
-    '/posts/tags/',
-    '/research/',
-    '/media/',
-    '/ja/',
-    '/ja/about/',
-    '/ja/projects/',
-    '/ja/posts/all/',
-    '/ja/posts/tags/',
-    '/ja/research/',
-    '/ja/media/',
-  ];
+  const staticPaths = STATIC_PATHS;
 
   for (const p of staticPaths) {
     urls.push({ loc: new URL(p, site).toString(), changefreq: 'weekly', priority: 0.6 });
   }
 
-  // Blog posts (en + ja)
+  // Blog posts (English only)
   const posts = await getCollection('posts');
   for (const post of posts) {
-    // Normalize path: strip language prefix for en, keep ja under /ja/
-    const isJa = post.slug.startsWith('ja/');
-    const slug = isJa ? post.slug.slice(3) : post.slug.replace(/^en\//, '');
-    const path = isJa ? `/ja/posts/${slug}/` : `/posts/${slug}/`;
+    if (post.slug.startsWith('ja/')) continue; // skip Japanese
+    const slug = post.slug.replace(/^en\//, '');
+    const path = `/posts/${slug}/`;
     urls.push({ loc: new URL(path, site).toString(), changefreq: 'monthly', priority: 0.7 });
   }
 
@@ -50,4 +34,3 @@ export async function GET({ site }) {
     headers: { 'Content-Type': 'application/xml' },
   });
 }
-

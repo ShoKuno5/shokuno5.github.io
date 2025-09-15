@@ -43,7 +43,7 @@ export const collections = {
       order: z.number(),
     }),
   }),
-  persona: defineCollection({
+  profile: defineCollection({
     type: 'content',
     schema: staticPageSchema,
   }),
