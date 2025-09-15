@@ -124,9 +124,8 @@ export async function getGitDatesForContent(collectionName: string, slug: string
     return dates;
   }
   
-  // In development, fall back to original implementation
-  const { getGitDates } = await import('./gitDates');
-  return getGitDates(filePath);
+  // In development, compute directly from git
+  return getGitDatesDirect(filePath);
 }
 
 /**
@@ -148,12 +147,27 @@ export function getGitDatesForContentSync(collectionName: string, slug: string):
     return dates;
   }
 
-  // Dev: fall back to direct git lookup
+  // Dev: compute directly from git
+  return getGitDatesDirect(filePath);
+}
+
+/**
+ * Direct git lookup for a single file (development only).
+ */
+function getGitDatesDirect(filePath: string): GitDates | null {
   try {
-    // dynamic import to avoid ESM resolution at build time
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const { getGitDates } = require('./gitDates');
-    return getGitDates(filePath);
+    // Most recent first; last line is the earliest commit
+    const out = execSync(`git log --follow --format=%ai -- "${filePath}"`, {
+      encoding: 'utf8',
+      timeout: 5000,
+      maxBuffer: 1024 * 1024,
+    }).trim();
+    if (!out) return null;
+    const lines = out.split('\n').filter(Boolean);
+    const modified = new Date(lines[0]);
+    const created = new Date(lines[lines.length - 1]);
+    if (isNaN(modified.getTime()) || isNaN(created.getTime())) return null;
+    return { created, modified };
   } catch {
     return null;
   }
