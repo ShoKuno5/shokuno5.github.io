@@ -28,7 +28,7 @@ const readingTimeData = content ? calculateReadingTime(content) : null;
 
 {isHomepageMode ? (
   <!-- Homepage mode: just the article -->
-  <article style="max-width: 45rem; margin: 0 auto; padding: 3rem 1.5rem;">
+  <article class="page-width">
     <!-- Elegant header with improved typography -->
     <header style="
       margin-bottom: 3rem;
@@ -209,7 +209,7 @@ const readingTimeData = content ? calculateReadingTime(content) : null;
 ) : (
   <!-- Individual post mode: full layout -->
   <Layout title={title} description={description}>
-    <article style="max-width: 45rem; margin: 0 auto; padding: 3rem 1.5rem; min-height: 100vh;">
+    <article class="page-width" style="min-height: 100vh;">
       <!-- Elegant header with improved typography -->
       <header style="
         margin-bottom: 3rem;

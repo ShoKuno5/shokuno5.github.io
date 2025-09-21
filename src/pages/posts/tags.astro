@@ -59,54 +59,53 @@ const sortedTags = Array.from(tagMap.entries())
 ---
 
 <Layout title="All Tags" description="Browse posts by tags">
-  <div class="max-w-4xl mx-auto px-6 sm:px-8 lg:px-10 py-12 lg:py-16">
-    <h1 class="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold mb-12 text-gray-900 break-words">All Tags</h1>
+  <section class="page-width" id="top">
+    <div class="markdown-body page-intro">
+      <h1>All Tags</h1>
+    </div>
     
-    <!-- Tag cloud -->
-    <nav class="mb-16 p-8 bg-gradient-to-br from-primary-50 to-accent-purple/5 rounded-xl border border-primary-100">
-      <h2 class="text-xl font-semibold mb-6 text-gray-800">Jump to tag:</h2>
-      <div class="flex flex-wrap gap-3">
+    <nav class="tag-cloud">
+      <h2>Jump to tag</h2>
+      <div class="tag-cloud-list">
         {sortedTags.map(([tag, tagPosts]) => (
           <a 
             href={`#tag-${tag.replace(/\s+/g, '-')}`}
-            class="inline-flex items-center px-4 py-2 bg-white border border-primary-200 rounded-full text-sm font-medium text-primary-700 hover:bg-primary-50 hover:border-primary-300 transition-all duration-200 shadow-sm"
+            class="tag-chip"
           >
-            {tag} <span class="ml-2 px-2 py-0.5 bg-primary-100 text-primary-600 rounded-full text-xs">{tagPosts.length}</span>
+            {tag}
+            <span>{tagPosts.length}</span>
           </a>
         ))}
       </div>
     </nav>
     
-    <!-- Posts by tag -->
-    <div class="space-y-12">
+    <div>
       {sortedTags.map(([tag, tagPosts]) => (
-        <section id={`tag-${tag.replace(/\s+/g, '-')}`} class="scroll-mt-8">
-          <h2 class="text-2xl font-semibold mb-6 text-gray-800 border-b border-gray-200 pb-3">
-            <span class="bg-gradient-to-r from-primary-600 to-accent-purple bg-clip-text text-transparent">{tag}</span>
-            <span class="text-sm font-normal text-gray-500 ml-3">({tagPosts.length} posts)</span>
+        <section id={`tag-${tag.replace(/\s+/g, '-')}`} class="tag-section">
+          <h2>
+            {tag}
+            <span>({tagPosts.length} posts)</span>
           </h2>
-          <ul class="space-y-4">
+          <ul class="archive-list">
             {tagPosts.map((post) => (
-              <li class="group">
+              <li>
                 <a 
                   href={`/posts/${post.slug.startsWith('en/') ? post.slug.slice(3) : post.slug}/`}
-                  class="flex items-start sm:items-center gap-4 p-4 rounded-lg hover:bg-gray-50 transition-colors"
+                  class="archive-link"
                 >
-                  <div class="flex-grow">
-                    <h3 class="font-medium text-gray-900 group-hover:text-primary-600 transition-colors">
-                      {post.title}
-                    </h3>
+                  <div class="archive-content">
+                    <h3>{post.title}</h3>
                     {post.summary && (
-                      <p class="text-sm text-gray-600 mt-1">{post.summary}</p>
+                      <p>{post.summary}</p>
                     )}
                   </div>
-                  <div class="flex flex-col items-end text-sm text-gray-500 font-medium flex-shrink-0">
+                  <div class="archive-meta">
                     <time>
                       {post.dates.publish.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
                     </time>
                     {post.dates.modified && (
-                      <time class="text-xs opacity-70">
-                        (upd: {post.dates.modified.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })})
+                      <time>
+                        upd: {post.dates.modified.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
                       </time>
                     )}
                   </div>
@@ -114,10 +113,10 @@ const sortedTags = Array.from(tagMap.entries())
               </li>
             ))}
           </ul>
-          <div class="mt-6">
-            <a href="#" class="inline-flex items-center text-sm text-primary-600 hover:text-primary-700 transition-colors">
-              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/>
+          <div class="tag-back">
+            <a href="#top">
+              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
               </svg>
               Back to top
             </a>
@@ -125,11 +124,5 @@ const sortedTags = Array.from(tagMap.entries())
         </section>
       ))}
     </div>
-  </div>
+  </section>
 </Layout>
-
-<style>
-  html {
-    scroll-behavior: smooth;
-  }
-</style>

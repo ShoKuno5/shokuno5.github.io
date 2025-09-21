@@ -1,8 +1,17 @@
 ---
+import { getEntry } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
-import { SECTIONS } from '../config/site.js';
+
+const entry = await getEntry('face', 'face');
+if (!entry) throw new Error('Face page content not found');
+const { Content } = await entry.render();
+const pageTitle = `${entry.data.title} - Sho Kuno`;
 ---
 
-<Layout title={`${SECTIONS.face.labels['en']} - Face`}>
-  <!-- Intentionally left blank for future writing -->
+<Layout title={pageTitle} description={entry.data.description}>
+  <article class="page-width">
+    <div class="markdown-body">
+      <Content />
+    </div>
+  </article>
 </Layout>

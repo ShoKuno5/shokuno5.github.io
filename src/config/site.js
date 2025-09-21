@@ -46,11 +46,6 @@ export const SECTIONS = {
     tagsLabel: { en: 'All Tags', ja: 'すべてのタグ' },
     path: (locale = DEFAULT_LOCALE) => route('/posts/', locale),
   },
-  media: {
-    id: 'media',
-    labels: { en: 'Media', ja: 'メディア' },
-    path: (locale = DEFAULT_LOCALE) => route('/media/', locale),
-  },
   contacts: {
     id: 'contacts',
     labels: { en: 'Contacts', ja: '連絡先' },
@@ -63,13 +58,12 @@ export const SECTIONS = {
   },
 };
 
-// Navigation items (even treatment of six sections)
+// Navigation items for top-level sections
 export function getNav(locale = DEFAULT_LOCALE) {
   return [
     { label: SECTIONS.face.labels[locale], href: SECTIONS.face.path(locale) },
     { label: SECTIONS.profile.labels[locale], href: SECTIONS.profile.path(locale) },
     { label: SECTIONS.posts.labels[locale], href: SECTIONS.posts.path(locale) },
-    { label: SECTIONS.media.labels[locale], href: SECTIONS.media.path(locale) },
     { label: SECTIONS.research.labels[locale], href: SECTIONS.research.path(locale) },
     { label: SECTIONS.contacts.labels[locale], href: SECTIONS.contacts.path(locale) },
   ];
@@ -85,5 +79,4 @@ export const STATIC_PATHS = [
   '/posts/all/',
   '/posts/tags/',
   SECTIONS.research.path('en'),
-  SECTIONS.media.path('en'),
 ];

@@ -46,34 +46,34 @@ const years = Object.keys(postsByYear).sort((a, b) => Number(b) - Number(a));
 ---
 
 <Layout title="All Posts" description="Archive of all blog posts">
-  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
-    <h1 class="text-4xl lg:text-5xl font-bold mb-12 bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">All Posts</h1>
+  <section class="page-width">
+    <div class="markdown-body page-intro">
+      <h1>All Posts</h1>
+    </div>
     
     {years.map((year) => (
-      <section class="mb-12">
-        <h2 class="text-2xl font-semibold mb-6 text-gray-800 border-b border-gray-200 pb-2">{year}</h2>
-        <ul class="space-y-4">
+      <section class="archive-year">
+        <h2>{year}</h2>
+        <ul class="archive-list">
           {postsByYear[Number(year)].map((post) => (
-            <li class="group">
+            <li>
               <a 
                 href={`/posts/${post.slug.startsWith('en/') ? post.slug.slice(3) : post.slug}/`}
-                class="flex items-start sm:items-center gap-4 p-4 rounded-lg hover:bg-gray-50 transition-colors"
+                class="archive-link"
               >
-                <div class="flex-grow">
-                  <h3 class="font-medium text-gray-900 group-hover:text-primary-600 transition-colors">
-                    {post.data.title}
-                  </h3>
+                <div class="archive-content">
+                  <h3>{post.data.title}</h3>
                   {post.data.summary && (
-                    <p class="text-sm text-gray-600 mt-1">{post.data.summary}</p>
+                    <p>{post.data.summary}</p>
                   )}
                 </div>
-                <div class="flex flex-col items-end text-sm text-gray-500 font-medium flex-shrink-0">
+                <div class="archive-meta">
                   <time>
                     {post.computedDates.published.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
                   </time>
                   {post.computedDates.modified && (
-                    <time class="text-xs opacity-70">
-                      (upd: {post.computedDates.modified.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })})
+                    <time>
+                      upd: {post.computedDates.modified.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
                     </time>
                   )}
                 </div>
@@ -83,5 +83,5 @@ const years = Object.keys(postsByYear).sort((a, b) => Number(b) - Number(a));
         </ul>
       </section>
     ))}
-  </div>
+  </section>
 </Layout>

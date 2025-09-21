@@ -59,15 +59,12 @@ export const collections = {
     type: 'content',
     schema: projectsPageSchema,
   }),
-  media: defineCollection({
-    type: 'data',
-    schema: z.object({
-      items: z.array(z.object({
-        src: z.string(),
-        title: z.string(),
-        caption: z.string().optional(),
-        alt: z.string().optional(),
-      }))
-    }),
+  face: defineCollection({
+    type: 'content',
+    schema: staticPageSchema,
+  }),
+  contacts: defineCollection({
+    type: 'content',
+    schema: staticPageSchema,
   }),
 };
