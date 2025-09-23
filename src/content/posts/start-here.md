@@ -9,12 +9,15 @@ tags:
 pinned: true
 ---
 
-Every page here is a post—research fragments, project notes, personal updates, and even this self-introduction. Scroll the home feed to move through my posts chronologically, or tap the filter chips to quickly pivot by tag. 
+Welcome to my page! I made this website to maintain (or retain) my habit of writing.\
+With the aid of Codex, I organized all the posts chronologically in this meta-post entitled "(You do not have to) Start Here". 
+This page functions as both the home page and a parent post that nests all the child posts in this repository. \
+Each post has a comment function where you can start or join a conversation. Feel free to open the post and leave a remark!
 
-### Contacts
+### Contacts 
 
 - Email: [kunosho1225@g.ecc.u-tokyo.ac.jp](mailto:kunosho1225@g.ecc.u-tokyo.ac.jp)
 - GitHub: [ShoKuno5](https://github.com/ShoKuno5)
 - LinkedIn: [Sho Kuno](https://www.linkedin.com)
 - X: [ShoKunoR](https://x.com/ShoKunoR)
-- CV: [CV](/cv.pdf)
+- [CV](/cv.pdf)
