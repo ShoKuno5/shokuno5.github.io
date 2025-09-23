@@ -43,10 +43,6 @@ export const collections = {
       order: z.number(),
     }),
   }),
-  profile: defineCollection({
-    type: 'content',
-    schema: staticPageSchema,
-  }),
   research: defineCollection({
     type: 'content',
     schema: staticPageSchema,
@@ -60,10 +56,6 @@ export const collections = {
     schema: projectsPageSchema,
   }),
   face: defineCollection({
-    type: 'content',
-    schema: staticPageSchema,
-  }),
-  contacts: defineCollection({
     type: 'content',
     schema: staticPageSchema,
   }),

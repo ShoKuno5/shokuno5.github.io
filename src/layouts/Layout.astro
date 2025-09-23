@@ -2,7 +2,7 @@
 import SideMenu from '../components/SideMenu.astro';
 import '../styles/global.css';
 import '../styles/markdown.css';
-import { SITE, getNav } from '../config/site.js';
+import { getNav } from '../config/site.js';
 type NavItem = { label: string; href: string; external?: boolean };
 
 export interface Props {
@@ -195,7 +195,7 @@ const nav: NavItem[] = getNav() as any;
           </div>
         </button>
         </div>
-        
+
         <!-- Elegant mobile navigation -->
         <nav id="nav-menu" style="
           display: none;
