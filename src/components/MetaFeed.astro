@@ -23,7 +23,12 @@ interface TagRecord {
   count: number;
 }
 
-const { posts = [], topTags = [] }: { posts: PostEntry[]; topTags: TagRecord[] } = Astro.props;
+interface Props {
+  posts?: PostEntry[];
+  topTags?: TagRecord[];
+}
+
+const { posts = [], topTags = [] } = Astro.props as Props;
 const normalizeTag = (value: string) => value.toLowerCase().replace(/[^a-z0-9]+/g, '-');
 ---
 <div class="meta-links">
