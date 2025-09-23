@@ -1,17 +1,49 @@
 ---
-import { getEntry } from 'astro:content';
-import PostLayout from '../layouts/PostLayout.astro';
+import Layout from '../layouts/Layout.astro';
 
-const entry = await getEntry('posts', 'artifact');
-if (!entry) throw new Error('Artifact post not found');
-const { Content } = await entry.render();
+const projectsTag = '/posts/tags/#tag-projects';
 ---
 
-<PostLayout
-  title={entry.data.title}
-  description={entry.data.description || entry.data.summary}
-  date={entry.data.pubDate}
-  tags={entry.data.tags}
->
-  <Content />
-</PostLayout>
+<Layout title="Projects — Sho Kuno">
+  <article class="page-width projects-body">
+    <header>
+      <h1>Projects</h1>
+      <p>Projects now live inside the main post stream. Follow the <a href={projectsTag}>projects tag</a> on the homepage to see every build log and write-up.</p>
+    </header>
+  </article>
+</Layout>
+
+<style>
+  .projects-body {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .projects-body h1 {
+    margin: 0;
+    font-size: clamp(2rem, 4vw, 2.4rem);
+    font-weight: 600;
+    letter-spacing: -0.015em;
+  }
+
+  .projects-body p {
+    margin: 0;
+    color: #4b5563;
+    font-size: 1rem;
+    line-height: 1.7;
+  }
+
+  .projects-body a {
+    color: inherit;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(17, 24, 39, 0.3);
+    padding-bottom: 0.1rem;
+  }
+
+  .projects-body a:hover,
+  .projects-body a:focus-visible {
+    border-bottom-color: rgba(17, 24, 39, 0.6);
+    outline: none;
+  }
+</style>

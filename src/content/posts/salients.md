@@ -8,6 +8,7 @@ tags:
   - narrative
 ---
 
+<!--
 ## Table of Contents
 
 - [Ape, Inc](#ape-inc)
@@ -17,10 +18,11 @@ tags:
 - [Questions that Comprise One's Self](#questions-that-comprise-ones-self)
 - [Notes](#notes)
   - [2025](#2025)
-    - [September 2025](#september-2025)
+  - [September 2025](#september-2025)
+-->
 
-# Ape, Inc
-## Plan for Primal Times
+## Ape, Inc
+### Plan for Primal Times
 
 - We live and grow like hermit crabs do; we are to find a better shelter that would fit ourselves.
   - We live and grow like apes, crafting all recognized entities by our hand. 
@@ -36,7 +38,7 @@ Since the moment we observed the auto-reproduction of the Tower of Babel that we
 
 On the ground, we would find the locals, animals, and nature—things we had never been able to understand so well until then, by virtue of the loss of words. 
 
-# Questions that Comprise One's Self
+## Questions that Comprise One's Self
 
 The question that triggers me the most is: 
 
@@ -65,9 +67,7 @@ But my question, essentially, is about the obscure.
 
 ---
 
-# Notes
-## 2025
-### September 2025
+## Notes
 
 **2025/09/13**
 - There is nothing happier than receiving money for the mathematics I do. 
