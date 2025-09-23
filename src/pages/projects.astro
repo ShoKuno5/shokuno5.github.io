@@ -1,32 +1,17 @@
 ---
 import { getEntry } from 'astro:content';
-import Layout from '../layouts/Layout.astro';
+import PostLayout from '../layouts/PostLayout.astro';
 
-const entry = await getEntry('projects-page', 'projects');
-if (!entry) throw new Error('Projects page content not found');
+const entry = await getEntry('posts', 'artifact');
+if (!entry) throw new Error('Artifact post not found');
 const { Content } = await entry.render();
-const projects = entry.data.projects;
 ---
 
-<Layout title="Projects - Sho Kuno">
-  <section class="page-width">
-    <div class="markdown-body page-intro">
-      <h1>Artifacts</h1>
-      <Content />
-    </div>
-
-    <div class="projects-grid">
-      {projects.map((project) => (
-        <a href={project.link} class="project-card">
-          <h3>{project.title}</h3>
-          <p>{project.description}</p>
-          <div class="project-tags">
-            {project.tags.map((tag) => (
-              <span class="project-tag">{tag}</span>
-            ))}
-          </div>
-        </a>
-      ))}
-    </div>
-  </section>
-</Layout>
+<PostLayout
+  title={entry.data.title}
+  description={entry.data.description || entry.data.summary}
+  date={entry.data.pubDate}
+  tags={entry.data.tags}
+>
+  <Content />
+</PostLayout>

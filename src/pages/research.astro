@@ -2,14 +2,16 @@
 import { getEntry } from 'astro:content';
 import PostLayout from '../layouts/PostLayout.astro';
 
-const entry = await getEntry('research', 'research');
-if (!entry) throw new Error('Research page content not found');
+const entry = await getEntry('posts', 'salients');
+if (!entry) throw new Error('Salients post not found');
 const { Content } = await entry.render();
 ---
 
-<PostLayout 
+<PostLayout
   title={entry.data.title}
-  showMeta={false}
+  description={entry.data.description || entry.data.summary}
+  date={entry.data.pubDate}
+  tags={entry.data.tags}
   showComments={false}
   mode="full"
 >

@@ -13,309 +13,88 @@ export interface Props {
   content?: string;
   mode?: 'homepage' | 'full';
   slug?: string;
+  variant?: 'default' | 'meta' | 'nested';
 }
 
-const { title, date, modified, tags, description, showMeta = true, showComments = true, content, mode = 'full', slug } = Astro.props;
+const props = Astro.props as Props;
+const {
+  title,
+  date,
+  modified,
+  tags,
+  description,
+  showMeta = true,
+  showComments = true,
+  content,
+  mode = 'full',
+  slug,
+  variant = 'default',
+} = props;
 
-// Adaptive display based on mode
 const isHomepageMode = mode === 'homepage';
-const actualShowMeta = isHomepageMode ? showMeta : showMeta;
 const actualShowComments = isHomepageMode ? false : showComments;
+const readingTime = content ? calculateReadingTime(content) : null;
+const tagToAnchor = (value: string) => value.toLowerCase().replace(/[^a-z0-9]+/g, '-');
 
-// Calculate reading time if content is provided
-const readingTimeData = content ? calculateReadingTime(content) : null;
+const publishLabel = date
+  ? `Published ${date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}`
+  : null;
+const updatedLabel = date && modified && modified.getTime() !== date.getTime()
+  ? `Updated ${modified.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}`
+  : null;
+const readingLabel = readingTime
+  ? `${readingTime.readingTimeText}${readingTime.wordCount ? ` · ${readingTime.wordCount} words` : ''}`
+  : null;
+
+const metaItems = [publishLabel, updatedLabel, readingLabel].filter(Boolean);
+const articleClasses = [
+  'page-width',
+  'post-shell',
+  isHomepageMode ? 'post-shell--excerpt' : 'post-shell--full',
+];
+
+if (variant === 'meta') articleClasses.push('post-shell--meta');
+if (variant === 'nested') articleClasses.push('post-shell--nested');
+
+const articleClass = articleClasses.filter(Boolean).join(' ');
 ---
-
-{isHomepageMode ? (
-  <!-- Homepage mode: just the article -->
-  <article class="page-width">
-    <!-- Elegant header with improved typography -->
-    <header style="
-      margin-bottom: 3rem;
-      padding-bottom: 2rem;
-      border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-    ">
-      {isHomepageMode && slug ? (
-        <h1 style="
-          font-size: 2.5rem;
-          font-weight: 800;
-          line-height: 1.1;
-          letter-spacing: -0.025em;
-          margin-bottom: 1.5rem;
-        ">
-          <a href={`/posts/${slug}/`} style="
-            background: linear-gradient(135deg, #1f2937, #4b5563, #0066cc);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            text-decoration: none;
-            transition: all 0.2s ease;
-          " class="gradient-title-link">
-            {title}
-          </a>
+{(() => {
+  const articleBody = (
+    <>
+      <header class="post-header">
+        <h1 class="post-title">
+          {isHomepageMode && slug ? (
+            <a href={`/posts/${slug}/`} class="post-title__link">{title}</a>
+          ) : (
+            title
+          )}
         </h1>
-      ) : (
-        <h1 style="
-          font-size: 2.5rem;
-          font-weight: 800;
-          line-height: 1.1;
-          letter-spacing: -0.025em;
-          margin-bottom: 1.5rem;
-          background: linear-gradient(135deg, #1f2937, #4b5563, #0066cc);
-          -webkit-background-clip: text;
-          background-clip: text;
-          color: transparent;
-        ">{title}</h1>
-      )}
-      
-      {actualShowMeta && (
-        <div style="
-          display: flex;
-          align-items: center;
-          gap: 1.5rem;
-          color: #6b7280;
-          margin-bottom: 1.5rem;
-          font-size: 0.9rem;
-          flex-wrap: wrap;
-        ">
-          <div style="display: flex; flex-direction: column; gap: 0.25rem;">
-            {date && (
-              <time style="font-weight: 500;">
-                Published: {date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
-              </time>
-            )}
-            {modified && date && modified.getTime() !== date.getTime() && (
-              <time style="font-size: 0.85rem; opacity: 0.8;">
-                Updated: {modified.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
-              </time>
-            )}
-          </div>
-          {readingTimeData && (
-            <div style="
-              display: flex;
-              align-items: center;
-              gap: 0.5rem;
-            ">
-              <svg style="width: 1rem; height: 1rem; opacity: 0.7;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <span style="font-weight: 500;">{readingTimeData.readingTimeText}</span>
-            </div>
-          )}
-          {readingTimeData && (
-            <div style="
-              display: flex;
-              align-items: center;
-              gap: 0.5rem;
-              opacity: 0.8;
-            ">
-              <svg style="width: 1rem; height: 1rem; opacity: 0.7;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-              <span style="font-size: 0.85rem;">{readingTimeData.wordCount} words</span>
-            </div>
-          )}
-        </div>
-      )}
-      
-      {tags && tags.length > 0 && (
-        <div style="display: flex; flex-wrap: wrap; gap: 0.75rem;">
-          {tags.map((tag) => (
-            <a 
-              href={`/posts/tags/#tag-${tag.toLowerCase().replace(/\s+/g, '-')}`}
-              style="
-                display: inline-flex;
-                align-items: center;
-                padding: 0.5rem 1rem;
-                font-size: 0.8rem;
-                font-weight: 500;
-                background: linear-gradient(135deg, #f8fafc, #e2e8f0);
-                color: #475569;
-                border-radius: 2rem;
-                text-decoration: none;
-                transition: all 0.2s ease;
-                border: 1px solid rgba(0, 0, 0, 0.05);
-              "
-              class="tag-link"
-            >
-              {tag}
-            </a>
-          ))}
-        </div>
-      )}
-    </header>
-    
-    <!-- Enhanced markdown content with sophisticated typography -->
-    <div class="sophisticated-markdown markdown-body">
-      <slot />
-    </div>
-    
-    {actualShowComments && (
-      <div style="
-        margin-top: 4rem;
-        padding-top: 2rem;
-        border-top: 1px solid rgba(0, 0, 0, 0.06);
-      ">
-        <script
-          src="https://giscus.app/client.js"
-          data-repo="ShoKuno5/shokuno5.github.io"
-          data-repo-id="R_kgDOO_0Lcg"
-          data-category="Announcements"
-          data-category-id="DIC_kwDOO_0Lcs4Cr6Ty"
-          data-mapping="pathname"
-          data-strict="0"
-          data-reactions-enabled="1"
-          data-emit-metadata="0"
-          data-input-position="bottom"
-          data-theme="preferred_color_scheme"
-          data-lang="en"
-          data-loading="lazy"
-          crossorigin="anonymous"
-          async
-          is:inline>
-        </script>
-      </div>
-    )}
-    
-    {isHomepageMode && slug && (
-      <div style="
-        margin-top: 2rem;
-        padding-top: 1.5rem;
-        border-top: 1px solid rgba(0, 0, 0, 0.04);
-      ">
-        <a 
-          href={`/posts/${slug}/`}
-          style="
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: #0066cc;
-            text-decoration: none;
-            font-weight: 500;
-            font-size: 0.9rem;
-            transition: color 0.2s ease;
-          "
-          onmouseover="this.style.color='#0052a3'"
-          onmouseout="this.style.color='#0066cc'"
-        >
-          Join the discussion
-          <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-3.582 8-8 8a8.959 8.959 0 01-4.906-1.465L3 21l2.535-5.094A8.963 8.963 0 013 12c0-4.418 3.582-8 8-8s8 3.582 8 8z" />
-          </svg>
-        </a>
-      </div>
-    )}
-  </article>
-) : (
-  <!-- Individual post mode: full layout -->
-  <Layout title={title} description={description}>
-    <article class="page-width" style="min-height: 100vh;">
-      <!-- Elegant header with improved typography -->
-      <header style="
-        margin-bottom: 3rem;
-        padding-bottom: 2rem;
-        border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-      ">
-        <h1 style="
-          font-size: 2.5rem;
-          font-weight: 800;
-          line-height: 1.1;
-          letter-spacing: -0.025em;
-          margin-bottom: 1.5rem;
-          background: linear-gradient(135deg, #1f2937, #4b5563, #0066cc);
-          -webkit-background-clip: text;
-          background-clip: text;
-          color: transparent;
-        ">{title}</h1>
-        
-        {actualShowMeta && (
-          <div style="
-            display: flex;
-            align-items: center;
-            gap: 1.5rem;
-            color: #6b7280;
-            margin-bottom: 1.5rem;
-            font-size: 0.9rem;
-            flex-wrap: wrap;
-          ">
-            <div style="display: flex; flex-direction: column; gap: 0.25rem;">
-              {date && (
-                <time style="font-weight: 500;">
-                  Published: {date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
-                </time>
-              )}
-              {modified && date && modified.getTime() !== date.getTime() && (
-                <time style="font-size: 0.85rem; opacity: 0.8;">
-                  Updated: {modified.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
-                </time>
-              )}
-            </div>
-            {readingTimeData && (
-              <div style="
-                display: flex;
-                align-items: center;
-                gap: 0.5rem;
-              ">
-                <svg style="width: 1rem; height: 1rem; opacity: 0.7;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span style="font-weight: 500;">{readingTimeData.readingTimeText}</span>
-              </div>
-            )}
-            {readingTimeData && (
-              <div style="
-                display: flex;
-                align-items: center;
-                gap: 0.5rem;
-                opacity: 0.8;
-              ">
-                <svg style="width: 1rem; height: 1rem; opacity: 0.7;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-                <span style="font-size: 0.85rem;">{readingTimeData.wordCount} words</span>
-              </div>
-            )}
-          </div>
-        )}
-        
-        {tags && tags.length > 0 && (
-          <div style="display: flex; flex-wrap: wrap; gap: 0.75rem;">
-            {tags.map((tag) => (
-              <a 
-                href={`/posts/tags/#tag-${tag.toLowerCase().replace(/\s+/g, '-')}`}
-                style="
-                  display: inline-flex;
-                  align-items: center;
-                  padding: 0.5rem 1rem;
-                  font-size: 0.8rem;
-                  font-weight: 500;
-                  background: linear-gradient(135deg, #f8fafc, #e2e8f0);
-                  color: #475569;
-                  border-radius: 2rem;
-                  text-decoration: none;
-                  transition: all 0.2s ease;
-                  border: 1px solid rgba(0, 0, 0, 0.05);
-                "
-                class="tag-link"
-              >
-                {tag}
-              </a>
+
+        {showMeta && metaItems.length > 0 && (
+          <ul class="post-meta">
+            {metaItems.map((item) => (
+              <li>{item}</li>
             ))}
-          </div>
+          </ul>
+        )}
+
+        {tags && tags.length > 0 && (
+          <ul class="post-tags">
+            {tags.map((tag) => (
+              <li>
+                <a class="post-tag" href={`/posts/tags/#tag-${tagToAnchor(tag)}`}>#{tag}</a>
+              </li>
+            ))}
+          </ul>
         )}
       </header>
-      
-      <!-- Enhanced markdown content with sophisticated typography -->
-      <div class="sophisticated-markdown markdown-body">
+
+      <div class="post-body markdown-body">
         <slot />
       </div>
-      
+
       {actualShowComments && (
-        <div style="
-          margin-top: 4rem;
-          padding-top: 2rem;
-          border-top: 1px solid rgba(0, 0, 0, 0.06);
-        ">
+        <div class="post-comments">
           <script
             src="https://giscus.app/client.js"
             data-repo="ShoKuno5/shokuno5.github.io"
@@ -336,499 +115,273 @@ const readingTimeData = content ? calculateReadingTime(content) : null;
           </script>
         </div>
       )}
-    </article>
-  </Layout>
-)}
 
-{!isHomepageMode && (
-<!-- Silent Reading Progress Script - Only for individual posts (not static pages) -->
-<script is:inline>
-(function() {
-  'use strict';
-  
-  function updateSilentProgress() {
-    const article = document.querySelector('article');
-    if (!article) return;
-    
-    const windowHeight = window.innerHeight;
-    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-    const documentHeight = document.documentElement.scrollHeight - windowHeight;
-    
-    // Calculate overall scroll progress through the entire article (0-100%)
-    let overallProgress = 0;
-    if (documentHeight > 0) {
-      overallProgress = Math.min((scrollTop / documentHeight) * 100, 100);
-    }
-    
-    // Find all h2 elements in the article
-    const headings = article.querySelectorAll('.sophisticated-markdown h2');
-    if (headings.length === 0) return;
-    
-    const viewportMiddle = scrollTop + windowHeight / 2;
-    
-    // Find which section we're currently reading
-    let currentSectionIndex = -1;
-    
-    for (let i = 0; i < headings.length; i++) {
-      const heading = headings[i];
-      const headingTop = heading.offsetTop;
-      const nextHeading = headings[i + 1];
-      const nextHeadingTop = nextHeading ? nextHeading.offsetTop : document.body.scrollHeight;
-      
-      // Check if we're currently in this section
-      if (viewportMiddle >= headingTop && viewportMiddle < nextHeadingTop) {
-        currentSectionIndex = i;
-        break;
-      }
-    }
-    
-    // Store the maximum progress reached for each section
-    if (!window.sectionMaxProgress) {
-      window.sectionMaxProgress = {};
-    }
-    
-    // Update current section's max progress
-    if (currentSectionIndex >= 0) {
-      const sectionKey = `section-${currentSectionIndex}`;
-      const currentProgress = overallProgress;
-      
-      // Store the highest progress reached for this section
-      if (!window.sectionMaxProgress[sectionKey] || currentProgress > window.sectionMaxProgress[sectionKey]) {
-        window.sectionMaxProgress[sectionKey] = currentProgress;
-      }
-    }
-    
-    // Update all headings based on their actual reading progress
-    headings.forEach((heading, index) => {
-      const sectionKey = `section-${index}`;
-      
-      if (index < currentSectionIndex) {
-        // Past sections - show the maximum progress actually achieved in that section
-        const maxProgressInSection = window.sectionMaxProgress[sectionKey] || 3;
-        let progressWidth;
-        if (maxProgressInSection <= 3) {
-          progressWidth = '3rem';
-        } else {
-          progressWidth = `${Math.min(maxProgressInSection, 100)}%`;
-        }
-        heading.style.setProperty('--progress-width', progressWidth);
-      } else if (index === currentSectionIndex) {
-        // Current section - show live overall progress
-        let progressWidth;
-        if (overallProgress <= 3) {
-          progressWidth = '3rem';
-        } else {
-          progressWidth = `${Math.min(overallProgress, 100)}%`;
-        }
-        heading.style.setProperty('--progress-width', progressWidth);
-      } else {
-        // Future sections - check if they're visible on screen
-        const headingRect = heading.getBoundingClientRect();
-        const isVisible = headingRect.top < windowHeight && headingRect.bottom > 0;
-        
-        if (isVisible) {
-          // Section is visible - show current overall progress
-          let progressWidth;
-          if (overallProgress <= 3) {
-            progressWidth = '3rem';
-          } else {
-            progressWidth = `${Math.min(overallProgress, 100)}%`;
-          }
-          heading.style.setProperty('--progress-width', progressWidth);
-        } else {
-          // Section is not visible - keep at default
-          heading.style.setProperty('--progress-width', '3rem');
-        }
-      }
-    });
-  }
-  
-  // Throttle scroll events for performance
-  let ticking = false;
-  function handleScroll() {
-    if (!ticking) {
-      requestAnimationFrame(function() {
-        updateSilentProgress();
-        ticking = false;
-      });
-      ticking = true;
-    }
-  }
-  
-  // Handle touch events for mobile
-  function handleTouch() {
-    setTimeout(updateSilentProgress, 50);
-  }
-  
-  // Initialize when DOM is ready
-  function init() {
-    updateSilentProgress(); // Initial calculation
-    
-    // Add scroll listeners
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    
-    // Add touch listeners for mobile
-    window.addEventListener('touchmove', handleTouch, { passive: true });
-    window.addEventListener('touchend', handleTouch, { passive: true });
-    
-    // Recalculate on resize (orientation change)
-    window.addEventListener('resize', function() {
-      setTimeout(updateSilentProgress, 100);
-    }, { passive: true });
-  }
-  
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
-    init();
-  }
-})();
-</script>
-)}
+      {isHomepageMode && slug && (
+        <footer class="post-footer">
+          <a class="post-footer__link" href={`/posts/${slug}/`}>
+            Open post ↗
+          </a>
+        </footer>
+      )}
+    </>
+  );
 
-<!-- Sophisticated Markdown Typography -->
-<style is:global>
-  /* Tag hover effects */
-  .tag-link:hover {
-    background: linear-gradient(135deg, #e2e8f0, #cbd5e1) !important;
-    transform: translateY(-1px) !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
-    color: #334155 !important;
-  }
-  
-  /* Enhanced markdown styling for sophisticated typography */
-  .sophisticated-markdown {
-    font-family: 'Inter', 'Noto Sans JP', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-    font-size: 1.125rem;
-    line-height: 1.8;
-    color: #374151;
-    letter-spacing: -0.011em;
-  }
-  
-  /* Typography Hierarchy */
-  .sophisticated-markdown h1 {
-    font-size: 2.25rem;
-    font-weight: 800;
-    line-height: 1.2;
-    letter-spacing: -0.025em;
-    margin: 3rem 0 1.5rem 0;
+  const articleNode = <article class={articleClass}>{articleBody}</article>;
+
+  return isHomepageMode ? articleNode : (
+    <Layout title={title} description={description}>
+      {articleNode}
+    </Layout>
+  );
+})()}
+
+<style>
+  .post-shell {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
     color: #111827;
-    background: linear-gradient(135deg, #111827, #374151);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
   }
-  
-  .sophisticated-markdown h2 {
-    font-size: 1.875rem;
-    font-weight: 700;
-    line-height: 1.3;
-    letter-spacing: -0.025em;
-    margin: 2.5rem 0 1.25rem 0;
-    color: #1f2937;
-    padding-bottom: 0.75rem;
-    border-bottom: 2px solid #e5e7eb;
-    position: relative;
+
+  .post-shell--excerpt {
+    gap: 2rem;
   }
-  
-  .sophisticated-markdown h2::after {
-    content: '';
-    position: absolute;
-    bottom: -2px;
-    left: 0;
-    width: var(--progress-width, 3rem);
-    height: 2px;
-    background: linear-gradient(135deg, #0066cc, #8b5cf6);
-    border-radius: 1px;
-    transition: width 0.3s ease-out;
-    max-width: 100%;
+
+  .post-shell--meta {
+    gap: 2.75rem;
   }
-  
-  .sophisticated-markdown h3 {
-    font-size: 1.5rem;
+
+  .post-shell--nested {
+    gap: 1.75rem;
+  }
+
+
+  .post-header {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .post-title {
+    margin: 0;
+    font-size: clamp(2rem, 4vw, 2.6rem);
     font-weight: 600;
-    line-height: 1.4;
-    letter-spacing: -0.025em;
-    margin: 2rem 0 1rem 0;
-    color: #374151;
-    position: relative;
-    padding-left: 1rem;
+    letter-spacing: -0.015em;
   }
-  
-  .sophisticated-markdown h3::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0.25rem;
-    width: 4px;
-    height: 1.5rem;
-    background: linear-gradient(135deg, #0066cc, #8b5cf6);
-    border-radius: 2px;
+
+  .post-shell--nested .post-title {
+    font-size: clamp(1.6rem, 3vw, 2rem);
   }
-  
-  .sophisticated-markdown h4 {
-    font-size: 1.25rem;
-    font-weight: 600;
-    line-height: 1.5;
-    margin: 1.75rem 0 0.75rem 0;
+
+  .post-title__link {
+    color: inherit;
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.2s ease;
+  }
+
+  .post-title__link:hover {
+    border-bottom-color: currentColor;
+  }
+
+  .post-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: 0.95rem;
     color: #4b5563;
   }
-  
+
+  .post-meta li {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .post-meta li + li::before {
+    content: '·';
+    margin: 0 0.6rem;
+    color: #9ca3af;
+  }
+
+  .post-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .post-tag {
+    text-decoration: none;
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #6b7280;
+    transition: color 0.2s ease;
+  }
+
+  .post-tag:hover {
+    color: #111827;
+  }
+
+  .post-body {
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+  }
+
+  .post-comments {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid #e5e7eb;
+  }
+
+  .post-footer {
+    margin-top: -0.5rem;
+  }
+
+  .post-footer__link {
+    font-size: 0.9rem;
+    color: #111827;
+    text-decoration: none;
+    border-bottom: 1px solid currentColor;
+    padding-bottom: 0.1rem;
+  }
+
+  .post-footer__link:hover {
+    color: #0b0b0b;
+  }
+
+  .post-shell--excerpt .post-comments {
+    display: none;
+  }
+
+  .post-shell--nested .post-footer {
+    display: none;
+  }
+
+  .sophisticated-markdown {
+    font-family: 'Inter', 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 1.05rem;
+    line-height: 1.75;
+    color: #1f2937;
+  }
+
+  .sophisticated-markdown h1,
+  .sophisticated-markdown h2,
+  .sophisticated-markdown h3,
+  .sophisticated-markdown h4,
   .sophisticated-markdown h5,
   .sophisticated-markdown h6 {
-    font-size: 1.125rem;
     font-weight: 600;
-    line-height: 1.5;
-    margin: 1.5rem 0 0.5rem 0;
-    color: #6b7280;
+    line-height: 1.25;
+    margin: 2.5rem 0 1rem;
+    color: #111827;
   }
-  
-  /* Paragraphs and text */
+
+  .sophisticated-markdown h2 { font-size: 1.8rem; }
+  .sophisticated-markdown h3 { font-size: 1.4rem; }
+
   .sophisticated-markdown p {
     margin: 1.5rem 0;
-    text-align: justify;
-    hyphens: auto;
-    -webkit-hyphens: auto;
-    -moz-hyphens: auto;
   }
-  
+
   .sophisticated-markdown p:first-of-type {
-    font-size: 1.2rem;
-    line-height: 1.7;
-    color: #1f2937;
-    font-weight: 400;
+    font-size: 1.15rem;
+    line-height: 1.8;
   }
-  
-  /* Links */
+
   .sophisticated-markdown a {
-    color: #0066cc;
+    color: #111827;
     text-decoration: none;
-    font-weight: 500;
-    border-bottom: 1px solid transparent;
-    transition: all 0.2s ease;
-    position: relative;
+    border-bottom: 1px solid rgba(17, 24, 39, 0.25);
+    transition: border-color 0.2s ease;
   }
-  
+
   .sophisticated-markdown a:hover {
-    color: #0052a3;
-    border-bottom-color: #0066cc;
+    border-bottom-color: rgba(17, 24, 39, 0.6);
   }
-  
-  /* Lists */
+
   .sophisticated-markdown ul,
   .sophisticated-markdown ol {
     margin: 1.5rem 0;
-    padding-left: 2rem;
+    padding-left: 1.5rem;
   }
-  
-  .sophisticated-markdown ol {
-    list-style-type: decimal;
-    counter-reset: item;
-  }
-  
-  .sophisticated-markdown ol li {
-    counter-increment: item;
-    list-style-type: decimal;
-    display: list-item;
-  }
-  
-  .sophisticated-markdown ol li::marker {
-    color: #0066cc;
-    font-weight: 600;
-  }
-  
-  /* Ensure ordered lists show numbers */
-  .sophisticated-markdown.markdown-body ol {
-    list-style-type: decimal !important;
-  }
-  
-  .sophisticated-markdown.markdown-body ol li {
-    list-style-type: decimal !important;
-    display: list-item !important;
-  }
-  
-  /* Alternative approach: force list style */
-  .sophisticated-markdown ol {
-    list-style: decimal outside !important;
-  }
-  
-  .sophisticated-markdown ol li {
-    list-style: decimal outside !important;
-    display: list-item !important;
-  }
-  
+
   .sophisticated-markdown li {
-    margin: 0.75rem 0;
-    line-height: 1.7;
+    margin: 0.65rem 0;
   }
-  
-  .sophisticated-markdown ul li {
-    list-style: none;
-    position: relative;
-  }
-  
-  .sophisticated-markdown ul li::before {
-    content: '•';
-    color: #0066cc;
-    font-weight: bold;
-    position: absolute;
-    left: -1.5rem;
-    font-size: 1.2rem;
-  }
-  
-  /* Code blocks */
+
   .sophisticated-markdown pre {
     background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: 12px;
-    padding: 1.5rem;
-    margin: 2rem 0;
-    overflow-x: auto;
-    font-size: 0.9rem;
-    line-height: 1.6;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  }
-  
-  .sophisticated-markdown code {
-    background: #f1f5f9;
-    color: #475569;
-    padding: 0.25rem 0.5rem;
+    border: 1px solid #e5e7eb;
     border-radius: 6px;
-    font-size: 0.9em;
-    font-weight: 500;
-    font-family: 'SF Mono', Monaco, Consolas, 'Liberation Mono', monospace;
-    border: 1px solid #e2e8f0;
+    padding: 1.25rem;
+    font-size: 0.95rem;
+    line-height: 1.6;
   }
-  
-  .sophisticated-markdown pre code {
-    background: transparent;
-    color: inherit;
-    padding: 0;
-    border: none;
-    font-size: inherit;
+
+  .sophisticated-markdown code {
+    background: #f3f4f6;
+    border-radius: 4px;
+    padding: 0.15rem 0.35rem;
   }
-  
-  /* Blockquotes */
+
   .sophisticated-markdown blockquote {
     margin: 2rem 0;
-    padding: 1.5rem 2rem;
-    background: linear-gradient(135deg, #f8fafc, #f1f5f9);
-    border-left: 4px solid #0066cc;
-    border-radius: 0 12px 12px 0;
+    padding: 1.5rem;
+    border-left: 2px solid #e5e7eb;
+    background: #fafafa;
     font-style: italic;
-    color: #475569;
-    position: relative;
   }
-  
-  .sophisticated-markdown blockquote::before {
-    content: '"';
-    position: absolute;
-    top: -0.5rem;
-    left: 1rem;
-    font-size: 4rem;
-    color: #cbd5e1;
-    font-family: Georgia, serif;
-  }
-  
-  .sophisticated-markdown blockquote p {
-    margin: 0;
-    font-size: 1.1rem;
-    line-height: 1.6;
-  }
-  
-  /* Tables */
+
   .sophisticated-markdown table {
     width: 100%;
     border-collapse: collapse;
     margin: 2rem 0;
-    background: white;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    font-size: 0.95rem;
   }
-  
+
   .sophisticated-markdown th,
   .sophisticated-markdown td {
-    padding: 1rem 1.5rem;
+    border: 1px solid #e5e7eb;
+    padding: 0.75rem 1rem;
     text-align: left;
-    border-bottom: 1px solid #e5e7eb;
   }
-  
-  .sophisticated-markdown th {
-    background: #f9fafb;
-    font-weight: 600;
-    color: #374151;
-  }
-  
-  .sophisticated-markdown tr:hover {
-    background: #f9fafb;
-  }
-  
-  /* Images */
+
   .sophisticated-markdown img {
     max-width: 100%;
     height: auto;
-    margin: 2rem auto;
     display: block;
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    margin: 2rem auto;
   }
-  
-  /* Horizontal rules */
+
   .sophisticated-markdown hr {
     border: none;
     height: 1px;
-    background: linear-gradient(135deg, transparent, #e5e7eb, transparent);
+    background: #e5e7eb;
     margin: 3rem 0;
   }
-  
-  /* Strong and emphasis */
-  .sophisticated-markdown strong {
-    font-weight: 700;
-    color: #1f2937;
-  }
-  
-  .sophisticated-markdown em {
-    font-style: italic;
-    color: #4b5563;
-  }
-  
-  /* Responsive design */
-  @media (max-width: 768px) {
-    .sophisticated-markdown {
-      font-size: 1rem;
-      line-height: 1.7;
+
+  @media (max-width: 720px) {
+    .post-shell--excerpt:not(:first-of-type) {
+      padding-top: 2rem;
     }
-    
-    .sophisticated-markdown h1 {
-      font-size: 1.875rem;
+
+    .post-title {
+      font-size: 2.1rem;
     }
-    
-    .sophisticated-markdown h2 {
-      font-size: 1.5rem;
+
+    .post-shell--nested .post-title {
+      font-size: 1.85rem;
     }
-    
-    .sophisticated-markdown h3 {
-      font-size: 1.25rem;
-    }
-    
-    .sophisticated-markdown p:first-of-type {
-      font-size: 1.125rem;
-    }
-    
-    .sophisticated-markdown pre {
-      padding: 1rem;
-      font-size: 0.8rem;
-    }
-    
-    .sophisticated-markdown blockquote {
-      padding: 1rem 1.5rem;
-      margin: 1.5rem 0;
-    }
-    
-    .sophisticated-markdown th,
-    .sophisticated-markdown td {
-      padding: 0.75rem 1rem;
+
+    .post-meta {
+      font-size: 0.9rem;
     }
   }
 </style>

@@ -25,8 +25,8 @@ const { Content } = await post.render();
 const gitDates = getGitDatesForContentSync('posts', post.slug);
 const filenameDate = extractDateFromFilename(post.slug);
 
-// Priority: frontmatter pubDate/date > filename date > git created date
-const publishDate = post.data.pubDate || post.data.date || filenameDate || gitDates?.created || new Date();
+// Priority: frontmatter pubDate > filename date > git created date
+const publishDate = post.data.pubDate || filenameDate || gitDates?.created || new Date();
 
 // For modified date, always use git modified if it exists and is different
 let modifiedDate = post.data.modified;

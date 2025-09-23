@@ -1,10 +1,17 @@
 ---
 title: "Salients"
-description: "Research overview focusing on machine learning and creative AI systems"
+description: "Research threads, questions, and dated notes on the climb between apes and cyborgs."
+pubDate: 2025-09-11
+tags:
+  - research
+  - notes
+  - narrative
 ---
 
 ## Table of Contents
 
+- [Ape, Inc](#ape-inc)
+  - [Plan for Primal Times](#plan-for-primal-times)
 - [Naive Hope](#naive-hope)
   - [The Second Birth of Early Human](#the-second-birth-of-early-human)
 - [Questions that Comprise One's Self](#questions-that-comprise-ones-self)
@@ -12,13 +19,22 @@ description: "Research overview focusing on machine learning and creative AI sys
   - [2025](#2025)
     - [September 2025](#september-2025)
 
+# Ape, Inc
+## Plan for Primal Times
+
+- We live and grow like hermit crabs do; we are to find a better shelter that would fit ourselves.
+  - We live and grow like apes, crafting all recognized entities by our hand. 
+- But what distinguishes us humans from other species is that we have memory, text, and the cognitive system for structures. 
+  - We thus create incremental, internal, recursive patterns of wall systems to better hide our raw bodies and avoid exposure to the exterior.
+- We are one step behind cyborgs, one step away from apes.
+- If not written, not exist.
+
 # Naive Hope
 ## The Second Birth of Early Human
 
 Since the moment we observed the auto-reproduction of the Tower of Babel that we built while we ascended, and became convinced that we would never see the other end of its fate, we decided to descend. 
 
-On the ground, we would find the locals, animals, and nature—things we had never been able to understand so well until then, by virture of the loss of words. 
-
+On the ground, we would find the locals, animals, and nature—things we had never been able to understand so well until then, by virtue of the loss of words. 
 
 # Questions that Comprise One's Self
 
@@ -47,7 +63,7 @@ But my question, essentially, is about the obscure.
 
 2025/09/11
 
---- 
+---
 
 # Notes
 ## 2025
@@ -60,7 +76,3 @@ But my question, essentially, is about the obscure.
 **2025/09/11**
 - The definition of one's intelligence is the ability to cognize and localize one's self in the embedding context and act on the persona. 
 - For sure, I will only be resituated in the world reflecting my position in the stream of society, however implicitly.
-
-
---- 
-

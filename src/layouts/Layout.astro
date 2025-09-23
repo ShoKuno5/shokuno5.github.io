@@ -1,9 +1,7 @@
 ---
-import SideMenu from '../components/SideMenu.astro';
 import '../styles/global.css';
 import '../styles/markdown.css';
-import { getNav } from '../config/site.js';
-type NavItem = { label: string; href: string; external?: boolean };
+import { SITE } from '../config/site.js';
 
 export interface Props {
   title: string;
@@ -11,9 +9,8 @@ export interface Props {
 }
 
 const { title, description = '' } = Astro.props;
-
-// Single-language site (English)
-const nav: NavItem[] = getNav() as any;
+const siteName = SITE.name;
+const tagline = SITE.tagline;
 ---
 
 <!DOCTYPE html>
@@ -25,10 +22,9 @@ const nav: NavItem[] = getNav() as any;
     {Astro.site && (
       <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site).toString()} />
     )}
-    
-    
-    <!-- Open Graph / Twitter -->
-    <meta property="og:site_name" content="Sho Kuno" />
+
+    <!-- Social -->
+    <meta property="og:site_name" content={siteName} />
     <meta property="og:type" content="website" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
@@ -39,354 +35,113 @@ const nav: NavItem[] = getNav() as any;
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
+
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    
-    <!-- Critical CSS inlined -->
+
     <style>
-      .critical-styles{font-family:'Inter','Noto Sans JP',-apple-system,BlinkMacSystemFont,system-ui,sans-serif}.auto-hide-header{position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(255,255,255,0.95);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid rgba(0,0,0,0.05);box-shadow:0 1px 20px rgba(0,0,0,0.08);-webkit-transform:translateZ(0);transform:translateY(0) translateZ(0);transition:transform 0.3s cubic-bezier(0.4,0,0.2,1)}.main-content{min-height:100vh;padding-top:90px}.gradient-title{background:linear-gradient(135deg,#0066cc,#8b5cf6);-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:700;font-size:1.5rem;letter-spacing:-0.025em}.tags-container{max-width:64rem;margin:0 auto;padding:1.5rem 2rem 3rem 2rem}.tags-title{font-size:clamp(1.5rem,4vw,3rem);font-weight:800;margin-bottom:3rem;color:#1f2937;line-height:1.1}.tag-cloud{margin-bottom:4rem;padding:2rem;background:linear-gradient(135deg,rgba(59,130,246,0.05),rgba(147,51,234,0.05));border-radius:0.75rem;border:1px solid rgba(59,130,246,0.1)}
+      :root {
+        color-scheme: light;
+      }
+
+      .site-shell {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        background: #ffffff;
+        color: #111827;
+      }
+
+      .site-header {
+        padding: 3rem 1.5rem 2.25rem;
+        text-align: center;
+        border-bottom: 1px solid #e5e7eb;
+      }
+
+      .site-brand {
+        font-size: clamp(1.9rem, 4.2vw, 2.6rem);
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .site-desc {
+        margin: 0.75rem auto 0;
+        max-width: 36rem;
+        font-size: 1rem;
+        color: #4b5563;
+        line-height: 1.65;
+      }
+
+      .site-main {
+        flex: 1;
+        width: 100%;
+      }
+
+      .site-footer {
+        padding: 2.5rem 1.5rem 3rem;
+        text-align: center;
+        font-size: 0.85rem;
+        color: #6b7280;
+        border-top: 1px solid #e5e7eb;
+        background: #fafafa;
+      }
+
+      @media (max-width: 600px) {
+        .site-header {
+          padding: 2.25rem 1.25rem 1.75rem;
+        }
+
+        .site-desc {
+          font-size: 0.95rem;
+        }
+      }
     </style>
-    
-    <!-- Typography - deferred loading -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+JP:wght@300;400;500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+JP:wght@300;400;500;600;700&display=swap"></noscript>
-    
-    <!-- Removed Prism CDN (using static highlighting) -->
-    
-    <!-- KaTeX - optimized loading -->
-    <link rel="preload" href="/katex.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="/katex.min.css"></noscript>
-    <link rel="preload" href="/fonts/KaTeX_Main-Regular.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="preload" href="/fonts/KaTeX_Math-Italic.woff2" as="font" type="font/woff2" crossorigin>
-    
-    
-    <!-- KaTeX CSS fixes for proper math rendering -->
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="preload"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+JP:wght@300;400;500;600;700&display=swap"
+      as="style"
+      onload="this.onload=null;this.rel='stylesheet'"
+    />
+    <noscript>
+      <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+JP:wght@300;400;500;600;700&display=swap"
+      />
+    </noscript>
+
+    <link rel="preload" href="/katex.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'" />
+    <noscript><link rel="stylesheet" href="/katex.min.css" /></noscript>
+    <link rel="preload" href="/fonts/KaTeX_Main-Regular.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/KaTeX_Math-Italic.woff2" as="font" type="font/woff2" crossorigin />
+
     <style is:global>
-      /* Hide KaTeX mathml accessibility annotations that show raw LaTeX */
-      .katex-mathml { 
-        display: none !important; 
+      .katex-mathml {
+        display: none !important;
       }
-      
-      /* Reset equation counter at the start of each post */
-      .markdown-body {
-        counter-reset: equation;
+
+      body {
+        margin: 0;
       }
     </style>
+
     <title>{title}</title>
   </head>
   <body>
-    <SideMenu />
-    <!-- Auto-hide navigation header -->
-    <header id="main-header" class="auto-hide-header" style="
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 1000;
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-      box-shadow: 0 1px 20px rgba(0, 0, 0, 0.08);
-      -webkit-transform: translateZ(0);
-      transform: translateY(0) translateZ(0);
-      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    ">
-      <div style="
-        max-width: 72rem;
-        margin: 0 auto;
-        padding: 1rem 1.5rem;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        min-height: 70px;
-        gap: 2rem;
-        width: 100%;
-        box-sizing: border-box;
-      ">
-        <!-- Container for navigation and hamburger -->
-        <div style="display: flex; align-items: center; gap: 2rem; flex-shrink: 0;">
-          <!-- Desktop navigation -->
-          <nav style="display: none;" id="desktop-nav">
-            <ul style="display: flex; align-items: center; gap: 2rem; list-style: none; margin: 0; padding: 0;">
-              {nav.map((item: NavItem) => (
-                <li style="position: relative;">
-                  <a href={item.href} style="
-                    color: #4b5563;
-                    text-decoration: none;
-                    font-size: 0.95rem;
-                    font-weight: 500;
-                    padding: 0.5rem 0;
-                    line-height: 1.5;
-                    display: inline-flex;
-                    align-items: center;
-                    transition: color 0.2s ease;
-                  " class="nav-link">
-                    {item.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </nav>
-          
-          <!-- Elegant hamburger button -->
-          <button 
-            id="nav-toggle" 
-            type="button" 
-            aria-label="Toggle navigation menu" 
-            aria-expanded="false"
-            style="
-              display: block;
-              width: 44px;
-              height: 44px;
-              padding: 10px;
-              border: none;
-              background: transparent;
-              cursor: pointer;
-              border-radius: 12px;
-              position: relative;
-              z-index: 1001;
-              transition: all 0.2s ease;
-              -webkit-tap-highlight-color: transparent;
-              -webkit-touch-callout: none;
-              -webkit-user-select: none;
-              touch-action: manipulation;
-              flex-shrink: 0;
-            "
-            class="hamburger-btn"
-          >
-          <div style="
-            width: 24px;
-            height: 18px;
-            position: relative;
-            margin: 0 auto;
-          ">
-            <span style="
-              display: block;
-              width: 24px;
-              height: 2px;
-              background-color: #374151;
-              border-radius: 2px;
-              position: absolute;
-              top: 0;
-              transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            " class="hamburger-line line-1"></span>
-            <span style="
-              display: block;
-              width: 24px;
-              height: 2px;
-              background-color: #374151;
-              border-radius: 2px;
-              position: absolute;
-              top: 8px;
-              transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            " class="hamburger-line line-2"></span>
-            <span style="
-              display: block;
-              width: 24px;
-              height: 2px;
-              background-color: #374151;
-              border-radius: 2px;
-              position: absolute;
-              top: 16px;
-              transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            " class="hamburger-line line-3"></span>
-          </div>
-        </button>
-        </div>
-
-        <!-- Elegant mobile navigation -->
-        <nav id="nav-menu" style="
-          display: none;
-          position: absolute;
-          top: 100%;
-          left: 0;
-          right: 0;
-          background: rgba(255, 255, 255, 0.98);
-          backdrop-filter: blur(20px);
-          -webkit-backdrop-filter: blur(20px);
-          border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-          z-index: 999;
-          opacity: 0;
-          transform: translateY(-10px);
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        " class="mobile-menu">
-          <ul style="padding: 1.5rem; margin: 0; list-style: none;">
-            {nav.map((item: NavItem) => (
-              <li style="margin-bottom: 0.25rem;">
-                <a href={item.href} style="
-                  display: block; 
-                  color: #374151; 
-                  text-decoration: none; 
-                  padding: 1rem 0;
-                  font-weight: 500;
-                  font-size: 1.05rem;
-                  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-                  transition: color 0.2s ease;
-                " class="mobile-nav-link">
-                  {item.label}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </nav>
-      </div>
-    </header>
-    
-    <script src="/nav-toggle.js?v=2025" defer is:inline></script>
-    <script is:inline>
-      // Show the top header only when at the very top of the page
-      (function(){
-        const header = document.getElementById('main-header');
-        if (!header) return;
-        const update = () => {
-          const atTop = window.scrollY <= 0;
-          if (atTop) {
-            header.classList.add('visible');
-            header.classList.remove('hidden');
-          } else {
-            header.classList.add('hidden');
-            header.classList.remove('visible');
-          }
-        };
-        if (document.readyState === 'loading') {
-          document.addEventListener('DOMContentLoaded', update, { once: true });
-        } else {
-          update();
-        }
-        window.addEventListener('scroll', update, { passive: true });
-      })();
-    </script>
-    
-    <!-- Beautiful interactive styles -->
-    <style>
-      /* Always hide desktop top-nav; use left side menu instead */
-      #desktop-nav { display: none !important; }
-
-      /* Auto-hide header styles */
-      .auto-hide-header.visible {
-        transform: translateY(0) translateZ(0) !important;
-      }
-      
-      .auto-hide-header.hidden {
-        transform: translateY(-100%) translateZ(0) !important;
-      }
-      
-      /* Navigation hover effects */
-      .nav-link:hover {
-        color: #0066cc !important;
-      }
-      
-      .dropdown-trigger:hover {
-        color: #0066cc !important;
-      }
-      
-      .dropdown-parent:hover .dropdown-menu {
-        opacity: 1 !important;
-        visibility: visible !important;
-        transform: translateY(0) !important;
-      }
-      
-      .dropdown-item:hover {
-        background-color: #f8fafc !important;
-        color: #0066cc !important;
-      }
-      
-      /* Hamburger button hover effects */
-      .hamburger-btn:hover {
-        background-color: rgba(0, 102, 204, 0.08) !important;
-      }
-      
-      .hamburger-btn:active {
-        transform: scale(0.95) !important;
-      }
-      
-      /* Hamburger active state */
-      .hamburger-btn.active .line-1 {
-        transform: rotate(45deg) translate(5px, 5px) !important;
-      }
-      
-      .hamburger-btn.active .line-2 {
-        opacity: 0 !important;
-      }
-      
-      .hamburger-btn.active .line-3 {
-        transform: rotate(-45deg) translate(7px, -6px) !important;
-      }
-      
-      /* Mobile menu active state */
-      .mobile-menu.active {
-        display: block !important;
-        opacity: 1 !important;
-        transform: translateY(0) !important;
-      }
-      
-      /* Force mobile menu visibility when active */
-      #nav-menu.active {
-        display: block !important;
-        opacity: 1 !important;
-        transform: translateY(0) !important;
-      }
-      
-      /* Mobile navigation hover effects */
-      .mobile-nav-link:hover {
-        color: #0066cc !important;
-        padding-left: 1rem !important;
-      }
-      
-      .mobile-sub-link:hover {
-        color: #0066cc !important;
-        border-left-color: #0066cc !important;
-      }
-      
-      /* Mobile dropdown arrow rotation */
-      .mobile-dropdown[open] summary svg {
-        transform: rotate(180deg) !important;
-      }
-      
-      /* Responsive behavior */
-      @media (min-width: 1024px) {
-        .hamburger-btn {
-          display: none !important;
-        }
-        
-        #desktop-nav {
-          display: block !important;
-        }
-      }
-      
-      @media (max-width: 1023px) {
-        #desktop-nav {
-          display: none !important;
-        }
-        
-        /* Ensure consistent hamburger positioning on mobile */
-        .hamburger-btn {
-          margin-right: 0 !important;
-          position: relative !important;
-          right: 0 !important;
-        }
-        
-        /* Ensure header container takes full width on mobile */
-        header > div {
-          padding-left: 1rem !important;
-          padding-right: 1rem !important;
-        }
-      }
-    </style>
-    
-    <main style="min-height: 100vh; padding-top: 90px;">
-      <slot />
-    </main>
-    
-    <footer class="border-t border-gray-200 mt-24 bg-gray-50">
-      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-center">
-        <p class="text-sm text-gray-600">© {new Date().getFullYear()} Sho Kuno</p>
-      </div>
-    </footer>
+    <div class="site-shell">
+      <header class="site-header">
+        <a class="site-brand" href="/">{siteName}</a>
+        <p class="site-desc">{tagline}</p>
+      </header>
+      <main class="site-main">
+        <slot />
+      </main>
+      <footer class="site-footer">
+        Made with Astro. Every page is a post; follow the tags to explore.
+      </footer>
+    </div>
   </body>
 </html>
-
-<!-- Removed global scrollbar suppression for accessibility -->

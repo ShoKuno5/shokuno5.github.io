@@ -1,80 +1,59 @@
 ---
-import Layout from '../../layouts/Layout.astro';
 import { getCollection } from 'astro:content';
-import { getGitDatesForContentSync } from '../../utils/gitDatesOptimized';
-import { extractDateFromFilename } from '../../utils/extractDateFromFilename';
+import Layout from '../../layouts/Layout.astro';
 
-const posts = await getCollection('posts', ({ id }) => id.startsWith('en/') || !id.includes('/'));
-const visiblePosts = posts.filter(post => !post.data.hidden);
+const entries = await getCollection('posts');
+const posts = entries
+  .map((entry) => ({
+    slug: entry.slug.startsWith('en/') ? entry.slug.slice(3) : entry.slug,
+    title: entry.data.title,
+    description: entry.data.description || entry.data.summary,
+    tags: entry.data.tags ?? [],
+    pubDate: entry.data.pubDate,
+    modified: entry.data.modified,
+    pinned: entry.data.pinned ?? false,
+  }))
+  .sort((a, b) => b.pubDate.getTime() - a.pubDate.getTime());
 
-// Enhance posts with git dates
-const postsWithDates = visiblePosts.map(post => {
-  const gitDates = getGitDatesForContentSync('posts', post.slug);
-  const filenameDate = extractDateFromFilename(post.slug);
-  
-  // Priority: frontmatter date > filename date > git created date
-  const publishDate = post.data.date || filenameDate || gitDates?.created || new Date();
-  
-  // For modified date, always use git modified if it exists and is different
-  let modifiedDate = post.data.modified;
-  if (!modifiedDate && gitDates?.modified) {
-    if (gitDates.modified.getTime() !== publishDate.getTime()) {
-      modifiedDate = gitDates.modified;
-    }
-  }
-  
-  return {
-    ...post,
-    computedDates: {
-      published: publishDate,
-      modified: modifiedDate
-    }
-  };
-});
+type PostEntry = (typeof posts)[number];
+const postsByYear: Record<number, PostEntry[]> = {};
+for (const post of posts) {
+  const year = post.pubDate.getFullYear();
+  if (!postsByYear[year]) postsByYear[year] = [];
+  postsByYear[year].push(post);
+}
 
-const sortedPosts = postsWithDates.sort((a, b) => b.computedDates.published.getTime() - a.computedDates.published.getTime());
-
-// Group posts by year
-const postsByYear = sortedPosts.reduce((acc, post) => {
-  const year = post.computedDates.published.getFullYear();
-  if (!acc[year]) acc[year] = [];
-  acc[year].push(post);
-  return acc;
-}, {} as Record<number, typeof postsWithDates>);
-
-const years = Object.keys(postsByYear).sort((a, b) => Number(b) - Number(a));
+const years = Object.keys(postsByYear)
+  .map(Number)
+  .sort((a, b) => b - a);
 ---
 
-<Layout title="All Posts" description="Archive of all blog posts">
-  <section class="page-width">
-    <div class="markdown-body page-intro">
-      <h1>All Posts</h1>
-    </div>
-    
+<Layout title="All posts — Sho Kuno" description="Complete archive of every post in reverse chronological order.">
+  <section class="page-width archive">
+    <header class="archive__intro">
+      <h1>All posts</h1>
+      <p>The entire catalogue in one place. Pinned posts keep their position in the main feed but fall back into chronology here.</p>
+    </header>
+
     {years.map((year) => (
-      <section class="archive-year">
+      <section class="archive__year">
         <h2>{year}</h2>
-        <ul class="archive-list">
-          {postsByYear[Number(year)].map((post) => (
+        <ul class="archive__list">
+          {postsByYear[year].map((post) => (
             <li>
-              <a 
-                href={`/posts/${post.slug.startsWith('en/') ? post.slug.slice(3) : post.slug}/`}
-                class="archive-link"
-              >
-                <div class="archive-content">
-                  <h3>{post.data.title}</h3>
-                  {post.data.summary && (
-                    <p>{post.data.summary}</p>
-                  )}
+              <a class="archive__item" href={`/posts/${post.slug}/`}>
+                <div class="archive__item-main">
+                  <h3>{post.title}</h3>
+                  {post.description && <p>{post.description}</p>}
                 </div>
-                <div class="archive-meta">
-                  <time>
-                    {post.computedDates.published.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
+                <div class="archive__item-meta">
+                  <time datetime={post.pubDate.toISOString()}>
+                    {post.pubDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                   </time>
-                  {post.computedDates.modified && (
-                    <time>
-                      upd: {post.computedDates.modified.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
-                    </time>
+                  {post.modified && (
+                    <span class="archive__item-updated">
+                      updated {post.modified.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                    </span>
                   )}
                 </div>
               </a>
@@ -85,3 +64,115 @@ const years = Object.keys(postsByYear).sort((a, b) => Number(b) - Number(a));
     ))}
   </section>
 </Layout>
+
+<style>
+  .archive {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+  }
+
+  .archive__intro h1 {
+    margin: 0;
+    font-size: clamp(2rem, 5vw, 2.6rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+
+  .archive__intro p {
+    margin: 0.75rem 0 0;
+    color: #475569;
+    max-width: 36rem;
+    line-height: 1.7;
+  }
+
+  .archive__year {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .archive__year > h2 {
+    margin: 0;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #0f172a;
+  }
+
+  .archive__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .archive__item {
+    display: flex;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding: 1.25rem 1.5rem;
+    text-decoration: none;
+    border-radius: 1.25rem;
+    border: 1px solid rgba(226, 232, 240, 0.9);
+    background: rgba(255, 255, 255, 0.82);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    color: inherit;
+  }
+
+  .archive__item:hover,
+  .archive__item:focus-visible {
+    transform: translateY(-3px);
+    box-shadow: 0 16px 32px -24px rgba(15, 23, 42, 0.25);
+    outline: none;
+  }
+
+  .archive__item-main {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .archive__item-main h3 {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 600;
+  }
+
+  .archive__item-main p {
+    margin: 0;
+    color: #475569;
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+
+  .archive__item-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    align-items: flex-end;
+    font-size: 0.85rem;
+    color: #64748b;
+    white-space: nowrap;
+  }
+
+  .archive__item-updated {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  @media (max-width: 720px) {
+    .archive__item {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .archive__item-meta {
+      align-items: flex-start;
+      flex-direction: row;
+      gap: 0.75rem;
+    }
+  }
+</style>
