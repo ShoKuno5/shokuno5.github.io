@@ -310,6 +310,125 @@ const isActive = (href: string) => {
           };
 
           enhanceBackrefs();
+
+          const initCitationPreview = () => {
+            const backrefs = Array.from(document.querySelectorAll('.citation-backref'));
+            if (backrefs.length === 0) return;
+
+            document.documentElement.classList.add('citation-preview-enabled');
+
+            const panel = document.createElement('div');
+            panel.className = 'citation-preview-panel';
+            panel.setAttribute('aria-hidden', 'true');
+            panel.style.visibility = 'hidden';
+
+            const windowEl = document.createElement('div');
+            windowEl.className = 'markdown-body citation-preview-window';
+            panel.appendChild(windowEl);
+            document.body.appendChild(panel);
+
+            let activeBackref = null;
+            let hideTimer = null;
+
+            const clearPanel = () => {
+              windowEl.innerHTML = '';
+            };
+
+            const buildClone = (target) => {
+              if (!target) return null;
+              const container =
+                target.closest('p, li, blockquote, figcaption, td, th, dd, dt, h1, h2, h3, h4, h5, h6') ||
+                target.parentElement;
+              if (!container) return null;
+
+              const clone = container.cloneNode(true);
+              const targetId = target.id;
+              if (targetId) {
+                const cloneTarget = clone.querySelector(`#${CSS.escape(targetId)}`);
+                if (cloneTarget) cloneTarget.classList.add('citation-preview-focus');
+              }
+              clone.querySelectorAll('[id]').forEach((node) => node.removeAttribute('id'));
+              return clone;
+            };
+
+            const positionPanel = (backref) => {
+              if (!backref) return;
+              const rect = backref.getBoundingClientRect();
+              const panelRect = panel.getBoundingClientRect();
+              const margin = 12;
+              const viewportWidth = window.innerWidth;
+              const viewportHeight = window.innerHeight;
+
+              let left = rect.left + rect.width / 2 - panelRect.width / 2;
+              left = Math.max(margin, Math.min(left, viewportWidth - panelRect.width - margin));
+
+              let top = rect.top - panelRect.height - 12;
+              if (top < margin) {
+                top = rect.bottom + 12;
+              }
+              if (top + panelRect.height > viewportHeight - margin) {
+                top = Math.max(margin, viewportHeight - panelRect.height - margin);
+              }
+
+              panel.style.left = `${left}px`;
+              panel.style.top = `${top}px`;
+            };
+
+            const showPreview = (backref) => {
+              const targetId = backref.getAttribute('href')?.slice(1);
+              if (!targetId) return;
+              const target = document.getElementById(targetId);
+              const clone = buildClone(target);
+              if (!clone) return;
+
+              clearPanel();
+              windowEl.appendChild(clone);
+
+              panel.classList.add('is-visible');
+              panel.style.visibility = 'hidden';
+              positionPanel(backref);
+
+              requestAnimationFrame(() => {
+                panel.style.visibility = 'visible';
+                positionPanel(backref);
+              });
+
+              activeBackref = backref;
+            };
+
+            const hidePreview = () => {
+              panel.classList.remove('is-visible');
+              panel.style.visibility = 'hidden';
+              clearPanel();
+              activeBackref = null;
+            };
+
+            const scheduleHide = () => {
+              if (hideTimer) window.clearTimeout(hideTimer);
+              hideTimer = window.setTimeout(hidePreview, 120);
+            };
+
+            backrefs.forEach((backref) => {
+              backref.addEventListener('mouseenter', () => {
+                if (hideTimer) window.clearTimeout(hideTimer);
+                showPreview(backref);
+              });
+              backref.addEventListener('mouseleave', scheduleHide);
+              backref.addEventListener('focus', () => showPreview(backref));
+              backref.addEventListener('blur', hidePreview);
+            });
+
+            window.addEventListener('scroll', hidePreview, { passive: true });
+            window.addEventListener(
+              'resize',
+              () => {
+                if (activeBackref) positionPanel(activeBackref);
+              },
+              { passive: true }
+            );
+          };
+
+          initCitationPreview();
         })();
     </script>
   </body>
