@@ -449,6 +449,19 @@ body.nav-open .nav-rail {
   color: var(--ink-soft);
 }
 
+.markdown-body .katex {
+  font-size: 1em;
+  line-height: 1.4;
+}
+
+.markdown-body .katex-display {
+  margin: 1.2rem 0;
+}
+
+.markdown-body .katex-display > .katex {
+  font-size: 1.05em;
+}
+
 .markdown-body a {
   color: var(--ink);
   text-decoration: underline;

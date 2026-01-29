@@ -1,0 +1,37 @@
+---
+import { CONTACT_LINKS } from '../config/site.js';
+import ContactLink from './ContactLink.astro';
+
+const {
+  variant = 'list',
+  className,
+  linkClass = 'icon-link',
+  location,
+} = Astro.props;
+
+/** @type {{ key: string; label: string; href: string; locations?: string[] }[]} */
+const links = location
+  ? CONTACT_LINKS.filter((link) => !link.locations || link.locations.includes(location))
+  : CONTACT_LINKS;
+
+const containerClass =
+  className || (variant === 'inline' ? 'nav-contact__links' : 'contact-icons');
+---
+
+{links.length > 0 && (
+  variant === 'inline'
+    ? (
+      <div class={containerClass}>
+        {links.map((contact) => (
+          <ContactLink contact={contact} className={linkClass} />
+        ))}
+      </div>
+    )
+    : (
+      <ul class={containerClass}>
+        {links.map((contact) => (
+          <li><ContactLink contact={contact} className={linkClass} /></li>
+        ))}
+      </ul>
+    )
+)}
