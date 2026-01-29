@@ -459,6 +459,82 @@ body.nav-open .nav-rail {
   text-decoration: none;
 }
 
+.markdown-body .citation-link {
+  text-decoration: none;
+  color: var(--accent);
+  cursor: pointer;
+  display: inline-block;
+  vertical-align: super;
+  font-size: 0.75rem;
+  line-height: 1;
+  margin-left: 0;
+}
+
+.markdown-body .citation-link:hover {
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.markdown-body .citation-link:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.citation-backrefs {
+  display: inline-flex;
+  gap: 0.35rem;
+  margin-left: 0.4rem;
+  vertical-align: middle;
+}
+
+.citation-backref {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  background: transparent;
+  font-size: 0.7rem;
+  color: var(--muted);
+  text-decoration: none;
+  position: relative;
+}
+
+.citation-backref:hover {
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.citation-backref::after {
+  content: attr(data-preview);
+  position: absolute;
+  left: 50%;
+  bottom: 140%;
+  transform: translateX(-50%) translateY(4px);
+  opacity: 0;
+  pointer-events: none;
+  max-width: 260px;
+  padding: 0.35rem 0.5rem;
+  border-radius: 0.35rem;
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  color: var(--ink);
+  font-size: 0.7rem;
+  line-height: 1.4;
+  white-space: normal;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  z-index: 5;
+}
+
+.citation-backref:hover::after,
+.citation-backref:focus-visible::after {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
 .contact-icons {
   display: flex;
   flex-wrap: wrap;
@@ -466,6 +542,12 @@ body.nav-open .nav-rail {
   list-style: none;
   padding: 0;
   margin: 0 0 1.2rem;
+}
+
+.markdown-body .contact-icons {
+  list-style: none;
+  padding-left: 0;
+  margin-left: 0;
 }
 
 .contact-icons li {
@@ -476,6 +558,14 @@ body.nav-open .nav-rail {
 .markdown-body ol {
   margin: 0 0 1.2rem;
   padding-left: 1.4rem;
+}
+
+.markdown-body ul {
+  list-style: disc;
+}
+
+.markdown-body ol {
+  list-style: decimal;
 }
 
 .markdown-body li {
@@ -525,6 +615,13 @@ body.nav-open .nav-rail {
   font-size: 0.75rem;
 }
 
+.citations-enabled sup[data-citation]:empty::before {
+  content: '[' attr(data-citation-index) ']';
+  font-size: 0.75rem;
+  margin-left: 0.2rem;
+}
+
+
 .citations-enabled .references {
   border-top: 1px solid var(--border);
   padding-top: 2rem;
@@ -540,6 +637,7 @@ body.nav-open .nav-rail {
 }
 
 .citations-enabled .references ol {
+  list-style: decimal;
   padding-left: 1.25rem;
   margin: 1.5rem 0 0;
   line-height: 1.6;

@@ -16,6 +16,19 @@ function formatAuthors(value) {
   return cleaned.replace(/\s+and\s+/gi, ', ');
 }
 
+function buildCitationPreview(text, matchIndex, matchLength) {
+  const windowSize = 60;
+  const start = Math.max(0, matchIndex - windowSize);
+  const end = Math.min(text.length, matchIndex + matchLength + windowSize);
+  const snippet = text.slice(start, end);
+  const cleaned = snippet.replace(CITE_PATTERN, '').replace(/\s+/g, ' ').trim();
+  if (!cleaned) return '';
+  const prefix = start > 0 ? '…' : '';
+  const suffix = end < text.length ? '…' : '';
+  const combined = `${prefix}${cleaned}${suffix}`;
+  return combined.length > 140 ? `${combined.slice(0, 137)}…` : combined;
+}
+
 function splitCitations(text) {
   const parts = [];
   CITE_PATTERN.lastIndex = 0;
@@ -33,7 +46,12 @@ function splitCitations(text) {
       .filter(Boolean);
 
     if (keys.length > 0) {
-      parts.push({ type: 'cite', keys });
+      parts.push({
+        type: 'cite',
+        keys,
+        matchIndex: match.index,
+        matchLength: match[0].length
+      });
     }
 
     lastIndex = match.index + match[0].length;
@@ -111,8 +129,44 @@ function buildReferenceItem(key, entry) {
   };
 }
 
-function buildReferencesSection(citationOrder, bibliography, sectionTitle) {
-  const items = citationOrder.map((key) => buildReferenceItem(key, bibliography.get(key)));
+function buildReferenceBackrefs(occurrences) {
+  if (!occurrences || occurrences.length === 0) return null;
+  const links = occurrences.map((occurrence, index) => {
+    const label = occurrence.label || String(index + 1);
+    const ariaLabel = occurrence.label ? `Back to line ${occurrence.label}` : `Back to citation ${index + 1}`;
+    return {
+      type: 'element',
+      tagName: 'a',
+      properties: {
+        href: `#${occurrence.id}`,
+        className: ['citation-backref'],
+        'aria-label': ariaLabel,
+        title: occurrence.preview || ariaLabel,
+        'data-preview': occurrence.preview || ''
+      },
+      children: [{ type: 'text', value: `↩︎${label}` }]
+    };
+  });
+
+  return {
+    type: 'element',
+    tagName: 'span',
+    properties: {
+      className: ['citation-backrefs']
+    },
+    children: links
+  };
+}
+
+function buildReferencesSection(citationOrder, bibliography, sectionTitle, citationOccurrencesByKey) {
+  const items = citationOrder.map((key) => {
+    const item = buildReferenceItem(key, bibliography.get(key));
+    const backrefs = buildReferenceBackrefs(citationOccurrencesByKey.get(key));
+    if (backrefs) {
+      item.children.push({ type: 'text', value: ' ' }, backrefs);
+    }
+    return item;
+  });
 
   return {
     type: 'element',
@@ -146,6 +200,7 @@ export function rehypeCitations(options = {}) {
     const bibliography = await bibliographyCache;
     const citationOrder = [];
     const citationIndexByKey = new Map();
+    const citationOccurrencesByKey = new Map();
 
     visit(tree, 'text', (node, index, parent) => {
       if (typeof node.value !== 'string' || !parent || typeof index !== 'number') {
@@ -170,6 +225,15 @@ export function rehypeCitations(options = {}) {
           continue;
         }
 
+        const lineNumber = typeof node.position?.start?.line === 'number'
+          ? node.position.start.line
+          : null;
+        const preview = buildCitationPreview(
+          node.value,
+          part.matchIndex ?? 0,
+          part.matchLength ?? 0
+        );
+
         part.keys.forEach((key, keyIndex) => {
           if (!citationIndexByKey.has(key)) {
             citationIndexByKey.set(key, citationOrder.length + 1);
@@ -177,13 +241,27 @@ export function rehypeCitations(options = {}) {
           }
 
           const citationIndex = citationIndexByKey.get(key);
+          const occurrences = citationOccurrencesByKey.get(key) || [];
+          const occurrenceIndex = occurrences.length + 1;
+          const citeId = `cite-${key}-${occurrenceIndex}`;
+          const label = lineNumber ? `L${lineNumber}` : String(occurrenceIndex);
+          occurrences.push({
+            id: citeId,
+            label,
+            preview
+          });
+          citationOccurrencesByKey.set(key, occurrences);
 
           replacementNodes.push({
             type: 'element',
-            tagName: 'sup',
+            tagName: 'a',
             properties: {
+              href: `#ref-${key}`,
+              className: ['citation-link'],
+              'aria-label': `Reference ${citationIndex}`,
               'data-citation': key,
-              'data-citation-index': String(citationIndex)
+              'data-citation-index': String(citationIndex),
+              id: citeId
             },
             children: [{ type: 'text', value: `[${citationIndex}]` }]
           });
@@ -199,7 +277,9 @@ export function rehypeCitations(options = {}) {
     });
 
     if (citationOrder.length > 0) {
-      tree.children.push(buildReferencesSection(citationOrder, bibliography, sectionTitle));
+      tree.children.push(
+        buildReferencesSection(citationOrder, bibliography, sectionTitle, citationOccurrencesByKey)
+      );
     }
   };
 }

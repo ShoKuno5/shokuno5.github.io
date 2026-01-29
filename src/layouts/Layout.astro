@@ -202,6 +202,25 @@ const isActive = (href: string) => {
               localStorage.setItem('nav-open', '0');
             }
           });
+
+          const enhanceCitations = () => {
+            const citations = Array.from(document.querySelectorAll('sup[data-citation]'));
+            citations.forEach((sup) => {
+              if (sup.closest('a.citation-link')) return;
+              const key = sup.getAttribute('data-citation');
+              if (!key) return;
+              const index = sup.getAttribute('data-citation-index') || '';
+              const text = (sup.textContent || '').trim();
+              const link = document.createElement('a');
+              link.className = 'citation-link';
+              link.href = `#ref-${key}`;
+              link.setAttribute('aria-label', `Reference ${index || '?'}`);
+              link.textContent = text || (index ? `[${index}]` : '[?]');
+              sup.replaceWith(link);
+            });
+          };
+
+          enhanceCitations();
         })();
     </script>
   </body>
