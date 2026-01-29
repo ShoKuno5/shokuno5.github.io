@@ -1,9 +1,51 @@
+import fs from 'node:fs';
 import { visit } from 'unist-util-visit';
 import { loadBibliography } from './citations.js';
 
 const CITE_PATTERN = /\\cite\{([^}]+)\}/g;
 
 let bibliographyCache;
+
+function getFileText(file) {
+  if (!file) return '';
+  if (typeof file.value === 'string') return file.value;
+  if (file.value != null) return String(file.value);
+  const filePath = typeof file.path === 'string' ? file.path : '';
+  if (!filePath) return '';
+  try {
+    return fs.readFileSync(filePath, 'utf8');
+  } catch {
+    return '';
+  }
+}
+
+function buildLineOffsets(text) {
+  const offsets = [0];
+  for (let i = 0; i < text.length; i += 1) {
+    if (text[i] === '\n') offsets.push(i + 1);
+  }
+  return offsets;
+}
+
+function lineNumberFromOffset(offsets, offset) {
+  if (!offsets || typeof offset !== 'number') return null;
+  let low = 0;
+  let high = offsets.length - 1;
+  while (low <= high) {
+    const mid = (low + high) >> 1;
+    const current = offsets[mid];
+    const next = offsets[mid + 1];
+    if (current <= offset && (next === undefined || next > offset)) {
+      return mid + 1;
+    }
+    if (current > offset) {
+      high = mid - 1;
+    } else {
+      low = mid + 1;
+    }
+  }
+  return offsets.length;
+}
 
 function cleanValue(value) {
   if (!value) return '';
@@ -133,17 +175,21 @@ function buildReferenceBackrefs(occurrences) {
   if (!occurrences || occurrences.length === 0) return null;
   const links = occurrences.map((occurrence, index) => {
     const label = occurrence.label || String(index + 1);
-    const ariaLabel = occurrence.label ? `Back to line ${occurrence.label}` : `Back to citation ${index + 1}`;
+    const ariaLabel = `Back to line ${label}`;
+    const previewText = occurrence.preview || '';
+    const properties = {
+      href: `#${occurrence.id}`,
+      className: ['citation-backref'],
+      'aria-label': ariaLabel,
+      'data-line': label
+    };
+    if (previewText) {
+      properties['data-preview'] = previewText;
+    }
     return {
       type: 'element',
       tagName: 'a',
-      properties: {
-        href: `#${occurrence.id}`,
-        className: ['citation-backref'],
-        'aria-label': ariaLabel,
-        title: occurrence.preview || ariaLabel,
-        'data-preview': occurrence.preview || ''
-      },
+      properties,
       children: [{ type: 'text', value: `↩︎${label}` }]
     };
   });
@@ -192,7 +238,7 @@ function buildReferencesSection(citationOrder, bibliography, sectionTitle, citat
 export function rehypeCitations(options = {}) {
   const { sectionTitle = 'References' } = options;
 
-  return async (tree) => {
+  return async (tree, file) => {
     if (!bibliographyCache) {
       bibliographyCache = loadBibliography();
     }
@@ -201,6 +247,41 @@ export function rehypeCitations(options = {}) {
     const citationOrder = [];
     const citationIndexByKey = new Map();
     const citationOccurrencesByKey = new Map();
+    const sourceText = getFileText(file);
+    const lineOffsets = sourceText ? buildLineOffsets(sourceText) : null;
+    let sourceSearchIndex = 0;
+
+    const resolveLineNumber = (node, part) => {
+      const position = node.position?.start;
+      if (typeof position?.line === 'number') {
+        return position.line;
+      }
+
+      if (lineOffsets && typeof position?.offset === 'number') {
+        const offset = position.offset + (part.matchIndex ?? 0);
+        const matchLength = part.matchLength ?? 0;
+        const nextIndex = offset + matchLength;
+        if (nextIndex > sourceSearchIndex) {
+          sourceSearchIndex = nextIndex;
+        }
+        return lineNumberFromOffset(lineOffsets, offset);
+      }
+
+      if (lineOffsets && sourceText && typeof node.value === 'string') {
+        const start = part.matchIndex ?? 0;
+        const length = part.matchLength ?? 0;
+        const token = node.value.slice(start, start + length);
+        if (token) {
+          const found = sourceText.indexOf(token, sourceSearchIndex);
+          if (found !== -1) {
+            sourceSearchIndex = found + token.length;
+            return lineNumberFromOffset(lineOffsets, found);
+          }
+        }
+      }
+
+      return null;
+    };
 
     visit(tree, 'text', (node, index, parent) => {
       if (typeof node.value !== 'string' || !parent || typeof index !== 'number') {
@@ -225,9 +306,7 @@ export function rehypeCitations(options = {}) {
           continue;
         }
 
-        const lineNumber = typeof node.position?.start?.line === 'number'
-          ? node.position.start.line
-          : null;
+        const lineNumber = resolveLineNumber(node, part);
         const preview = buildCitationPreview(
           node.value,
           part.matchIndex ?? 0,
@@ -244,7 +323,7 @@ export function rehypeCitations(options = {}) {
           const occurrences = citationOccurrencesByKey.get(key) || [];
           const occurrenceIndex = occurrences.length + 1;
           const citeId = `cite-${key}-${occurrenceIndex}`;
-          const label = lineNumber ? `L${lineNumber}` : String(occurrenceIndex);
+          const label = lineNumber ? String(lineNumber) : String(occurrenceIndex);
           occurrences.push({
             id: citeId,
             label,
@@ -261,6 +340,7 @@ export function rehypeCitations(options = {}) {
               'aria-label': `Reference ${citationIndex}`,
               'data-citation': key,
               'data-citation-index': String(citationIndex),
+              'data-citation-line': label,
               id: citeId
             },
             children: [{ type: 'text', value: `[${citationIndex}]` }]

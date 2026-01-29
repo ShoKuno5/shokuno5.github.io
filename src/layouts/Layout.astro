@@ -205,22 +205,111 @@ const isActive = (href: string) => {
 
           const enhanceCitations = () => {
             const citations = Array.from(document.querySelectorAll('sup[data-citation]'));
+            const occurrenceCounts = new Map();
             citations.forEach((sup) => {
               if (sup.closest('a.citation-link')) return;
               const key = sup.getAttribute('data-citation');
               if (!key) return;
               const index = sup.getAttribute('data-citation-index') || '';
+              const nextCount = (occurrenceCounts.get(key) || 0) + 1;
+              occurrenceCounts.set(key, nextCount);
               const text = (sup.textContent || '').trim();
               const link = document.createElement('a');
               link.className = 'citation-link';
               link.href = `#ref-${key}`;
               link.setAttribute('aria-label', `Reference ${index || '?'}`);
+              link.setAttribute('data-citation', key);
+              if (index) {
+                link.setAttribute('data-citation-index', index);
+              }
+              link.id = `cite-${key}-${nextCount}`;
               link.textContent = text || (index ? `[${index}]` : '[?]');
               sup.replaceWith(link);
             });
           };
 
           enhanceCitations();
+
+          const buildPreviewFromTarget = (target) => {
+            if (!target) return '';
+            const container =
+              target.closest('p, li, blockquote, figcaption, td, th, dd, dt, h1, h2, h3, h4, h5, h6') ||
+              target.parentElement;
+            if (!container) return '';
+            const maxLength = 140;
+            const normalizeText = (value) =>
+              String(value || '')
+                .replace(/\[\d+\]/g, '')
+                .replace(/\s+/g, ' ')
+                .trim();
+            const fullText = normalizeText(container.textContent || '');
+            if (!fullText) return '';
+
+            let anchorOffset = 0;
+            if (container.contains(target)) {
+              const range = document.createRange();
+              range.setStart(container, 0);
+              range.setEndBefore(target);
+              anchorOffset = normalizeText(range.toString()).length;
+            }
+
+            if (fullText.length <= maxLength) return fullText;
+            const halfWindow = Math.floor(maxLength / 2);
+            let start = Math.max(0, anchorOffset - halfWindow);
+            let end = Math.min(fullText.length, start + maxLength);
+            if (end - start < maxLength) {
+              start = Math.max(0, end - maxLength);
+            }
+            let snippet = fullText.slice(start, end).trim();
+            if (start > 0) snippet = `…${snippet}`;
+            if (end < fullText.length) snippet = `${snippet}…`;
+            return snippet;
+          };
+
+          const extractLineFromLabel = (label) => {
+            if (!label) return '';
+            const match = label.match(/\\d+/);
+            return match ? match[0] : '';
+          };
+
+          const normalizeLineLabel = (value) => {
+            if (!value) return '';
+            const match = String(value).match(/\\d+/);
+            return match ? match[0] : '';
+          };
+
+          const enhanceBackrefs = () => {
+            const backrefs = Array.from(document.querySelectorAll('.citation-backref'));
+            backrefs.forEach((backref) => {
+              const current = (backref.textContent || '').trim();
+              const targetId = backref.getAttribute('href')?.slice(1);
+              if (!targetId) return;
+              const target = document.getElementById(targetId);
+              const line =
+                target?.getAttribute('data-citation-line') ||
+                backref.getAttribute('data-line') ||
+                extractLineFromLabel(backref.getAttribute('aria-label'));
+              const normalizedLine = normalizeLineLabel(line);
+              if (normalizedLine && current !== `↩︎${normalizedLine}`) {
+                backref.textContent = `↩︎${normalizedLine}`;
+                backref.setAttribute('data-line', normalizedLine);
+              }
+              const preview = buildPreviewFromTarget(target);
+              if (preview) {
+                backref.setAttribute('data-preview', preview);
+                backref.removeAttribute('title');
+                return;
+              }
+              const hasPreview = backref.getAttribute('data-preview');
+              if (!hasPreview || !hasPreview.trim()) {
+                const fallback = 'Back to citation';
+                backref.setAttribute('data-preview', fallback);
+                backref.removeAttribute('title');
+              }
+            });
+          };
+
+          enhanceBackrefs();
         })();
     </script>
   </body>

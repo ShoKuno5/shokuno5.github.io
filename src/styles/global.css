@@ -468,6 +468,13 @@ body.nav-open .nav-rail {
   font-size: 0.75rem;
   line-height: 1;
   margin-left: 0;
+  scroll-margin-top: 6rem;
+}
+
+.markdown-body .citation-link:target {
+  outline: 2px solid rgba(11, 95, 255, 0.25);
+  outline-offset: 2px;
+  border-radius: 3px;
 }
 
 .markdown-body .citation-link:hover {
@@ -534,6 +541,7 @@ body.nav-open .nav-rail {
   opacity: 1;
   transform: translateX(-50%) translateY(0);
 }
+
 
 .contact-icons {
   display: flex;
