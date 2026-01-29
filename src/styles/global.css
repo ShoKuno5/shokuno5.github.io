@@ -365,6 +365,12 @@ body.nav-open .nav-rail {
   max-width: 720px;
 }
 
+.post-comments {
+  margin-top: 2.5rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border);
+}
+
 
 .markdown-body {
   max-width: 100%;
