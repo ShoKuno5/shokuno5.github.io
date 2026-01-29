@@ -10,7 +10,6 @@ pinned: true
 ---
 
 Welcome to my page! I made this website to maintain (or retain) my habit of writing.\
-With the aid of Codex, I organized all the posts chronologically in this meta-post entitled "(You do not have to) Start Here". 
 This page functions as both the home page and a parent post that nests all the child posts in this repository. \
 Each post has a comment function where you can start or join a conversation. Feel free to open the post and leave a remark!
 
