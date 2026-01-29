@@ -1,5 +1,5 @@
 ---
-title: "(You do not have to) Start Here"
+title: "Who Am I?"
 description: "How this post-first site works, where to begin, and how to reach me."
 pubDate: 2025-09-22
 tags:

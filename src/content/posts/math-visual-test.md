@@ -12,7 +12,7 @@ tags:
 type: academic
 ---
 
-# Mathematical Expressions and Visual Content Test
+
 
 This post demonstrates the rendering capabilities for various mathematical expressions, images, and visual content on the blog.
 
@@ -217,11 +217,3 @@ This test post demonstrates the blog's capability to render:
 1. **Inline and block mathematical expressions** using KaTeX
 
 2. **Complex mathematical notation** including matrices, integrals, and summations
-
-3. **Academic citations** with proper bibliography generation
-
-4. **Code blocks** with mathematical comments
-
-5. **Tables** with mathematical content
-
-The rendering system successfully handles both simple expressions like $E = mc^2$ and complex multi-line equations with proper formatting and spacing.

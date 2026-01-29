@@ -1,0 +1,80 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../layouts/Layout.astro';
+import { SITE } from '../config/site.js';
+import { normalizeTag } from '../utils/tags';
+
+const entries = await getCollection('posts');
+
+const tagsMap = new Map<string, { label: string; slug: string; posts: {
+  slug: string;
+  title: string;
+  description?: string;
+  pubDate: Date;
+}[] }>();
+
+for (const entry of entries) {
+  const tags = entry.data.tags ?? [];
+  for (const rawTag of tags) {
+    const tagSlug = normalizeTag(rawTag);
+    const slug = entry.slug;
+    if (!tagsMap.has(tagSlug)) {
+      tagsMap.set(tagSlug, { label: rawTag, slug: tagSlug, posts: [] });
+    }
+    tagsMap.get(tagSlug)!.posts.push({
+      slug,
+      title: entry.data.title,
+      description: entry.data.description || entry.data.summary,
+      pubDate: entry.data.pubDate,
+    });
+  }
+}
+
+const tags = Array.from(tagsMap.values())
+  .map((tag) => ({
+    ...tag,
+    posts: tag.posts.sort((a, b) => b.pubDate.getTime() - a.pubDate.getTime()),
+  }))
+  .sort((a, b) => a.label.localeCompare(b.label));
+
+const formatDate = (value: Date) =>
+  value.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+
+---
+
+<Layout title={`${SITE.name} - Tags`} description="Browse posts by tag.">
+  <header class="intro">
+    <h1 class="intro-title">Tags</h1>
+    <p class="intro-lede">Browse posts by topic.</p>
+  </header>
+
+  <section>
+    <div class="post-item__meta">
+      {tags.map((tag) => (
+        <a class="tag-pill" href={`#tag-${tag.slug}`}>#{tag.label} ({tag.posts.length})</a>
+      ))}
+    </div>
+  </section>
+
+  <section class="tag-sections">
+    {tags.map((tag) => (
+      <section class="tag-section" id={`tag-${tag.slug}`}>
+        <div class="tag-section__header">
+          <span class="tag-pill">#{tag.label}</span>
+          <span class="tag-count">{tag.posts.length} post{tag.posts.length === 1 ? '' : 's'}</span>
+        </div>
+        <div class="post-list">
+          {tag.posts.map((post) => (
+            <article class="post-item">
+              <div class="post-item__meta">
+                <time datetime={post.pubDate.toISOString()}>{formatDate(post.pubDate)}</time>
+              </div>
+              <a class="post-item__title" href={`/posts/${post.slug}/`}>{post.title}</a>
+              {post.description && <p class="post-item__excerpt">{post.description}</p>}
+            </article>
+          ))}
+        </div>
+      </section>
+    ))}
+  </section>
+</Layout>

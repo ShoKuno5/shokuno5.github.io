@@ -4,9 +4,7 @@
   "version": "0.0.1",
   "scripts": {
     "dev": "astro dev",
-    "build": "npm run prebuild && astro check && astro build",
-    "build:clean": "npm run prebuild && astro check && astro build",
-    "prebuild": "node scripts/prebuild.js",
+    "build": "astro check && astro build",
     "preview": "astro preview",
     "astro": "astro",
     "check": "astro check"
@@ -14,16 +12,8 @@
   "dependencies": {
     "@astrojs/mdx": "^4.3.0",
     "@astrojs/tailwind": "^6.0.2",
-    "@benrbray/remark-cite": "^2.0.1-alpha.4",
-    "@citation-js/core": "^0.7.18",
-    "@citation-js/plugin-bibtex": "^0.7.18",
-    "@citation-js/plugin-csl": "^0.7.18",
     "astro": "^5.10.2",
-    "bibtex-parse-js": "^0.0.24",
-    "citation-js": "^0.7.19",
-    "gray-matter": "^4.0.3",
     "katex": "^0.16.22",
-    "rehype-citation": "^2.3.1",
     "rehype-katex": "^7.0.1",
     "remark-math": "^6.0.0",
     "shiki": "^3.7.0",

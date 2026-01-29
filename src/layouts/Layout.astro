@@ -1,7 +1,6 @@
 ---
 import '../styles/global.css';
-import '../styles/markdown.css';
-import { SITE } from '../config/site.js';
+import { SITE, NAV_LINKS } from '../config/site.js';
 
 export interface Props {
   title: string;
@@ -10,7 +9,21 @@ export interface Props {
 
 const { title, description = '' } = Astro.props;
 const siteName = SITE.name;
-const tagline = SITE.tagline;
+const year = new Date().getFullYear();
+
+const contacts = [
+  SITE.contact?.email ? { label: 'Email', href: `mailto:${SITE.contact.email}` } : null,
+  SITE.contact?.github ? { label: 'GitHub', href: SITE.contact.github } : null,
+  SITE.contact?.linkedin ? { label: 'LinkedIn', href: SITE.contact.linkedin } : null,
+].filter(Boolean) as { label: string; href: string }[];
+
+const pathname = Astro.url.pathname;
+const isActive = (href: string) => {
+  const [path] = href.split('#');
+  if (href.startsWith('/#') && pathname.startsWith('/posts/')) return true;
+  if (!path || path === '/') return pathname === '/';
+  return pathname.startsWith(path);
+};
 ---
 
 <!DOCTYPE html>
@@ -23,7 +36,6 @@ const tagline = SITE.tagline;
       <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site).toString()} />
     )}
 
-    <!-- Social -->
     <meta property="og:site_name" content={siteName} />
     <meta property="og:type" content="website" />
     <meta property="og:title" content={title} />
@@ -38,83 +50,15 @@ const tagline = SITE.tagline;
 
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 
-    <style>
-      :root {
-        color-scheme: light;
-      }
-
-      .site-shell {
-        display: flex;
-        flex-direction: column;
-        min-height: 100vh;
-        background: #ffffff;
-        color: #111827;
-      }
-
-      .site-header {
-        padding: 3rem 1.5rem 2.25rem;
-        text-align: center;
-        border-bottom: 1px solid #e5e7eb;
-      }
-
-      .site-brand {
-        font-size: clamp(1.9rem, 4.2vw, 2.6rem);
-        font-weight: 700;
-        letter-spacing: -0.02em;
-        color: inherit;
-        text-decoration: none;
-      }
-
-      .site-desc {
-        margin: 0.75rem auto 0;
-        max-width: 36rem;
-        font-size: 1rem;
-        color: #4b5563;
-        line-height: 1.65;
-      }
-
-      .site-main {
-        flex: 1;
-        width: 100%;
-      }
-
-      .site-footer {
-        padding: 2.5rem 1.5rem 3rem;
-        text-align: center;
-        font-size: 0.85rem;
-        color: #6b7280;
-        border-top: 1px solid #e5e7eb;
-        background: #fafafa;
-      }
-
-      @media (max-width: 600px) {
-        .site-header {
-          padding: 2.25rem 1.25rem 1.75rem;
-        }
-
-        .site-desc {
-          font-size: 0.95rem;
-        }
-      }
-    </style>
-
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      rel="preload"
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+JP:wght@300;400;500;600;700&display=swap"
-      as="style"
-      onload="this.onload=null;this.rel='stylesheet'"
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
     />
-    <noscript>
-      <link
-        rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+JP:wght@300;400;500;600;700&display=swap"
-      />
-    </noscript>
 
-    <link rel="preload" href="/katex.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'" />
-    <noscript><link rel="stylesheet" href="/katex.min.css" /></noscript>
+    <link rel="preload" href="/katex.min.css" as="style" />
+    <link rel="stylesheet" href="/katex.min.css" />
     <link rel="preload" href="/fonts/KaTeX_Main-Regular.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/fonts/KaTeX_Math-Italic.woff2" as="font" type="font/woff2" crossorigin />
 
@@ -122,26 +66,108 @@ const tagline = SITE.tagline;
       .katex-mathml {
         display: none !important;
       }
-
-      body {
-        margin: 0;
-      }
     </style>
+
+    <slot name="head" />
 
     <title>{title}</title>
   </head>
   <body>
+    <a class="skip-link" href="#content">Skip to content</a>
     <div class="site-shell">
-      <header class="site-header">
-        <a class="site-brand" href="/">{siteName}</a>
-        <p class="site-desc">{tagline}</p>
-      </header>
-      <main class="site-main">
+      <button class="nav-toggle" type="button" aria-controls="site-nav" aria-expanded="false">
+        Menu
+      </button>
+      <div class="nav-backdrop" data-nav-close></div>
+      <aside class="nav-rail" id="site-nav">
+
+        <nav class="nav-links" aria-label="Primary">
+          {NAV_LINKS.map((link) => (
+            <a
+              class={`nav-link${isActive(link.href) ? ' is-active' : ''}`}
+              href={link.href}
+              data-nav-link
+            >
+              {link.label}
+            </a>
+          ))}
+        </nav>
+
+        {contacts.length > 0 && (
+          <div class="nav-contact">
+            <span class="nav-kicker">Contact</span>
+            <div class="nav-contact__links">
+              {contacts.map((contact) => (
+                <a href={contact.href}>{contact.label}</a>
+              ))}
+            </div>
+          </div>
+        )}
+      </aside>
+
+      <main id="content" class="site-main">
         <slot />
+        <footer class="site-footer">
+          <span>(c) {siteName} {year}</span>
+          <span>All rights reserved.</span>
+        </footer>
       </main>
-      <footer class="site-footer">
-        Made with Astro. Every page is a post; follow the tags to explore.
-      </footer>
     </div>
+    <script is:inline>
+      (() => {
+        const root = document.body;
+        const toggle = document.querySelector('.nav-toggle');
+        if (!toggle) return;
+          const stored = localStorage.getItem('nav-open');
+          if (stored === '1') {
+            root.classList.add('nav-open');
+            toggle.setAttribute('aria-expanded', 'true');
+          }
+          toggle.addEventListener('click', () => {
+            const next = !root.classList.contains('nav-open');
+            root.classList.toggle('nav-open', next);
+            toggle.setAttribute('aria-expanded', String(next));
+            localStorage.setItem('nav-open', next ? '1' : '0');
+          });
+          const closeTargets = Array.from(document.querySelectorAll('[data-nav-close]'));
+          const navLinks = Array.from(document.querySelectorAll('[data-nav-link]'));
+          const closeNav = () => {
+            root.classList.remove('nav-open');
+            toggle.setAttribute('aria-expanded', 'false');
+            localStorage.setItem('nav-open', '0');
+          };
+
+          closeTargets.forEach((target) => {
+            target.addEventListener('click', () => {
+              closeNav();
+            });
+          });
+
+          navLinks.forEach((link) => {
+            link.addEventListener('click', (event) => {
+              const url = new URL(link.getAttribute('href') || '/', window.location.origin);
+              const samePage = url.pathname === window.location.pathname;
+              if (samePage && url.hash) {
+                event.preventDefault();
+                closeNav();
+                const hash = url.hash;
+                history.replaceState(null, '', window.location.pathname);
+                window.location.hash = hash;
+                return;
+              }
+              root.classList.remove('nav-open');
+              toggle.setAttribute('aria-expanded', 'false');
+              localStorage.setItem('nav-open', '0');
+            });
+          });
+          document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') {
+              root.classList.remove('nav-open');
+              toggle.setAttribute('aria-expanded', 'false');
+              localStorage.setItem('nav-open', '0');
+            }
+          });
+        })();
+    </script>
   </body>
 </html>

@@ -1,79 +1,69 @@
 ---
 import { getCollection } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
-import PostLayout from '../layouts/PostLayout.astro';
-import MetaFeed from '../components/MetaFeed.astro';
+import { SITE } from '../config/site.js';
+import { normalizeTag } from '../utils/tags';
 
-const rawPosts = await getCollection('posts');
+const entries = await getCollection('posts');
 
-if (rawPosts.length === 0) {
-  throw new Error('No posts found. At least one post is required for the meta feed.');
+if (entries.length === 0) {
+  throw new Error('No posts found. Add at least one post to render the homepage.');
 }
 
-const normalizeTag = (value: string) => value.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+const normalized = entries.map((entry) => ({
+  entry,
+  slug: entry.slug,
+}));
 
-const sortedEntries = rawPosts
-  .map((entry) => ({
-    entry,
-    slug: entry.slug.startsWith('en/') ? entry.slug.slice(3) : entry.slug,
-  }))
-  .sort((a, b) => b.entry.data.pubDate.getTime() - a.entry.data.pubDate.getTime());
-
-const metaEntry = sortedEntries.find(({ entry }) => entry.data.pinned) ?? sortedEntries[0];
-const inclusionEntries = sortedEntries.filter(({ slug }) => slug !== metaEntry.slug);
-
-const { Content: MetaContent } = await metaEntry.entry.render();
-
-const inclusionPosts = await Promise.all(
-  inclusionEntries.map(async ({ entry, slug }) => {
+const rendered = await Promise.all(
+  normalized.map(async ({ entry, slug }) => {
     const { Content } = await entry.render();
-    return {
-      slug,
-      data: entry.data,
-      body: entry.body,
-      Content,
-    };
-  }),
+    return { entry, slug, Content };
+  })
 );
 
-const tagMap = new Map<string, { label: string; count: number }>();
-for (const { data } of inclusionPosts) {
-  const tags = data.tags ?? [];
-  for (const originalTag of tags) {
-    const key = normalizeTag(originalTag);
-    const record = tagMap.get(key);
-    if (record) {
-      record.count += 1;
-    } else {
-      tagMap.set(key, { label: originalTag, count: 1 });
-    }
-  }
-}
+const sorted = rendered.sort(
+  (a, b) => b.entry.data.pubDate.getTime() - a.entry.data.pubDate.getTime()
+);
 
-const topTags = Array.from(tagMap.entries())
-  .sort((a, b) => b[1].count - a[1].count)
-  .slice(0, 8)
-  .map(([key, { label, count }]) => ({ key, label, count }));
+const pinnedPosts = sorted.filter((item) => item.entry.data.pinned);
+const unpinnedPosts = sorted.filter((item) => !item.entry.data.pinned);
+const posts = pinnedPosts.length > 0 ? [...pinnedPosts, ...unpinnedPosts] : sorted;
+
+const formatDate = (value: Date) =>
+  value.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+
 ---
 
-<Layout
-  title="Sho Kuno — Posts"
-  description="A single chronological stream of posts: research, projects, updates, and notes."
->
-  <PostLayout
-    title={metaEntry.entry.data.title}
-    description={metaEntry.entry.data.description || metaEntry.entry.data.summary}
-    date={metaEntry.entry.data.pubDate}
-    modified={metaEntry.entry.data.modified}
-    tags={metaEntry.entry.data.tags}
-    content={metaEntry.entry.body}
-    mode="homepage"
-    slug={metaEntry.slug}
-    showComments={false}
-    variant="meta"
-  >
-    <MetaContent />
+<Layout title={`${SITE.name} - Home`} description={SITE.tagline}>
+  <header class="intro">
+    <h1 class="intro-title">{SITE.name}</h1>
+    {SITE.tagline && <p class="intro-lede">{SITE.tagline}</p>}
+  </header>
 
-    <MetaFeed posts={inclusionPosts} topTags={topTags} />
-  </PostLayout>
+  <div id="posts" aria-label="Posts">
+    <div class="post-list">
+      {posts.map(({ entry, slug, Content }) => (
+        <article
+          class="post-item"
+          data-tags={(entry.data.tags ?? []).map(normalizeTag).join(' ')}
+        >
+          <div class="post-item__meta">
+            {entry.data.pinned && <span class="tag-pill">Pinned</span>}
+            <time datetime={entry.data.pubDate.toISOString()}>{formatDate(entry.data.pubDate)}</time>
+            {(entry.data.tags ?? []).map((tag) => (
+              <a class="tag-pill" href={`/tags/#tag-${normalizeTag(tag)}`}>#{tag}</a>
+            ))}
+          </div>
+          <a class="post-item__title" href={`/posts/${slug}/`}>{entry.data.title}</a>
+          {(entry.data.description || entry.data.summary) && (
+            <p class="post-item__excerpt">{entry.data.description || entry.data.summary}</p>
+          )}
+          <div class="post-body markdown-body">
+            <Content />
+          </div>
+        </article>
+      ))}
+    </div>
+  </div>
 </Layout>

@@ -1,148 +1,29 @@
 ---
-import { getCollection, type CollectionEntry } from 'astro:content';
+import { getCollection } from 'astro:content';
 import PostLayout from '../../layouts/PostLayout.astro';
-import PostLayoutWithCitations from '../../layouts/PostLayoutWithCitations.astro';
-import AcademicLayout from '../../layouts/AcademicLayout.astro';
-import MetaFeed from '../../components/MetaFeed.astro';
-import { getGitDatesForContentSync } from '../../utils/gitDatesOptimized';
-import { extractDateFromFilename } from '../../utils/extractDateFromFilename';
 
 export async function getStaticPaths() {
   const posts = await getCollection('posts');
-  return posts.map((post) => {
-    // Handle both old flat structure and new en/ja structure
-    const slug = post.slug.startsWith('en/') ? post.slug.slice(3) : post.slug;
-    return {
-      params: { slug },
-      props: { post },
-    };
-  });
+  return posts.map((post) => ({
+    params: { slug: post.slug },
+    props: { post },
+  }));
 }
-
-type PostEntry = CollectionEntry<'posts'>;
-type MetaFeedPost = {
-  slug: string;
-  data: PostEntry['data'];
-  body: PostEntry['body'];
-  Content: Awaited<ReturnType<PostEntry['render']>>['Content'];
-};
-
-const normalizeTag = (value: string) => value.toLowerCase().replace(/[^a-z0-9]+/g, '-');
 
 const { post } = Astro.props;
-const normalizedSlug = post.slug.startsWith('en/') ? post.slug.slice(3) : post.slug;
 const { Content } = await post.render();
 
-let metaFeedPosts: MetaFeedPost[] | null = null;
-let metaFeedTopTags: { key: string; label: string; count: number }[] = [];
-
-if (normalizedSlug === 'start-here') {
-  const rawPosts = await getCollection('posts');
-  const inclusionEntries = rawPosts
-    .map((entry) => ({
-      entry,
-      slug: entry.slug.startsWith('en/') ? entry.slug.slice(3) : entry.slug,
-    }))
-    .filter(({ slug }) => slug !== normalizedSlug)
-    .sort((a, b) => b.entry.data.pubDate.getTime() - a.entry.data.pubDate.getTime());
-
-  const inclusionPosts = await Promise.all(
-    inclusionEntries.map(async ({ entry, slug }) => {
-      const { Content } = await entry.render();
-      return {
-        slug,
-        data: entry.data,
-        body: entry.body,
-        Content,
-      };
-    }),
-  );
-
-  metaFeedPosts = inclusionPosts;
-
-  const tagMap = new Map<string, { key: string; label: string; count: number }>();
-  for (const { data } of inclusionPosts) {
-    const tags = data.tags ?? [];
-    for (const originalTag of tags) {
-      const key = normalizeTag(originalTag);
-      const record = tagMap.get(key);
-      if (record) {
-        record.count += 1;
-      } else {
-        tagMap.set(key, { key, label: originalTag, count: 1 });
-      }
-    }
-  }
-
-  metaFeedTopTags = Array.from(tagMap.values())
-    .sort((a, b) => b.count - a.count)
-    .slice(0, 8);
-}
-
-// Get dates with proper priority
-const gitDates = getGitDatesForContentSync('posts', post.slug);
-const filenameDate = extractDateFromFilename(post.slug);
-
-// Priority: frontmatter pubDate > filename date > git created date
-const publishDate = post.data.pubDate || filenameDate || gitDates?.created || new Date();
-
-// For modified date, always use git modified if it exists and is different
-let modifiedDate = post.data.modified;
-if (!modifiedDate && gitDates?.modified) {
-  // Always show git modified date if it's different from published date
-  if (gitDates.modified.getTime() !== publishDate.getTime()) {
-    modifiedDate = gitDates.modified;
-  }
-}
-
-// Determine which layout to use based on frontmatter and content
-const useAcademicLayout = post.data.type === 'academic';
-// Check if post content contains citations (check raw markdown)
-const contentHasCitations = post.body.includes('cite{') || post.body.includes('\\cite{');
-// Use citations layout when citations are detected
-const useCitationsLayout = contentHasCitations;
-
-let LayoutComponent = PostLayout;
-if (useCitationsLayout) {
-  // Citations take priority over academic layout for proper processing
-  LayoutComponent = PostLayoutWithCitations;
-} else if (useAcademicLayout) {
-  LayoutComponent = AcademicLayout;
-}
+const publishDate = post.data.pubDate;
+const modifiedDate = post.data.modified;
 ---
 
-{useCitationsLayout ? (
-  <PostLayoutWithCitations
-    title={post.data.title} 
-    date={publishDate}
-    modified={modifiedDate}
-    tags={post.data.tags}
-    description={post.data.description || post.data.summary}
-    content={post.body}
-  >
-    <Content />
-  </PostLayoutWithCitations>
-) : useAcademicLayout ? (
-  <AcademicLayout
-    title={post.data.title}
-    description={post.data.description || post.data.summary}
-    date={publishDate}
-    tags={post.data.tags}
-    author={post.data.author}
-  >
-    <Content />
-  </AcademicLayout>
-) : (
-  <PostLayout
-    title={post.data.title} 
-    date={publishDate}
-    modified={modifiedDate}
-    tags={post.data.tags}
-    description={post.data.description || post.data.summary}
-  >
-    <Content />
-    {metaFeedPosts && (
-      <MetaFeed posts={metaFeedPosts} topTags={metaFeedTopTags} />
-    )}
-  </PostLayout>
-)}
+<PostLayout
+  title={post.data.title}
+  date={publishDate}
+  modified={modifiedDate}
+  tags={post.data.tags}
+  description={post.data.description || post.data.summary}
+  content={post.body}
+>
+  <Content />
+</PostLayout>
