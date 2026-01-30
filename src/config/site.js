@@ -1,6 +1,6 @@
 export const SITE = {
   name: 'Sho Kuno',
-  tagline: 'Research, projects, fragments, notes.',
+  tagline: 'Building up: research, projects, fragments, notes.',
   contact: {
     email: 'kunosho1225@g.ecc.u-tokyo.ac.jp',
     github: 'https://github.com/ShoKuno5',

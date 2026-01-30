@@ -3,6 +3,7 @@ import { getCollection } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
 import { SITE } from '../config/site.js';
 import { normalizeTag } from '../utils/tags';
+import { getPostDates } from '../utils/postDates';
 
 const entries = await getCollection('posts');
 
@@ -18,12 +19,13 @@ const normalized = entries.map((entry) => ({
 const rendered = await Promise.all(
   normalized.map(async ({ entry, slug }) => {
     const { Content } = await entry.render();
-    return { entry, slug, Content };
+    const { published, updated } = getPostDates(entry);
+    return { entry, slug, Content, publishedDate: published, updatedDate: updated };
   })
 );
 
 const sorted = rendered.sort(
-  (a, b) => b.entry.data.pubDate.getTime() - a.entry.data.pubDate.getTime()
+  (a, b) => b.updatedDate.getTime() - a.updatedDate.getTime()
 );
 
 const pinnedPosts = sorted.filter((item) => item.entry.data.pinned);
@@ -43,19 +45,36 @@ const formatDate = (value: Date) =>
 
   <div id="posts" aria-label="Posts">
     <div class="post-list">
-      {posts.map(({ entry, slug, Content }) => (
+      {posts.map(({ entry, slug, Content, publishedDate, updatedDate }) => (
         <article
           class="post-item"
           data-tags={(entry.data.tags ?? []).map(normalizeTag).join(' ')}
         >
-          <div class="post-item__meta">
-            {entry.data.pinned && <span class="tag-pill">Pinned</span>}
-            <time datetime={entry.data.pubDate.toISOString()}>{formatDate(entry.data.pubDate)}</time>
-            {(entry.data.tags ?? []).map((tag) => (
-              <a class="tag-pill" href={`/tags/#tag-${normalizeTag(tag)}`}>#{tag}</a>
-            ))}
-          </div>
           <a class="post-item__title" href={`/posts/${slug}/`}>{entry.data.title}</a>
+          <div class="post-item__meta">
+            <div class="post-item__meta-row">
+              {entry.data.pinned && <span class="tag-pill">Pinned</span>}
+              <span class="post-item__date">
+                Published{' '}
+                <time datetime={publishedDate.toISOString()}>
+                  {formatDate(publishedDate)}
+                </time>
+              </span>
+              {updatedDate.getTime() !== publishedDate.getTime() && (
+                <span class="post-item__date">
+                  Last updated{' '}
+                  <time datetime={updatedDate.toISOString()}>{formatDate(updatedDate)}</time>
+                </span>
+              )}
+            </div>
+            {(entry.data.tags ?? []).length > 0 && (
+              <div class="post-item__meta-row post-item__meta-row--tags">
+                {(entry.data.tags ?? []).map((tag) => (
+                  <a class="tag-pill" href={`/tags/#tag-${normalizeTag(tag)}`}>#{tag}</a>
+                ))}
+              </div>
+            )}
+          </div>
           {(entry.data.description || entry.data.summary) && (
             <p class="post-item__excerpt">{entry.data.description || entry.data.summary}</p>
           )}

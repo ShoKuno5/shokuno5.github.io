@@ -14,6 +14,8 @@ This page gathers research threads and resources in one place. For longer-form w
 
 - [Google Scholar](https://scholar.google.com/citations?user=Vhz0T3kAAAAJ&hl=ja)
 - [CV](/cv.pdf)
+  
+## Industry Experience
 
 ## Collaborate
 

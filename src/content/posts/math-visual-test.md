@@ -12,8 +12,6 @@ tags:
 type: academic
 ---
 
-
-
 This post demonstrates the rendering capabilities for various mathematical expressions, images, and visual content on the blog.
 
 ## Basic Mathematical Expressions
