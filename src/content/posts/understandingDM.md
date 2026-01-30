@@ -1,5 +1,5 @@
 ---
-title: 'Reading Notes: Symmetry and Machine Learning'
+title: 'Understanding Diffusion and Flows Models'
 description: ''
 pubDate: 2026-01-30T14:29:00.000Z
 author: Sho Kuno
@@ -8,6 +8,9 @@ tags:
   - machine learning
   - katex
   - images
-  - reading notes
+  - generative models
+  - diffusion models
+  - flow models
+  - flow matching
 type: academic
 ---

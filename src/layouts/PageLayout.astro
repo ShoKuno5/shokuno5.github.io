@@ -1,0 +1,23 @@
+---
+import Layout from './Layout.astro';
+
+export interface Props {
+  title: string;
+  description?: string;
+  heading?: string;
+}
+
+const { title, description = '', heading } = Astro.props;
+const displayTitle = heading || title;
+---
+
+<Layout title={title} description={description}>
+  <header class="intro">
+    <h1 class="intro-title">{displayTitle}</h1>
+    {description && <p class="intro-lede">{description}</p>}
+  </header>
+
+  <div class="post-body markdown-body">
+    <slot />
+  </div>
+</Layout>
