@@ -576,7 +576,7 @@ button.tag-pill {
   font-family: var(--font-display);
   font-weight: 400;
   line-height: 1.2;
-  margin: 1rem 0 0.35rem;
+  margin: 2rem 0 1rem;
   color: var(--ink);
 }
 
