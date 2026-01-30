@@ -6,36 +6,53 @@ import { normalizeTag } from '../utils/tags';
 
 const entries = await getCollection('posts');
 
-const tagsMap = new Map<string, { label: string; slug: string; posts: {
+type TagSummary = {
+  label: string;
+  slug: string;
+  count: number;
+};
+
+type PostSummary = {
   slug: string;
   title: string;
   description?: string;
   pubDate: Date;
-}[] }>();
+  tags: { label: string; slug: string }[];
+};
+
+const tagsMap = new Map<string, TagSummary>();
+const posts: PostSummary[] = [];
 
 for (const entry of entries) {
-  const tags = entry.data.tags ?? [];
-  for (const rawTag of tags) {
+  const rawTags = entry.data.tags ?? [];
+  const seenTags = new Set<string>();
+  const postTags: PostSummary['tags'] = [];
+
+  for (const rawTag of rawTags) {
     const tagSlug = normalizeTag(rawTag);
-    const slug = entry.slug;
+    if (!tagSlug || seenTags.has(tagSlug)) continue;
+    seenTags.add(tagSlug);
+
     if (!tagsMap.has(tagSlug)) {
-      tagsMap.set(tagSlug, { label: rawTag, slug: tagSlug, posts: [] });
+      tagsMap.set(tagSlug, { label: rawTag, slug: tagSlug, count: 0 });
     }
-    tagsMap.get(tagSlug)!.posts.push({
-      slug,
-      title: entry.data.title,
-      description: entry.data.description || entry.data.summary,
-      pubDate: entry.data.pubDate,
-    });
+
+    const tag = tagsMap.get(tagSlug)!;
+    tag.count += 1;
+    postTags.push({ label: tag.label, slug: tag.slug });
   }
+
+  posts.push({
+    slug: entry.slug,
+    title: entry.data.title,
+    description: entry.data.description || entry.data.summary,
+    pubDate: entry.data.pubDate,
+    tags: postTags,
+  });
 }
 
-const tags = Array.from(tagsMap.values())
-  .map((tag) => ({
-    ...tag,
-    posts: tag.posts.sort((a, b) => b.pubDate.getTime() - a.pubDate.getTime()),
-  }))
-  .sort((a, b) => a.label.localeCompare(b.label));
+const tags = Array.from(tagsMap.values()).sort((a, b) => a.label.localeCompare(b.label));
+const sortedPosts = posts.sort((a, b) => b.pubDate.getTime() - a.pubDate.getTime());
 
 const formatDate = (value: Date) =>
   value.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
@@ -48,33 +65,262 @@ const formatDate = (value: Date) =>
     <p class="intro-lede">Browse posts by topic.</p>
   </header>
 
-  <section>
-    <div class="post-item__meta">
+  <section class="tag-filter" data-filter-root>
+    <div class="tag-filter__header">
+      <div class="tag-filter__copy">
+        <h2 class="tag-filter__title">Tag map</h2>
+        <p class="tag-filter__lede">Select a tag to filter posts. Counts update with the selection.</p>
+      </div>
+      <div class="tag-filter__status" aria-live="polite">
+        <span class="tag-filter__label" data-filter-label>All posts</span>
+        <span class="tag-filter__count" data-filter-count>
+          {sortedPosts.length} post{sortedPosts.length === 1 ? '' : 's'}
+        </span>
+      </div>
+    </div>
+    <div class="tag-filter__list" data-tag-filter>
+      <button
+        class="tag-pill is-active"
+        type="button"
+        data-tag="all"
+        data-label="All posts"
+        aria-pressed="true"
+      >
+        All
+        <span class="tag-pill__count" data-count>
+          {sortedPosts.length}
+        </span>
+      </button>
       {tags.map((tag) => (
-        <a class="tag-pill" href={`#tag-${tag.slug}`}>#{tag.label} ({tag.posts.length})</a>
+        <button
+          class="tag-pill"
+          type="button"
+          data-tag={tag.slug}
+          data-label={tag.label}
+          aria-pressed="false"
+        >
+          #{tag.label}
+          <span class="tag-pill__count" data-count>{tag.count}</span>
+        </button>
       ))}
     </div>
   </section>
 
-  <section class="tag-sections">
-    {tags.map((tag) => (
-      <section class="tag-section" id={`tag-${tag.slug}`}>
-        <div class="tag-section__header">
-          <span class="tag-pill">#{tag.label}</span>
-          <span class="tag-count">{tag.posts.length} post{tag.posts.length === 1 ? '' : 's'}</span>
+  <section class="post-list" data-post-list>
+    {sortedPosts.map((post) => (
+      <article
+        class="post-item"
+        data-post
+        data-tags={post.tags.map((tag) => tag.slug).join(' ')}
+      >
+        <div class="post-item__meta">
+          <time datetime={post.pubDate.toISOString()}>{formatDate(post.pubDate)}</time>
         </div>
-        <div class="post-list">
-          {tag.posts.map((post) => (
-            <article class="post-item">
-              <div class="post-item__meta">
-                <time datetime={post.pubDate.toISOString()}>{formatDate(post.pubDate)}</time>
-              </div>
-              <a class="post-item__title" href={`/posts/${post.slug}/`}>{post.title}</a>
-              {post.description && <p class="post-item__excerpt">{post.description}</p>}
-            </article>
-          ))}
-        </div>
-      </section>
+        <a class="post-item__title" href={`/posts/${post.slug}/`}>{post.title}</a>
+        {post.description && <p class="post-item__excerpt">{post.description}</p>}
+        {post.tags.length > 0 && (
+          <div class="post-item__tags">
+            {post.tags.map((tag) => (
+              <a class="post-tag" href={`#tag-${tag.slug}`} data-tag-action={tag.slug}>
+                #{tag.label}
+              </a>
+            ))}
+          </div>
+        )}
+      </article>
     ))}
   </section>
+  <p class="tag-filter__empty" data-filter-empty hidden>
+    No posts match that tag yet.
+  </p>
+  <script is:inline>
+    (() => {
+      const filterRoot = document.querySelector('[data-filter-root]');
+      const tagList = document.querySelector('[data-tag-filter]');
+      const postList = document.querySelector('[data-post-list]');
+      if (!filterRoot || !tagList || !postList) return;
+
+      const tagButtons = Array.from(tagList.querySelectorAll('[data-tag]'));
+      const postCards = Array.from(postList.querySelectorAll('[data-post]'));
+      const statusLabel = document.querySelector('[data-filter-label]');
+      const statusCount = document.querySelector('[data-filter-count]');
+      const emptyState = document.querySelector('[data-filter-empty]');
+      const tagMeta = new Map();
+      let activeTags = new Set();
+
+      tagButtons.forEach((button, index) => {
+        const tag = button.dataset.tag;
+        if (!tag || tag === 'all') return;
+        tagMeta.set(tag, { label: button.dataset.label || tag, order: index });
+      });
+
+      const sortTags = (tags) =>
+        [...tags].sort(
+          (a, b) => (tagMeta.get(a)?.order ?? 0) - (tagMeta.get(b)?.order ?? 0)
+        );
+
+      const getPostTags = (post) => {
+        const value = post.dataset.tags || '';
+        return value ? value.split(' ').filter(Boolean) : [];
+      };
+
+      const updateHash = (tags) => {
+        const base = `${window.location.pathname}${window.location.search}`;
+        if (tags.size === 0) {
+          history.replaceState(null, '', base);
+          return;
+        }
+        const ordered = sortTags(tags);
+        if (ordered.length === 1) {
+          history.replaceState(null, '', `${base}#tag-${ordered[0]}`);
+        } else {
+          history.replaceState(null, '', `${base}#tags=${ordered.join(',')}`);
+        }
+      };
+
+      const updateButtons = (selected) => {
+        tagButtons.forEach((button) => {
+          const tag = button.dataset.tag || '';
+          const isActive = tag === 'all' ? selected.size === 0 : selected.has(tag);
+          button.classList.toggle('is-active', isActive);
+          button.setAttribute('aria-pressed', String(isActive));
+        });
+      };
+
+      const updateCounts = (visiblePosts, selected) => {
+        const counts = new Map();
+        tagButtons.forEach((button) => counts.set(button.dataset.tag, 0));
+
+        visiblePosts.forEach((post) => {
+          const seen = new Set();
+          getPostTags(post).forEach((tag) => {
+            if (seen.has(tag)) return;
+            seen.add(tag);
+            counts.set(tag, (counts.get(tag) || 0) + 1);
+          });
+        });
+
+        counts.set('all', visiblePosts.length);
+
+        tagButtons.forEach((button) => {
+          const tag = button.dataset.tag || '';
+          const count = counts.get(tag) || 0;
+          const countEl = button.querySelector('[data-count]');
+          if (countEl) countEl.textContent = String(count);
+          if (tag !== 'all') {
+            const shouldDisable = count === 0 && !selected.has(tag);
+            if (shouldDisable) {
+              button.setAttribute('disabled', 'true');
+            } else {
+              button.removeAttribute('disabled');
+            }
+            button.classList.toggle('is-disabled', shouldDisable);
+          }
+        });
+
+        if (emptyState) {
+          if (visiblePosts.length === 0) {
+            emptyState.removeAttribute('hidden');
+          } else {
+            emptyState.setAttribute('hidden', 'true');
+          }
+        }
+      };
+
+      const updateStatus = (visiblePosts, selected) => {
+        const labels = sortTags(selected).map((tag) => tagMeta.get(tag)?.label || tag);
+        if (statusLabel) {
+          if (labels.length === 0) {
+            statusLabel.textContent = 'All posts';
+          } else if (labels.length === 1) {
+            statusLabel.textContent = `Tag: ${labels[0]}`;
+          } else {
+            statusLabel.textContent = `Tags: ${labels.join(', ')}`;
+          }
+        }
+        if (statusCount) {
+          const count = visiblePosts.length;
+          statusCount.textContent = `${count} post${count === 1 ? '' : 's'}`;
+        }
+      };
+
+      const applyFilter = ({ updateUrl = true } = {}) => {
+        const requiredTags = [...activeTags];
+        const visiblePosts = [];
+
+        postCards.forEach((post) => {
+          const tags = getPostTags(post);
+          const show =
+            requiredTags.length === 0 || requiredTags.every((tag) => tags.includes(tag));
+          post.hidden = !show;
+          if (show) visiblePosts.push(post);
+        });
+
+        updateButtons(activeTags);
+        updateCounts(visiblePosts, activeTags);
+        updateStatus(visiblePosts, activeTags);
+        if (updateUrl) updateHash(activeTags);
+      };
+
+      const setSelection = (tags, options = {}) => {
+        const next = new Set();
+        tags.forEach((tag) => {
+          if (tagMeta.has(tag)) next.add(tag);
+        });
+        activeTags = next;
+        applyFilter(options);
+      };
+
+      tagButtons.forEach((button) => {
+        button.addEventListener('click', () => {
+          const tag = button.dataset.tag || 'all';
+          if (tag === 'all') {
+            setSelection([]);
+            return;
+          }
+          const next = new Set(activeTags);
+          if (next.has(tag)) {
+            next.delete(tag);
+          } else {
+            next.add(tag);
+          }
+          setSelection([...next]);
+        });
+      });
+
+      document.querySelectorAll('[data-tag-action]').forEach((link) => {
+        link.addEventListener('click', (event) => {
+          event.preventDefault();
+          const tag = link.getAttribute('data-tag-action') || 'all';
+          const next = new Set(activeTags);
+          if (next.has(tag)) {
+            next.delete(tag);
+          } else if (tagMeta.has(tag)) {
+            next.add(tag);
+          }
+          setSelection([...next]);
+          filterRoot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        });
+      });
+
+      const parseHash = () => {
+        const tagMatch = window.location.hash.match(/^#tag-([^,]+)$/);
+        if (tagMatch) return [tagMatch[1]];
+        const tagsMatch = window.location.hash.match(/^#tags=([^]+)$/);
+        if (tagsMatch) {
+          return tagsMatch[1]
+            .split(',')
+            .map((value) => value.trim())
+            .filter(Boolean);
+        }
+        return [];
+      };
+
+      setSelection(parseHash(), { updateUrl: false });
+
+      window.addEventListener('hashchange', () => {
+        setSelection(parseHash(), { updateUrl: false });
+      });
+    })();
+  </script>
 </Layout>
