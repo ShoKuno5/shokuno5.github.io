@@ -1,5 +1,5 @@
 ---
-title: 'Understanding Diffusion and Flows Models'
+title: 'Understanding Diffusion and Flow Models'
 description: ''
 pubDate: 2026-01-30T14:29:00.000Z
 author: Sho Kuno

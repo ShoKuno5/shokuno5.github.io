@@ -760,6 +760,60 @@ button.tag-pill {
   list-style: decimal;
 }
 
+.markdown-body h1#contents + ol,
+.markdown-body h2#contents + ol,
+.markdown-body h3#contents + ol,
+.markdown-body h4#contents + ol,
+.markdown-body h5#contents + ol,
+.markdown-body h6#contents + ol,
+.markdown-body h1#contents + ol ol,
+.markdown-body h2#contents + ol ol,
+.markdown-body h3#contents + ol ol,
+.markdown-body h4#contents + ol ol,
+.markdown-body h5#contents + ol ol,
+.markdown-body h6#contents + ol ol {
+  list-style: none;
+  padding-left: 0;
+  counter-reset: toc;
+}
+
+.markdown-body h1#contents + ol ol,
+.markdown-body h2#contents + ol ol,
+.markdown-body h3#contents + ol ol,
+.markdown-body h4#contents + ol ol,
+.markdown-body h5#contents + ol ol,
+.markdown-body h6#contents + ol ol {
+  padding-left: 1.8rem;
+}
+
+.markdown-body h1#contents + ol li,
+.markdown-body h2#contents + ol li,
+.markdown-body h3#contents + ol li,
+.markdown-body h4#contents + ol li,
+.markdown-body h5#contents + ol li,
+.markdown-body h6#contents + ol li {
+  position: relative;
+  padding-left: 2.8rem;
+  counter-increment: toc;
+}
+
+.markdown-body h1#contents + ol li::before,
+.markdown-body h2#contents + ol li::before,
+.markdown-body h3#contents + ol li::before,
+.markdown-body h4#contents + ol li::before,
+.markdown-body h5#contents + ol li::before,
+.markdown-body h6#contents + ol li::before {
+  content: counters(toc, ".") ". ";
+  position: absolute;
+  left: 0;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  width: 2.4rem;
+  padding-right: 0.4rem;
+  text-align: right;
+}
+
+
 .markdown-body li {
   margin: 0.3rem 0;
 }

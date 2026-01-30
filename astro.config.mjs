@@ -4,6 +4,8 @@ import { defineConfig } from 'astro/config';
 import mdx from '@astrojs/mdx';
 import tailwind from '@astrojs/tailwind';
 import remarkMath from 'remark-math';
+import remarkToc from 'remark-toc';
+import rehypeSlug from 'rehype-slug';
 import rehypeKatex from 'rehype-katex';
 import { rehypeLazyImages } from './src/utils/rehype-lazy-images.js';
 import { rehypeCitations } from './src/utils/rehype-citations.js';
@@ -15,8 +17,12 @@ export default defineConfig({
   output: 'static',
   integrations: [
     mdx({
-      remarkPlugins: [remarkMath],
+      remarkPlugins: [
+        remarkMath,
+        [remarkToc, { heading: 'Contents', maxDepth: 3, ordered: true }],
+      ],
       rehypePlugins: [
+        rehypeSlug,
         rehypeKatex,
         rehypeLazyImages,
         [rehypeCitations, { sectionTitle: 'References', version: CITATIONS_VERSION }]
@@ -25,8 +31,12 @@ export default defineConfig({
     tailwind()
   ],
   markdown: {
-    remarkPlugins: [remarkMath],
+    remarkPlugins: [
+      remarkMath,
+      [remarkToc, { heading: 'Contents', maxDepth: 3, ordered: true }],
+    ],
     rehypePlugins: [
+      rehypeSlug,
       rehypeKatex,
       rehypeLazyImages,
       [rehypeCitations, { sectionTitle: 'References', version: CITATIONS_VERSION }]
