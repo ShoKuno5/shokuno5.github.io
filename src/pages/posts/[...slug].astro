@@ -2,9 +2,10 @@
 import { getCollection } from 'astro:content';
 import PostLayout from '../../layouts/PostLayout.astro';
 import { getPostDates } from '../../utils/postDates';
+import { filterPublishedPosts } from '../../utils/postVisibility';
 
 export async function getStaticPaths() {
-  const posts = await getCollection('posts');
+  const posts = filterPublishedPosts(await getCollection('posts'));
   return posts.map((post) => ({
     params: { slug: post.slug },
     props: { post },

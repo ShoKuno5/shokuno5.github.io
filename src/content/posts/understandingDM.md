@@ -12,5 +12,6 @@ tags:
   - diffusion models
   - flow models
   - flow matching
+  - draft
 type: academic
 ---

@@ -4,8 +4,9 @@ import Layout from '../layouts/Layout.astro';
 import { SITE } from '../config/site.js';
 import { normalizeTag } from '../utils/tags';
 import { getPostDates } from '../utils/postDates';
+import { filterPublishedPosts } from '../utils/postVisibility';
 
-const entries = await getCollection('posts');
+const entries = filterPublishedPosts(await getCollection('posts'));
 
 type TagSummary = {
   label: string;

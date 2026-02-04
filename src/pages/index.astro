@@ -3,9 +3,10 @@ import { getCollection } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
 import { SITE } from '../config/site.js';
 import { normalizeTag } from '../utils/tags';
+import { filterPublishedPosts } from '../utils/postVisibility';
 import { getPostDates } from '../utils/postDates';
 
-const entries = await getCollection('posts');
+const entries = filterPublishedPosts(await getCollection('posts'));
 
 if (entries.length === 0) {
   throw new Error('No posts found. Add at least one post to render the homepage.');
