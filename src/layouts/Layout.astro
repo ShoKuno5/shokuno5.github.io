@@ -1,14 +1,18 @@
 ---
 import '../styles/global.css';
 import ContactLinks from '../components/ContactLinks.astro';
+import NavScript from '../components/scripts/NavScript.astro';
+import CitationScript from '../components/scripts/CitationScript.astro';
 import { SITE, NAV_LINKS, CONTACT_LINKS } from '../config/site.js';
 
 export interface Props {
   title: string;
   description?: string;
+  enableMath?: boolean;
+  enableCitations?: boolean;
 }
 
-const { title, description = '' } = Astro.props;
+const { title, description = '', enableMath = false, enableCitations = false } = Astro.props;
 const siteName = SITE.name;
 const year = new Date().getFullYear();
 
@@ -56,16 +60,26 @@ const isActive = (href: string) => {
       href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
     />
 
-    <link rel="preload" href="/katex.min.css" as="style" />
-    <link rel="stylesheet" href="/katex.min.css" />
-    <link rel="preload" href="/fonts/KaTeX_Main-Regular.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="preload" href="/fonts/KaTeX_Math-Italic.woff2" as="font" type="font/woff2" crossorigin />
-
-    <style is:global>
-      .katex-mathml {
-        display: none !important;
-      }
-    </style>
+    {enableMath && (
+      <>
+        <link rel="preload" href="/katex.min.css" as="style" />
+        <link rel="stylesheet" href="/katex.min.css" />
+        <link
+          rel="preload"
+          href="/fonts/KaTeX_Main-Regular.woff2"
+          as="font"
+          type="font/woff2"
+          crossorigin
+        />
+        <link
+          rel="preload"
+          href="/fonts/KaTeX_Math-Italic.woff2"
+          as="font"
+          type="font/woff2"
+          crossorigin
+        />
+      </>
+    )}
 
     <slot name="head" />
 
@@ -108,288 +122,8 @@ const isActive = (href: string) => {
         </footer>
       </main>
     </div>
-    <script is:inline>
-      (() => {
-        const root = document.body;
-        const toggle = document.querySelector('.nav-toggle');
-        if (!toggle) return;
-          const stored = localStorage.getItem('nav-open');
-          if (stored === '1') {
-            root.classList.add('nav-open');
-            toggle.setAttribute('aria-expanded', 'true');
-          }
-          toggle.addEventListener('click', () => {
-            const next = !root.classList.contains('nav-open');
-            root.classList.toggle('nav-open', next);
-            toggle.setAttribute('aria-expanded', String(next));
-            localStorage.setItem('nav-open', next ? '1' : '0');
-          });
-          const closeTargets = Array.from(document.querySelectorAll('[data-nav-close]'));
-          const navLinks = Array.from(document.querySelectorAll('[data-nav-link]'));
-          const closeNav = () => {
-            root.classList.remove('nav-open');
-            toggle.setAttribute('aria-expanded', 'false');
-            localStorage.setItem('nav-open', '0');
-          };
-
-          closeTargets.forEach((target) => {
-            target.addEventListener('click', () => {
-              closeNav();
-            });
-          });
-
-          navLinks.forEach((link) => {
-            link.addEventListener('click', (event) => {
-              const url = new URL(link.getAttribute('href') || '/', window.location.origin);
-              const samePage = url.pathname === window.location.pathname;
-              if (samePage && url.hash) {
-                event.preventDefault();
-                closeNav();
-                const hash = url.hash;
-                history.replaceState(null, '', window.location.pathname);
-                window.location.hash = hash;
-                return;
-              }
-              root.classList.remove('nav-open');
-              toggle.setAttribute('aria-expanded', 'false');
-              localStorage.setItem('nav-open', '0');
-            });
-          });
-          document.addEventListener('keydown', (event) => {
-            if (event.key === 'Escape') {
-              root.classList.remove('nav-open');
-              toggle.setAttribute('aria-expanded', 'false');
-              localStorage.setItem('nav-open', '0');
-            }
-          });
-
-          const enhanceCitations = () => {
-            const citations = Array.from(document.querySelectorAll('sup[data-citation]'));
-            const occurrenceCounts = new Map();
-            citations.forEach((sup) => {
-              if (sup.closest('a.citation-link')) return;
-              const key = sup.getAttribute('data-citation');
-              if (!key) return;
-              const index = sup.getAttribute('data-citation-index') || '';
-              const nextCount = (occurrenceCounts.get(key) || 0) + 1;
-              occurrenceCounts.set(key, nextCount);
-              const text = (sup.textContent || '').trim();
-              const link = document.createElement('a');
-              link.className = 'citation-link';
-              link.href = `#ref-${key}`;
-              link.setAttribute('aria-label', `Reference ${index || '?'}`);
-              link.setAttribute('data-citation', key);
-              if (index) {
-                link.setAttribute('data-citation-index', index);
-              }
-              link.id = `cite-${key}-${nextCount}`;
-              link.textContent = text || (index ? `[${index}]` : '[?]');
-              sup.replaceWith(link);
-            });
-          };
-
-          enhanceCitations();
-
-          const buildPreviewFromTarget = (target) => {
-            if (!target) return '';
-            const container =
-              target.closest('p, li, blockquote, figcaption, td, th, dd, dt, h1, h2, h3, h4, h5, h6') ||
-              target.parentElement;
-            if (!container) return '';
-            const maxLength = 140;
-            const normalizeText = (value) =>
-              String(value || '')
-                .replace(/\[\d+\]/g, '')
-                .replace(/\s+/g, ' ')
-                .trim();
-            const fullText = normalizeText(container.textContent || '');
-            if (!fullText) return '';
-
-            let anchorOffset = 0;
-            if (container.contains(target)) {
-              const range = document.createRange();
-              range.setStart(container, 0);
-              range.setEndBefore(target);
-              anchorOffset = normalizeText(range.toString()).length;
-            }
-
-            if (fullText.length <= maxLength) return fullText;
-            const halfWindow = Math.floor(maxLength / 2);
-            let start = Math.max(0, anchorOffset - halfWindow);
-            let end = Math.min(fullText.length, start + maxLength);
-            if (end - start < maxLength) {
-              start = Math.max(0, end - maxLength);
-            }
-            let snippet = fullText.slice(start, end).trim();
-            if (start > 0) snippet = `…${snippet}`;
-            if (end < fullText.length) snippet = `${snippet}…`;
-            return snippet;
-          };
-
-          const extractLineFromLabel = (label) => {
-            if (!label) return '';
-            const match = label.match(/\\d+/);
-            return match ? match[0] : '';
-          };
-
-          const normalizeLineLabel = (value) => {
-            if (!value) return '';
-            const match = String(value).match(/\\d+/);
-            return match ? match[0] : '';
-          };
-
-          const enhanceBackrefs = () => {
-            const backrefs = Array.from(document.querySelectorAll('.citation-backref'));
-            backrefs.forEach((backref) => {
-              const current = (backref.textContent || '').trim();
-              const targetId = backref.getAttribute('href')?.slice(1);
-              if (!targetId) return;
-              const target = document.getElementById(targetId);
-              const line =
-                target?.getAttribute('data-citation-line') ||
-                backref.getAttribute('data-line') ||
-                extractLineFromLabel(backref.getAttribute('aria-label'));
-              const normalizedLine = normalizeLineLabel(line);
-              if (normalizedLine && current !== `↩︎${normalizedLine}`) {
-                backref.textContent = `↩︎${normalizedLine}`;
-                backref.setAttribute('data-line', normalizedLine);
-              }
-              const preview = buildPreviewFromTarget(target);
-              if (preview) {
-                backref.setAttribute('data-preview', preview);
-                backref.removeAttribute('title');
-                return;
-              }
-              const hasPreview = backref.getAttribute('data-preview');
-              if (!hasPreview || !hasPreview.trim()) {
-                const fallback = 'Back to citation';
-                backref.setAttribute('data-preview', fallback);
-                backref.removeAttribute('title');
-              }
-            });
-          };
-
-          enhanceBackrefs();
-
-          const initCitationPreview = () => {
-            const backrefs = Array.from(document.querySelectorAll('.citation-backref'));
-            if (backrefs.length === 0) return;
-
-            document.documentElement.classList.add('citation-preview-enabled');
-
-            const panel = document.createElement('div');
-            panel.className = 'citation-preview-panel';
-            panel.setAttribute('aria-hidden', 'true');
-            panel.style.visibility = 'hidden';
-
-            const windowEl = document.createElement('div');
-            windowEl.className = 'markdown-body citation-preview-window';
-            panel.appendChild(windowEl);
-            document.body.appendChild(panel);
-
-            let activeBackref = null;
-            let hideTimer = null;
-
-            const clearPanel = () => {
-              windowEl.innerHTML = '';
-            };
-
-            const buildClone = (target) => {
-              if (!target) return null;
-              const container =
-                target.closest('p, li, blockquote, figcaption, td, th, dd, dt, h1, h2, h3, h4, h5, h6') ||
-                target.parentElement;
-              if (!container) return null;
-
-              const clone = container.cloneNode(true);
-              const targetId = target.id;
-              if (targetId) {
-                const cloneTarget = clone.querySelector(`#${CSS.escape(targetId)}`);
-                if (cloneTarget) cloneTarget.classList.add('citation-preview-focus');
-              }
-              clone.querySelectorAll('[id]').forEach((node) => node.removeAttribute('id'));
-              return clone;
-            };
-
-            const positionPanel = (backref) => {
-              if (!backref) return;
-              const rect = backref.getBoundingClientRect();
-              const panelRect = panel.getBoundingClientRect();
-              const margin = 12;
-              const viewportWidth = window.innerWidth;
-              const viewportHeight = window.innerHeight;
-
-              let left = rect.left + rect.width / 2 - panelRect.width / 2;
-              left = Math.max(margin, Math.min(left, viewportWidth - panelRect.width - margin));
-
-              let top = rect.top - panelRect.height - 12;
-              if (top < margin) {
-                top = rect.bottom + 12;
-              }
-              if (top + panelRect.height > viewportHeight - margin) {
-                top = Math.max(margin, viewportHeight - panelRect.height - margin);
-              }
-
-              panel.style.left = `${left}px`;
-              panel.style.top = `${top}px`;
-            };
-
-            const showPreview = (backref) => {
-              const targetId = backref.getAttribute('href')?.slice(1);
-              if (!targetId) return;
-              const target = document.getElementById(targetId);
-              const clone = buildClone(target);
-              if (!clone) return;
-
-              clearPanel();
-              windowEl.appendChild(clone);
-
-              panel.classList.add('is-visible');
-              panel.style.visibility = 'hidden';
-              positionPanel(backref);
-
-              requestAnimationFrame(() => {
-                panel.style.visibility = 'visible';
-                positionPanel(backref);
-              });
-
-              activeBackref = backref;
-            };
-
-            const hidePreview = () => {
-              panel.classList.remove('is-visible');
-              panel.style.visibility = 'hidden';
-              clearPanel();
-              activeBackref = null;
-            };
-
-            const scheduleHide = () => {
-              if (hideTimer) window.clearTimeout(hideTimer);
-              hideTimer = window.setTimeout(hidePreview, 120);
-            };
-
-            backrefs.forEach((backref) => {
-              backref.addEventListener('mouseenter', () => {
-                if (hideTimer) window.clearTimeout(hideTimer);
-                showPreview(backref);
-              });
-              backref.addEventListener('mouseleave', scheduleHide);
-              backref.addEventListener('focus', () => showPreview(backref));
-              backref.addEventListener('blur', hidePreview);
-            });
-
-            window.addEventListener('scroll', hidePreview, { passive: true });
-            window.addEventListener(
-              'resize',
-              () => {
-                if (activeBackref) positionPanel(activeBackref);
-              },
-              { passive: true }
-            );
-          };
-
-          initCitationPreview();
-        })();
-    </script>
+    <NavScript />
+    {enableCitations && <CitationScript />}
+    <slot name="scripts" />
   </body>
 </html>

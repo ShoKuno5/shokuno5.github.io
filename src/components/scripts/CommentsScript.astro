@@ -1,0 +1,53 @@
+<script>
+  // @ts-nocheck
+  const initComments = () => {
+    const roots = Array.from(document.querySelectorAll('[data-comments-root]'));
+    if (roots.length === 0) return;
+
+    roots.forEach((root) => {
+      const button = root.querySelector('[data-load-comments]');
+      const mount = root.querySelector('[data-comments-mount]');
+      if (!button || !mount) return;
+
+      const loadComments = () => {
+        if (root.getAttribute('data-loaded') === '1') return;
+
+        const script = document.createElement('script');
+        script.src = 'https://giscus.app/client.js';
+        script.async = true;
+        script.crossOrigin = 'anonymous';
+
+        const attrs = {
+          'data-repo': root.getAttribute('data-repo') || '',
+          'data-repo-id': root.getAttribute('data-repo-id') || '',
+          'data-category': root.getAttribute('data-category') || '',
+          'data-category-id': root.getAttribute('data-category-id') || '',
+          'data-mapping': root.getAttribute('data-mapping') || 'pathname',
+          'data-strict': root.getAttribute('data-strict') || '0',
+          'data-reactions-enabled': root.getAttribute('data-reactions-enabled') || '1',
+          'data-emit-metadata': root.getAttribute('data-emit-metadata') || '0',
+          'data-input-position': root.getAttribute('data-input-position') || 'bottom',
+          'data-theme': root.getAttribute('data-theme') || 'preferred_color_scheme',
+          'data-lang': root.getAttribute('data-lang') || 'en',
+          'data-loading': 'lazy',
+        };
+
+        Object.entries(attrs).forEach(([key, value]) => {
+          script.setAttribute(key, value);
+        });
+
+        mount.appendChild(script);
+        root.setAttribute('data-loaded', '1');
+        button.setAttribute('hidden', 'true');
+      };
+
+      button.addEventListener('click', loadComments);
+    });
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initComments, { once: true });
+  } else {
+    initComments();
+  }
+</script>

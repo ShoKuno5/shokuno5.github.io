@@ -1,10 +1,11 @@
 ---
 import { getCollection } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
+import PostCard from '../components/PostCard.astro';
+import TimelineScript from '../components/scripts/TimelineScript.astro';
 import { SITE } from '../config/site.js';
-import { normalizeTag } from '../utils/tags';
 import { filterPublishedPosts } from '../utils/postVisibility';
-import { getPostDates } from '../utils/postDates';
+import { buildPostCatalog } from '../utils/postCatalog';
 
 const entries = filterPublishedPosts(await getCollection('posts'));
 
@@ -12,78 +13,67 @@ if (entries.length === 0) {
   throw new Error('No posts found. Add at least one post to render the homepage.');
 }
 
-const normalized = entries.map((entry) => ({
-  entry,
-  slug: entry.slug,
-}));
+const catalog = buildPostCatalog(entries);
 
 const rendered = await Promise.all(
-  normalized.map(async ({ entry, slug }) => {
-    const { Content } = await entry.render();
-    const { published, updated } = getPostDates(entry);
-    return { entry, slug, Content, publishedDate: published, updatedDate: updated };
+  catalog.map(async (post) => {
+    const { Content } = await post.entry.render();
+    const anchorId = `post-${post.slug.replace(/[^a-zA-Z0-9_-]+/g, '-')}`;
+    return { ...post, Content, anchorId };
   })
 );
 
-const sorted = rendered.sort(
-  (a, b) => b.updatedDate.getTime() - a.updatedDate.getTime()
-);
-
-const pinnedPosts = sorted.filter((item) => item.entry.data.pinned);
-const unpinnedPosts = sorted.filter((item) => !item.entry.data.pinned);
-const posts = pinnedPosts.length > 0 ? [...pinnedPosts, ...unpinnedPosts] : sorted;
-
-const formatDate = (value: Date) =>
-  value.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
-
+const hasMathInFeed = rendered.some((post) => post.hasMath);
+const hasCitationsInFeed = rendered.some((post) => post.hasCitations);
 ---
 
-<Layout title={`${SITE.name} - Home`} description={SITE.tagline}>
+<Layout
+  title={`${SITE.name} - Home`}
+  description={SITE.tagline}
+  enableMath={hasMathInFeed}
+  enableCitations={hasCitationsInFeed}
+>
   <header class="intro">
     <h1 class="intro-title">{SITE.name}</h1>
     {SITE.tagline && <p class="intro-lede">{SITE.tagline}</p>}
   </header>
 
+  {rendered.length > 1 && (
+    <nav class="timeline-jump" aria-label="Timeline shortcuts">
+      <span class="timeline-jump__label">Jump to</span>
+      <div class="timeline-jump__links">
+        {rendered.map((post) => (
+          <a class="timeline-jump__link" href={`#${post.anchorId}`}>
+            {post.title}
+          </a>
+        ))}
+      </div>
+    </nav>
+  )}
+
   <div id="posts" aria-label="Posts">
     <div class="post-list">
-      {posts.map(({ entry, slug, Content, publishedDate, updatedDate }) => (
-        <article
-          class="post-item"
-          data-tags={(entry.data.tags ?? []).map(normalizeTag).join(' ')}
+      {rendered.map(({ Content, ...post }) => (
+        <PostCard
+          id={post.anchorId}
+          title={post.title}
+          href={`/posts/${post.slug}/`}
+          description={post.excerpt}
+          publishedDate={post.publishedDate}
+          updatedDate={post.updatedDate}
+          pinned={post.pinned}
+          tagLinks={post.tags.map((tag) => ({
+            label: tag.label,
+            href: `/tags/#tag-${tag.slug}`,
+          }))}
+          dataTags={post.normalizedTags}
+          reveal
         >
-          <a class="post-item__title" href={`/posts/${slug}/`}>{entry.data.title}</a>
-          <div class="post-item__meta">
-            <div class="post-item__meta-row">
-              {entry.data.pinned && <span class="tag-pill">Pinned</span>}
-              <span class="post-item__date">
-                Published{' '}
-                <time datetime={publishedDate.toISOString()}>
-                  {formatDate(publishedDate)}
-                </time>
-              </span>
-              {updatedDate.getTime() !== publishedDate.getTime() && (
-                <span class="post-item__date">
-                  Last updated{' '}
-                  <time datetime={updatedDate.toISOString()}>{formatDate(updatedDate)}</time>
-                </span>
-              )}
-            </div>
-            {(entry.data.tags ?? []).length > 0 && (
-              <div class="post-item__meta-row post-item__meta-row--tags">
-                {(entry.data.tags ?? []).map((tag) => (
-                  <a class="tag-pill" href={`/tags/#tag-${normalizeTag(tag)}`}>#{tag}</a>
-                ))}
-              </div>
-            )}
-          </div>
-          {(entry.data.description || entry.data.summary) && (
-            <p class="post-item__excerpt">{entry.data.description || entry.data.summary}</p>
-          )}
-          <div class="post-body markdown-body">
-            <Content />
-          </div>
-        </article>
+          <Content />
+        </PostCard>
       ))}
     </div>
   </div>
+
+  <TimelineScript slot="scripts" />
 </Layout>

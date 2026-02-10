@@ -1,12 +1,14 @@
 ---
 import { getCollection } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
+import PostCard from '../components/PostCard.astro';
+import TimelineScript from '../components/scripts/TimelineScript.astro';
 import { SITE } from '../config/site.js';
-import { normalizeTag } from '../utils/tags';
-import { getPostDates } from '../utils/postDates';
 import { filterPublishedPosts } from '../utils/postVisibility';
+import { buildPostCatalog } from '../utils/postCatalog';
 
 const entries = filterPublishedPosts(await getCollection('posts'));
+const catalog = buildPostCatalog(entries);
 
 type TagSummary = {
   label: string;
@@ -14,55 +16,27 @@ type TagSummary = {
   count: number;
 };
 
-type PostSummary = {
-  slug: string;
-  title: string;
-  description?: string;
-  publishedDate: Date;
-  updatedDate: Date;
-  tags: { label: string; slug: string }[];
-};
-
 const tagsMap = new Map<string, TagSummary>();
-const posts: PostSummary[] = [];
 
-for (const entry of entries) {
-  const rawTags = entry.data.tags ?? [];
-  const seenTags = new Set<string>();
-  const postTags: PostSummary['tags'] = [];
+for (const post of catalog) {
+  const seen = new Set<string>();
 
-  for (const rawTag of rawTags) {
-    const tagSlug = normalizeTag(rawTag);
-    if (!tagSlug || seenTags.has(tagSlug)) continue;
-    seenTags.add(tagSlug);
+  for (const tag of post.tags) {
+    if (seen.has(tag.slug)) continue;
+    seen.add(tag.slug);
 
-    if (!tagsMap.has(tagSlug)) {
-      tagsMap.set(tagSlug, { label: rawTag, slug: tagSlug, count: 0 });
+    if (!tagsMap.has(tag.slug)) {
+      tagsMap.set(tag.slug, { label: tag.label, slug: tag.slug, count: 0 });
     }
 
-    const tag = tagsMap.get(tagSlug)!;
-    tag.count += 1;
-    postTags.push({ label: tag.label, slug: tag.slug });
+    const summary = tagsMap.get(tag.slug);
+    if (summary) {
+      summary.count += 1;
+    }
   }
-
-  const { published, updated } = getPostDates(entry);
-
-  posts.push({
-    slug: entry.slug,
-    title: entry.data.title,
-    description: entry.data.description || entry.data.summary,
-    publishedDate: published,
-    updatedDate: updated,
-    tags: postTags,
-  });
 }
 
 const tags = Array.from(tagsMap.values()).sort((a, b) => a.label.localeCompare(b.label));
-const sortedPosts = posts.sort((a, b) => b.updatedDate.getTime() - a.updatedDate.getTime());
-
-const formatDate = (value: Date) =>
-  value.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
-
 ---
 
 <Layout title={`${SITE.name} - Tags`} description="Browse posts by tag.">
@@ -80,7 +54,7 @@ const formatDate = (value: Date) =>
       <div class="tag-filter__status" aria-live="polite">
         <span class="tag-filter__label" data-filter-label>All posts</span>
         <span class="tag-filter__count" data-filter-count>
-          {sortedPosts.length} post{sortedPosts.length === 1 ? '' : 's'}
+          {catalog.length} post{catalog.length === 1 ? '' : 's'}
         </span>
       </div>
     </div>
@@ -93,9 +67,7 @@ const formatDate = (value: Date) =>
         aria-pressed="true"
       >
         All
-        <span class="tag-pill__count" data-count>
-          {sortedPosts.length}
-        </span>
+        <span class="tag-pill__count" data-count>{catalog.length}</span>
       </button>
       {tags.map((tag) => (
         <button
@@ -113,47 +85,30 @@ const formatDate = (value: Date) =>
   </section>
 
   <section class="post-list" data-post-list>
-    {sortedPosts.map((post) => (
-      <article
-        class="post-item"
-        data-post
-        data-tags={post.tags.map((tag) => tag.slug).join(' ')}
-      >
-        <a class="post-item__title" href={`/posts/${post.slug}/`}>{post.title}</a>
-        <div class="post-item__meta">
-          <div class="post-item__meta-row">
-            <span class="post-item__date">
-              Published{' '}
-              <time datetime={post.publishedDate.toISOString()}>
-                {formatDate(post.publishedDate)}
-              </time>
-            </span>
-            {post.updatedDate.getTime() !== post.publishedDate.getTime() && (
-              <span class="post-item__date">
-                Last updated{' '}
-                <time datetime={post.updatedDate.toISOString()}>
-                  {formatDate(post.updatedDate)}
-                </time>
-              </span>
-            )}
-          </div>
-        </div>
-        {post.description && <p class="post-item__excerpt">{post.description}</p>}
-        {post.tags.length > 0 && (
-          <div class="post-item__tags">
-            {post.tags.map((tag) => (
-              <a class="post-tag" href={`#tag-${tag.slug}`} data-tag-action={tag.slug}>
-                #{tag.label}
-              </a>
-            ))}
-          </div>
-        )}
-      </article>
+    {catalog.map((post) => (
+      <PostCard
+        title={post.title}
+        href={`/posts/${post.slug}/`}
+        description={post.excerpt}
+        publishedDate={post.publishedDate}
+        updatedDate={post.updatedDate}
+        pinned={post.pinned}
+        tagLinks={post.tags.map((tag) => ({
+          label: tag.label,
+          href: `#tag-${tag.slug}`,
+          action: tag.slug,
+        }))}
+        dataTags={post.normalizedTags}
+        dataPost
+        reveal
+      />
     ))}
   </section>
+
   <p class="tag-filter__empty" data-filter-empty hidden>
     No posts match that tag yet.
   </p>
+
   <script is:inline>
     (() => {
       const filterRoot = document.querySelector('[data-filter-root]');
@@ -175,10 +130,8 @@ const formatDate = (value: Date) =>
         tagMeta.set(tag, { label: button.dataset.label || tag, order: index });
       });
 
-      const sortTags = (tags) =>
-        [...tags].sort(
-          (a, b) => (tagMeta.get(a)?.order ?? 0) - (tagMeta.get(b)?.order ?? 0)
-        );
+      const sortTags = (values) =>
+        [...values].sort((a, b) => (tagMeta.get(a)?.order ?? 0) - (tagMeta.get(b)?.order ?? 0));
 
       const getPostTags = (post) => {
         const value = post.dataset.tags || '';
@@ -191,6 +144,7 @@ const formatDate = (value: Date) =>
           history.replaceState(null, '', base);
           return;
         }
+
         const ordered = sortTags(tags);
         if (ordered.length === 1) {
           history.replaceState(null, '', `${base}#tag-${ordered[0]}`);
@@ -228,6 +182,7 @@ const formatDate = (value: Date) =>
           const count = counts.get(tag) || 0;
           const countEl = button.querySelector('[data-count]');
           if (countEl) countEl.textContent = String(count);
+
           if (tag !== 'all') {
             const shouldDisable = count === 0 && !selected.has(tag);
             if (shouldDisable) {
@@ -250,6 +205,7 @@ const formatDate = (value: Date) =>
 
       const updateStatus = (visiblePosts, selected) => {
         const labels = sortTags(selected).map((tag) => tagMeta.get(tag)?.label || tag);
+
         if (statusLabel) {
           if (labels.length === 0) {
             statusLabel.textContent = 'All posts';
@@ -259,6 +215,7 @@ const formatDate = (value: Date) =>
             statusLabel.textContent = `Tags: ${labels.join(', ')}`;
           }
         }
+
         if (statusCount) {
           const count = visiblePosts.length;
           statusCount.textContent = `${count} post${count === 1 ? '' : 's'}`;
@@ -271,8 +228,7 @@ const formatDate = (value: Date) =>
 
         postCards.forEach((post) => {
           const tags = getPostTags(post);
-          const show =
-            requiredTags.length === 0 || requiredTags.every((tag) => tags.includes(tag));
+          const show = requiredTags.length === 0 || requiredTags.every((tag) => tags.includes(tag));
           post.hidden = !show;
           if (show) visiblePosts.push(post);
         });
@@ -299,6 +255,7 @@ const formatDate = (value: Date) =>
             setSelection([]);
             return;
           }
+
           const next = new Set(activeTags);
           if (next.has(tag)) {
             next.delete(tag);
@@ -327,6 +284,7 @@ const formatDate = (value: Date) =>
       const parseHash = () => {
         const tagMatch = window.location.hash.match(/^#tag-([^,]+)$/);
         if (tagMatch) return [tagMatch[1]];
+
         const tagsMatch = window.location.hash.match(/^#tags=([^]+)$/);
         if (tagsMatch) {
           return tagsMatch[1]
@@ -334,6 +292,7 @@ const formatDate = (value: Date) =>
             .map((value) => value.trim())
             .filter(Boolean);
         }
+
         return [];
       };
 
@@ -344,4 +303,6 @@ const formatDate = (value: Date) =>
       });
     })();
   </script>
+
+  <TimelineScript slot="scripts" />
 </Layout>

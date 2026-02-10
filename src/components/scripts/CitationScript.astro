@@ -1,0 +1,280 @@
+<script>
+  // @ts-nocheck
+  const initCitationEnhancements = () => {
+    const hasCitations = Boolean(
+      document.querySelector('sup[data-citation], .citation-backref, a.citation-link')
+    );
+
+    if (!hasCitations) return;
+
+    const enhanceCitations = () => {
+      const citations = Array.from(document.querySelectorAll('sup[data-citation]'));
+      const occurrenceCounts = new Map();
+
+      citations.forEach((sup) => {
+        if (sup.closest('a.citation-link')) return;
+
+        const key = sup.getAttribute('data-citation');
+        if (!key) return;
+
+        const index = sup.getAttribute('data-citation-index') || '';
+        const nextCount = (occurrenceCounts.get(key) || 0) + 1;
+        occurrenceCounts.set(key, nextCount);
+
+        const text = (sup.textContent || '').trim();
+        const reference = document.querySelector(
+          `[data-citation-key="${CSS.escape(key)}"]`
+        );
+        const referenceId = reference?.id || `ref-${key}`;
+        const link = document.createElement('a');
+        link.className = 'citation-link';
+        link.href = `#${referenceId}`;
+        link.setAttribute('aria-label', `Reference ${index || '?'}`);
+        link.setAttribute('data-citation', key);
+
+        if (index) {
+          link.setAttribute('data-citation-index', index);
+        }
+
+        const citePrefix = referenceId.startsWith('ref-')
+          ? referenceId.replace(/^ref-/, 'cite-')
+          : `cite-${key}`;
+        link.id = `${citePrefix}-${nextCount}`;
+        link.textContent = text || (index ? `[${index}]` : '[?]');
+        sup.replaceWith(link);
+      });
+    };
+
+    const buildPreviewFromTarget = (target) => {
+      if (!target) return '';
+
+      const container =
+        target.closest('p, li, blockquote, figcaption, td, th, dd, dt, h1, h2, h3, h4, h5, h6') ||
+        target.parentElement;
+
+      if (!container) return '';
+
+      const maxLength = 140;
+
+      const normalizeText = (value) =>
+        String(value || '')
+          .replace(/\[\d+\]/g, '')
+          .replace(/\s+/g, ' ')
+          .trim();
+
+      const fullText = normalizeText(container.textContent || '');
+      if (!fullText) return '';
+
+      let anchorOffset = 0;
+      if (container.contains(target)) {
+        const range = document.createRange();
+        range.setStart(container, 0);
+        range.setEndBefore(target);
+        anchorOffset = normalizeText(range.toString()).length;
+      }
+
+      if (fullText.length <= maxLength) return fullText;
+
+      const halfWindow = Math.floor(maxLength / 2);
+      let start = Math.max(0, anchorOffset - halfWindow);
+      let end = Math.min(fullText.length, start + maxLength);
+
+      if (end - start < maxLength) {
+        start = Math.max(0, end - maxLength);
+      }
+
+      let snippet = fullText.slice(start, end).trim();
+      if (start > 0) snippet = `...${snippet}`;
+      if (end < fullText.length) snippet = `${snippet}...`;
+      return snippet;
+    };
+
+    const extractLineFromLabel = (label) => {
+      if (!label) return '';
+      const match = label.match(/\d+/);
+      return match ? match[0] : '';
+    };
+
+    const normalizeLineLabel = (value) => {
+      if (!value) return '';
+      const match = String(value).match(/\d+/);
+      return match ? match[0] : '';
+    };
+
+    const enhanceBackrefs = () => {
+      const backrefs = Array.from(document.querySelectorAll('.citation-backref'));
+
+      backrefs.forEach((backref) => {
+        const current = (backref.textContent || '').trim();
+        const targetId = backref.getAttribute('href')?.slice(1);
+        if (!targetId) return;
+
+        const target = document.getElementById(targetId);
+        const line =
+          target?.getAttribute('data-citation-line') ||
+          backref.getAttribute('data-line') ||
+          extractLineFromLabel(backref.getAttribute('aria-label'));
+
+        const normalizedLine = normalizeLineLabel(line);
+        if (normalizedLine && current !== `↩${normalizedLine}`) {
+          backref.textContent = `↩${normalizedLine}`;
+          backref.setAttribute('data-line', normalizedLine);
+        }
+
+        const preview = buildPreviewFromTarget(target);
+        if (preview) {
+          backref.setAttribute('data-preview', preview);
+          backref.removeAttribute('title');
+          return;
+        }
+
+        const hasPreview = backref.getAttribute('data-preview');
+        if (!hasPreview || !hasPreview.trim()) {
+          backref.setAttribute('data-preview', 'Back to citation');
+          backref.removeAttribute('title');
+        }
+      });
+    };
+
+    const initCitationPreview = () => {
+      const backrefs = Array.from(document.querySelectorAll('.citation-backref'));
+      if (backrefs.length === 0) return;
+
+      document.documentElement.classList.add('citation-preview-enabled');
+
+      const panel = document.createElement('div');
+      panel.className = 'citation-preview-panel';
+      panel.setAttribute('aria-hidden', 'true');
+      panel.style.visibility = 'hidden';
+
+      const windowEl = document.createElement('div');
+      windowEl.className = 'markdown-body citation-preview-window';
+      panel.appendChild(windowEl);
+      document.body.appendChild(panel);
+
+      let activeBackref = null;
+      let hideTimer = null;
+
+      const clearPanel = () => {
+        windowEl.innerHTML = '';
+      };
+
+      const buildClone = (target) => {
+        if (!target) return null;
+
+        const container =
+          target.closest('p, li, blockquote, figcaption, td, th, dd, dt, h1, h2, h3, h4, h5, h6') ||
+          target.parentElement;
+
+        if (!container) return null;
+
+        const clone = container.cloneNode(true);
+        const targetId = target.id;
+
+        if (targetId) {
+          const selector = CSS.escape(targetId);
+          const cloneTarget = clone.querySelector(`#${selector}`);
+          if (cloneTarget) cloneTarget.classList.add('citation-preview-focus');
+        }
+
+        clone.querySelectorAll('[id]').forEach((node) => {
+          node.removeAttribute('id');
+        });
+
+        return clone;
+      };
+
+      const positionPanel = (backref) => {
+        if (!backref) return;
+
+        const rect = backref.getBoundingClientRect();
+        const panelRect = panel.getBoundingClientRect();
+        const margin = 12;
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
+
+        let left = rect.left + rect.width / 2 - panelRect.width / 2;
+        left = Math.max(margin, Math.min(left, viewportWidth - panelRect.width - margin));
+
+        let top = rect.top - panelRect.height - 12;
+        if (top < margin) {
+          top = rect.bottom + 12;
+        }
+
+        if (top + panelRect.height > viewportHeight - margin) {
+          top = Math.max(margin, viewportHeight - panelRect.height - margin);
+        }
+
+        panel.style.left = `${left}px`;
+        panel.style.top = `${top}px`;
+      };
+
+      const showPreview = (backref) => {
+        const targetId = backref.getAttribute('href')?.slice(1);
+        if (!targetId) return;
+
+        const target = document.getElementById(targetId);
+        const clone = buildClone(target);
+        if (!clone) return;
+
+        clearPanel();
+        windowEl.appendChild(clone);
+
+        panel.classList.add('is-visible');
+        panel.style.visibility = 'hidden';
+        positionPanel(backref);
+
+        requestAnimationFrame(() => {
+          panel.style.visibility = 'visible';
+          positionPanel(backref);
+        });
+
+        activeBackref = backref;
+      };
+
+      const hidePreview = () => {
+        panel.classList.remove('is-visible');
+        panel.style.visibility = 'hidden';
+        clearPanel();
+        activeBackref = null;
+      };
+
+      const scheduleHide = () => {
+        if (hideTimer) window.clearTimeout(hideTimer);
+        hideTimer = window.setTimeout(hidePreview, 120);
+      };
+
+      backrefs.forEach((backref) => {
+        backref.addEventListener('mouseenter', () => {
+          if (hideTimer) window.clearTimeout(hideTimer);
+          showPreview(backref);
+        });
+
+        backref.addEventListener('mouseleave', scheduleHide);
+        backref.addEventListener('focus', () => showPreview(backref));
+        backref.addEventListener('blur', hidePreview);
+      });
+
+      window.addEventListener('scroll', hidePreview, { passive: true });
+      window.addEventListener(
+        'resize',
+        () => {
+          if (activeBackref) {
+            positionPanel(activeBackref);
+          }
+        },
+        { passive: true }
+      );
+    };
+
+    enhanceCitations();
+    enhanceBackrefs();
+    initCitationPreview();
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initCitationEnhancements, { once: true });
+  } else {
+    initCitationEnhancements();
+  }
+</script>

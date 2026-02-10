@@ -6,6 +6,45 @@ const CITE_PATTERN = /\\cite\{([^}]+)\}/g;
 
 let bibliographyCache;
 
+function hashToken(value) {
+  let hash = 0;
+  const input = String(value || '');
+  for (let i = 0; i < input.length; i += 1) {
+    hash = (hash << 5) - hash + input.charCodeAt(i);
+    hash |= 0;
+  }
+  return Math.abs(hash).toString(36);
+}
+
+function slugToken(value) {
+  const slug = String(value || '')
+    .toLowerCase()
+    .replace(/[^a-z0-9_-]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+  return slug || 'item';
+}
+
+function createDocNamespace(file) {
+  const pathFromFile = typeof file?.path === 'string' ? file.path : '';
+  if (!pathFromFile) return 'doc';
+  const normalized = pathFromFile.replace(/\\/g, '/');
+  const baseName = normalized.split('/').pop() || normalized;
+  const withoutExt = baseName.replace(/\.[^.]+$/, '');
+  return `${slugToken(withoutExt)}-${hashToken(normalized)}`;
+}
+
+function createCitationToken(key) {
+  return `${slugToken(key)}-${hashToken(key)}`;
+}
+
+function getReferenceId(docNamespace, key) {
+  return `ref-${docNamespace}-${createCitationToken(key)}`;
+}
+
+function getCitationId(docNamespace, key, occurrenceIndex) {
+  return `cite-${docNamespace}-${createCitationToken(key)}-${occurrenceIndex}`;
+}
+
 function getFileText(file) {
   if (!file) return '';
   if (typeof file.value === 'string') return file.value;
@@ -137,7 +176,7 @@ function buildReferenceText(entryTags) {
   return parts.join(' ').trim();
 }
 
-function buildReferenceItem(key, entry) {
+function buildReferenceItem(docNamespace, key, entry) {
   const entryTags = entry?.entryTags ?? {};
   const mainText = buildReferenceText(entryTags) || `Missing reference: ${key}.`;
   const doi = cleanValue(entryTags.doi);
@@ -164,7 +203,7 @@ function buildReferenceItem(key, entry) {
     type: 'element',
     tagName: 'li',
     properties: {
-      id: `ref-${key}`,
+      id: getReferenceId(docNamespace, key),
       'data-citation-key': key
     },
     children
@@ -204,9 +243,15 @@ function buildReferenceBackrefs(occurrences) {
   };
 }
 
-function buildReferencesSection(citationOrder, bibliography, sectionTitle, citationOccurrencesByKey) {
+function buildReferencesSection(
+  docNamespace,
+  citationOrder,
+  bibliography,
+  sectionTitle,
+  citationOccurrencesByKey
+) {
   const items = citationOrder.map((key) => {
-    const item = buildReferenceItem(key, bibliography.get(key));
+    const item = buildReferenceItem(docNamespace, key, bibliography.get(key));
     const backrefs = buildReferenceBackrefs(citationOccurrencesByKey.get(key));
     if (backrefs) {
       item.children.push({ type: 'text', value: ' ' }, backrefs);
@@ -247,6 +292,7 @@ export function rehypeCitations(options = {}) {
     const citationOrder = [];
     const citationIndexByKey = new Map();
     const citationOccurrencesByKey = new Map();
+    const docNamespace = createDocNamespace(file);
     const sourceText = getFileText(file);
     const lineOffsets = sourceText ? buildLineOffsets(sourceText) : null;
     let sourceSearchIndex = 0;
@@ -322,7 +368,7 @@ export function rehypeCitations(options = {}) {
           const citationIndex = citationIndexByKey.get(key);
           const occurrences = citationOccurrencesByKey.get(key) || [];
           const occurrenceIndex = occurrences.length + 1;
-          const citeId = `cite-${key}-${occurrenceIndex}`;
+          const citeId = getCitationId(docNamespace, key, occurrenceIndex);
           const label = lineNumber ? String(lineNumber) : String(occurrenceIndex);
           occurrences.push({
             id: citeId,
@@ -335,7 +381,7 @@ export function rehypeCitations(options = {}) {
             type: 'element',
             tagName: 'a',
             properties: {
-              href: `#ref-${key}`,
+              href: `#${getReferenceId(docNamespace, key)}`,
               className: ['citation-link'],
               'aria-label': `Reference ${citationIndex}`,
               'data-citation': key,
@@ -358,7 +404,13 @@ export function rehypeCitations(options = {}) {
 
     if (citationOrder.length > 0) {
       tree.children.push(
-        buildReferencesSection(citationOrder, bibliography, sectionTitle, citationOccurrencesByKey)
+        buildReferencesSection(
+          docNamespace,
+          citationOrder,
+          bibliography,
+          sectionTitle,
+          citationOccurrencesByKey
+        )
       );
     }
   };

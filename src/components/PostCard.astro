@@ -1,0 +1,92 @@
+---
+export type TagLink = {
+  label: string;
+  href: string;
+  action?: string;
+};
+
+export interface Props {
+  id?: string;
+  title: string;
+  href: string;
+  description?: string;
+  publishedDate: Date;
+  updatedDate: Date;
+  pinned?: boolean;
+  tagLinks?: TagLink[];
+  dataTags?: string;
+  className?: string;
+  reveal?: boolean;
+  dataPost?: boolean;
+}
+
+const {
+  id,
+  title,
+  href,
+  description,
+  publishedDate,
+  updatedDate,
+  pinned = false,
+  tagLinks = [],
+  dataTags = '',
+  className = '',
+  reveal = false,
+  dataPost = false,
+} = Astro.props;
+
+const articleClass = ['post-item', className].filter(Boolean).join(' ');
+const hasBody = Astro.slots.has('default');
+const showUpdated = updatedDate.getTime() !== publishedDate.getTime();
+
+const formatDate = (value: Date) =>
+  value.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  });
+---
+
+<article
+  id={id}
+  class={articleClass}
+  data-tags={dataTags || undefined}
+  data-reveal={reveal ? '' : undefined}
+  data-post={dataPost ? '' : undefined}
+>
+  <a class="post-item__title" href={href}>{title}</a>
+
+  <div class="post-item__meta">
+    <div class="post-item__meta-row">
+      {pinned && <span class="tag-pill">Pinned</span>}
+      <span class="post-item__date">
+        Published{' '}
+        <time datetime={publishedDate.toISOString()}>{formatDate(publishedDate)}</time>
+      </span>
+      {showUpdated && (
+        <span class="post-item__date">
+          Last updated{' '}
+          <time datetime={updatedDate.toISOString()}>{formatDate(updatedDate)}</time>
+        </span>
+      )}
+    </div>
+
+    {tagLinks.length > 0 && (
+      <div class="post-item__meta-row post-item__meta-row--tags">
+        {tagLinks.map((tag) => (
+          <a class="tag-pill" href={tag.href} data-tag-action={tag.action}>
+            #{tag.label}
+          </a>
+        ))}
+      </div>
+    )}
+  </div>
+
+  {description && <p class="post-item__excerpt">{description}</p>}
+
+  {hasBody && (
+    <div class="post-body markdown-body">
+      <slot />
+    </div>
+  )}
+</article>

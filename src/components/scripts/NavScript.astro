@@ -1,0 +1,79 @@
+<script>
+  // @ts-nocheck
+  const NAV_STORAGE_KEY = 'nav-open';
+
+  const initNav = () => {
+    const root = document.body;
+    const toggle = document.querySelector('.nav-toggle');
+    if (!root || !toggle) return;
+
+    const closeTargets = Array.from(document.querySelectorAll('[data-nav-close]'));
+    const navLinks = Array.from(document.querySelectorAll('[data-nav-link]'));
+
+    const persist = (isOpen) => {
+      try {
+        localStorage.setItem(NAV_STORAGE_KEY, isOpen ? '1' : '0');
+      } catch {
+        // Ignore storage failures (private mode, disabled storage).
+      }
+    };
+
+    const setOpen = (isOpen) => {
+      root.classList.toggle('nav-open', isOpen);
+      toggle.setAttribute('aria-expanded', String(isOpen));
+      persist(isOpen);
+    };
+
+    try {
+      const stored = localStorage.getItem(NAV_STORAGE_KEY);
+      if (stored === '1') {
+        setOpen(true);
+      }
+    } catch {
+      // Ignore storage failures.
+    }
+
+    toggle.addEventListener('click', () => {
+      const next = !root.classList.contains('nav-open');
+      setOpen(next);
+    });
+
+    const closeNav = () => setOpen(false);
+
+    closeTargets.forEach((target) => {
+      target.addEventListener('click', closeNav);
+    });
+
+    navLinks.forEach((link) => {
+      link.addEventListener('click', (event) => {
+        const href = link.getAttribute('href') || '/';
+        const url = new URL(href, window.location.href);
+        const samePage =
+          url.pathname === window.location.pathname && url.search === window.location.search;
+
+        if (samePage && url.hash) {
+          event.preventDefault();
+          closeNav();
+          const base = `${window.location.pathname}${window.location.search}`;
+          history.replaceState(null, '', base);
+          window.location.hash = url.hash;
+          return;
+        }
+
+        closeNav();
+      });
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') {
+        closeNav();
+      }
+    });
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initNav, { once: true });
+  } else {
+    initNav();
+  }
+</script>

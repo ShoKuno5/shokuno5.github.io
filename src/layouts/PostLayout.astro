@@ -1,7 +1,9 @@
 ---
 import Layout from './Layout.astro';
+import CommentsScript from '../components/scripts/CommentsScript.astro';
 import { calculateReadingTime } from '../utils/readingTime';
 import { normalizeTag } from '../utils/tags';
+import { hasCitationContent, hasMathContent } from '../utils/contentFeatures';
 
 export interface Props {
   title: string;
@@ -12,23 +14,25 @@ export interface Props {
   content?: string;
 }
 
-const {
-  title,
-  date,
-  modified,
-  tags,
-  description,
-  content,
-} = Astro.props as Props;
+const { title, date, modified, tags, description, content } = Astro.props as Props;
 
 const readingTime = content ? calculateReadingTime(content) : null;
+const enableMath = content ? hasMathContent(content) : false;
+const enableCitations = content ? hasCitationContent(content) : false;
 
 const publishLabel = date
   ? `Published ${date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}`
   : null;
-const updatedLabel = date && modified && modified.getTime() !== date.getTime()
-  ? `Last updated ${modified.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}`
-  : null;
+
+const updatedLabel =
+  date && modified && modified.getTime() !== date.getTime()
+    ? `Last updated ${modified.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      })}`
+    : null;
+
 const readingLabel = readingTime
   ? `${readingTime.readingTimeText}${readingTime.wordCount ? ` - ${readingTime.wordCount} words` : ''}`
   : null;
@@ -36,7 +40,12 @@ const readingLabel = readingTime
 const metaItems = [publishLabel, updatedLabel, readingLabel].filter(Boolean);
 ---
 
-<Layout title={title} description={description}>
+<Layout
+  title={title}
+  description={description}
+  enableMath={enableMath}
+  enableCitations={enableCitations}
+>
   <article class="post-shell">
     <header class="post-header">
       <h1 class="post-title">{title}</h1>
@@ -63,29 +72,34 @@ const metaItems = [publishLabel, updatedLabel, readingLabel].filter(Boolean);
       )}
     </header>
 
-    <div class="post-body markdown-body citations-enabled">
+    <div class={`post-body markdown-body${enableCitations ? ' citations-enabled' : ''}`}>
       <slot />
     </div>
 
-    <div class="post-comments">
-      <script
-        src="https://giscus.app/client.js"
-        data-repo="ShoKuno5/shokuno5.github.io"
-        data-repo-id="R_kgDOO_0Lcg"
-        data-category="Announcements"
-        data-category-id="DIC_kwDOO_0Lcs4Cr6Ty"
-        data-mapping="pathname"
-        data-strict="0"
-        data-reactions-enabled="1"
-        data-emit-metadata="0"
-        data-input-position="bottom"
-        data-theme="preferred_color_scheme"
-        data-lang="en"
-        data-loading="lazy"
-        crossorigin="anonymous"
-        async
-        is:inline>
-      </script>
+    <div
+      class="post-comments"
+      data-comments-root
+      data-repo="ShoKuno5/shokuno5.github.io"
+      data-repo-id="R_kgDOO_0Lcg"
+      data-category="Announcements"
+      data-category-id="DIC_kwDOO_0Lcs4Cr6Ty"
+      data-mapping="pathname"
+      data-strict="0"
+      data-reactions-enabled="1"
+      data-emit-metadata="0"
+      data-input-position="bottom"
+      data-theme="preferred_color_scheme"
+      data-lang="en"
+    >
+      <button class="comments-trigger" type="button" data-load-comments>
+        Load discussion
+      </button>
+      <div data-comments-mount></div>
+      <noscript>
+        Enable JavaScript to load comments.
+      </noscript>
     </div>
   </article>
+
+  <CommentsScript slot="scripts" />
 </Layout>
