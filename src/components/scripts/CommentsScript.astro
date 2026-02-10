@@ -12,6 +12,12 @@
       const loadComments = () => {
         if (root.getAttribute('data-loaded') === '1') return;
 
+        window.dispatchEvent(
+          new CustomEvent('site:track', {
+            detail: { event: 'comments_load', meta: { path: window.location.pathname } },
+          })
+        );
+
         const script = document.createElement('script');
         script.src = 'https://giscus.app/client.js';
         script.async = true;

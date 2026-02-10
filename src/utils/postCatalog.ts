@@ -2,10 +2,17 @@ import type { CollectionEntry } from 'astro:content';
 import { getPostDates } from './postDates';
 import { normalizeTag } from './tags';
 import { hasCitationContent, hasMathContent } from './contentFeatures';
+import { extractCitationKeys } from './citationKeys';
 
-export type PostTag = {
+export type PostLabel = {
   label: string;
   slug: string;
+};
+
+export type PostSeries = {
+  name: string;
+  slug: string;
+  order?: number;
 };
 
 export type PostCatalogItem = {
@@ -15,13 +22,20 @@ export type PostCatalogItem = {
   description: string;
   summary: string;
   excerpt: string;
-  tags: PostTag[];
+  tags: PostLabel[];
+  topics: PostLabel[];
   normalizedTags: string;
+  normalizedTopics: string;
   publishedDate: Date;
   updatedDate: Date;
   pinned: boolean;
   hasMath: boolean;
   hasCitations: boolean;
+  citationKeys: string[];
+  difficulty: 'intro' | 'intermediate' | 'advanced' | null;
+  prerequisites: string[];
+  series: PostSeries | null;
+  status: 'reviewed' | 'evergreen' | 'archived' | null;
 };
 
 const byPinnedThenUpdated = (a: PostCatalogItem, b: PostCatalogItem) => {
@@ -31,18 +45,46 @@ const byPinnedThenUpdated = (a: PostCatalogItem, b: PostCatalogItem) => {
   return b.updatedDate.getTime() - a.updatedDate.getTime();
 };
 
+const normalizeLabels = (values: string[] = []): PostLabel[] => {
+  const seen = new Set<string>();
+  const labels: PostLabel[] = [];
+
+  for (const rawValue of values) {
+    const slug = normalizeTag(rawValue);
+    if (!slug || seen.has(slug)) continue;
+    seen.add(slug);
+    labels.push({ label: rawValue, slug });
+  }
+
+  return labels;
+};
+
+const resolveSeries = (
+  seriesValue: CollectionEntry<'posts'>['data']['series']
+): PostSeries | null => {
+  if (!seriesValue) return null;
+
+  if (typeof seriesValue === 'string') {
+    const slug = normalizeTag(seriesValue);
+    if (!slug) return null;
+    return { name: seriesValue, slug };
+  }
+
+  const name = seriesValue.name;
+  const slug = normalizeTag(name);
+  if (!slug) return null;
+
+  return {
+    name,
+    slug,
+    order: seriesValue.order,
+  };
+};
+
 export function buildPostCatalog(entries: CollectionEntry<'posts'>[]): PostCatalogItem[] {
   const catalog = entries.map((entry) => {
-    const rawTags = entry.data.tags ?? [];
-    const seenTags = new Set<string>();
-    const tags: PostTag[] = [];
-
-    for (const rawTag of rawTags) {
-      const slug = normalizeTag(rawTag);
-      if (!slug || seenTags.has(slug)) continue;
-      seenTags.add(slug);
-      tags.push({ label: rawTag, slug });
-    }
+    const tags = normalizeLabels(entry.data.tags ?? []);
+    const topics = normalizeLabels(entry.data.topics ?? []);
 
     const { published, updated } = getPostDates(entry);
     const description = entry.data.description || '';
@@ -57,12 +99,19 @@ export function buildPostCatalog(entries: CollectionEntry<'posts'>[]): PostCatal
       summary,
       excerpt,
       tags,
+      topics,
       normalizedTags: tags.map((tag) => tag.slug).join(' '),
+      normalizedTopics: topics.map((topic) => topic.slug).join(' '),
       publishedDate: published,
       updatedDate: updated,
       pinned: Boolean(entry.data.pinned),
       hasMath: hasMathContent(entry.body),
       hasCitations: hasCitationContent(entry.body),
+      citationKeys: extractCitationKeys(entry.body),
+      difficulty: entry.data.difficulty ?? null,
+      prerequisites: entry.data.prerequisites ?? [],
+      series: resolveSeries(entry.data.series),
+      status: entry.data.status ?? null,
     };
   });
 

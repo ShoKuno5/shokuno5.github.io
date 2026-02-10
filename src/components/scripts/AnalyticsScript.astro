@@ -1,0 +1,113 @@
+---
+const { endpoint } = Astro.props as { endpoint: string };
+---
+
+<script is:inline define:vars={{ endpoint }}>
+  // @ts-nocheck
+  const ANALYTICS_ENDPOINT = endpoint;
+
+  const ALLOWED_EVENTS = new Set([
+    'page_view',
+    'scroll_50',
+    'scroll_90',
+    'citation_open',
+    'comments_load',
+    'search_use',
+    'related_post_click',
+    'citation_graph_click',
+  ]);
+
+  const sent = new Set();
+
+  const toPayload = (eventName, meta) => ({
+    event: eventName,
+    path: window.location.pathname,
+    ts: Date.now(),
+    meta: meta && typeof meta === 'object' ? meta : {},
+  });
+
+  const sendEvent = (eventName, meta = {}) => {
+    if (!ANALYTICS_ENDPOINT || !ALLOWED_EVENTS.has(eventName)) return;
+
+    const dedupeKey = `${eventName}:${window.location.pathname}:${JSON.stringify(meta)}`;
+    if (eventName.startsWith('scroll_') && sent.has(dedupeKey)) return;
+    if (eventName.startsWith('scroll_')) sent.add(dedupeKey);
+
+    const payload = JSON.stringify(toPayload(eventName, meta));
+
+    if (navigator.sendBeacon) {
+      const blob = new Blob([payload], { type: 'application/json' });
+      navigator.sendBeacon(ANALYTICS_ENDPOINT, blob);
+      return;
+    }
+
+    fetch(ANALYTICS_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: payload,
+      keepalive: true,
+    }).catch(() => {
+      // Ignore analytics transport failures.
+    });
+  };
+
+  const trackScroll = () => {
+    const doc = document.documentElement;
+    const body = document.body;
+    const scrollHeight = Math.max(doc.scrollHeight, body.scrollHeight);
+    const clientHeight = doc.clientHeight;
+
+    if (scrollHeight <= clientHeight) return;
+
+    const depth = ((window.scrollY + clientHeight) / scrollHeight) * 100;
+    if (depth >= 50) sendEvent('scroll_50');
+    if (depth >= 90) sendEvent('scroll_90');
+  };
+
+  const parseMeta = (raw = '') => {
+    const meta = {};
+    if (!raw) return meta;
+
+    raw.split('|').forEach((pair) => {
+      const [key, ...rest] = pair.split(':');
+      const value = rest.join(':').trim();
+      if (!key || !value) return;
+      meta[key.trim()] = value;
+    });
+
+    return meta;
+  };
+
+  const initAnalytics = () => {
+    sendEvent('page_view');
+
+    window.addEventListener('scroll', trackScroll, { passive: true });
+
+    document.addEventListener('click', (event) => {
+      const target = event.target instanceof Element
+        ? event.target.closest('[data-track-event]')
+        : null;
+
+      if (!target) return;
+
+      const eventName = target.getAttribute('data-track-event');
+      if (!eventName) return;
+
+      const metaRaw = target.getAttribute('data-track-meta') || '';
+      sendEvent(eventName, parseMeta(metaRaw));
+    });
+
+    window.addEventListener('site:track', (event) => {
+      const detail = event?.detail || {};
+      const eventName = detail.event;
+      if (!eventName) return;
+      sendEvent(eventName, detail.meta || {});
+    });
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initAnalytics, { once: true });
+  } else {
+    initAnalytics();
+  }
+</script>

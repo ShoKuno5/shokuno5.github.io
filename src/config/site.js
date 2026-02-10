@@ -4,6 +4,9 @@ export const SITE = {
   posts: {
     excludeTags: ['draft', 'private'],
   },
+  analytics: {
+    endpoint: '',
+  },
   contact: {
     email: 'kunosho1225@g.ecc.u-tokyo.ac.jp',
     github: 'https://github.com/ShoKuno5',
@@ -17,6 +20,8 @@ export const SITE = {
 export const NAV_LINKS = [
   { label: 'Home', href: '/' },
   { label: 'Research', href: '/research/' },
+  { label: 'Topics', href: '/topics/' },
+  { label: 'Series', href: '/series/' },
   { label: 'Tags', href: '/tags/' },
 ];
 

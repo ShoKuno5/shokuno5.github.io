@@ -9,6 +9,17 @@ tags:
   - test
   - katex
   - images
+topics:
+  - mathematics
+  - visual reasoning
+summary: 'A stress-test article for math rendering, figures, and citation behavior across the site.'
+difficulty: intro
+status: reviewed
+series:
+  name: Mathematical Notes
+  order: 1
+prerequisites:
+  - Basic algebraic notation
 type: academic
 ---
 

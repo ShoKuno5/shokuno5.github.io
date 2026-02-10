@@ -1,0 +1,79 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../layouts/Layout.astro';
+import { SITE } from '../config/site.js';
+import { filterPublishedPosts } from '../utils/postVisibility';
+import { buildPostCatalog, type PostCatalogItem } from '../utils/postCatalog';
+
+type SeriesBlock = {
+  name: string;
+  slug: string;
+  posts: PostCatalogItem[];
+};
+
+const entries = filterPublishedPosts(await getCollection('posts'));
+const catalog = buildPostCatalog(entries);
+
+const seriesMap = new Map<string, SeriesBlock>();
+
+catalog.forEach((post) => {
+  if (!post.series) return;
+
+  if (!seriesMap.has(post.series.slug)) {
+    seriesMap.set(post.series.slug, {
+      name: post.series.name,
+      slug: post.series.slug,
+      posts: [],
+    });
+  }
+
+  seriesMap.get(post.series.slug)?.posts.push(post);
+});
+
+const seriesList = Array.from(seriesMap.values())
+  .map((series) => ({
+    ...series,
+    posts: [...series.posts].sort((a, b) => {
+      const orderA = a.series?.order ?? Number.MAX_SAFE_INTEGER;
+      const orderB = b.series?.order ?? Number.MAX_SAFE_INTEGER;
+      if (orderA !== orderB) return orderA - orderB;
+      return a.publishedDate.getTime() - b.publishedDate.getTime();
+    }),
+  }))
+  .sort((a, b) => a.name.localeCompare(b.name));
+
+const formatDate = (value: Date) =>
+  value.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+---
+
+<Layout title={`${SITE.name} - Series`} description="Narrative sequences across related posts.">
+  <header class="intro">
+    <h1 class="intro-title">Series</h1>
+    <p class="intro-lede">Follow posts in intentional order when ideas build over time.</p>
+  </header>
+
+  {seriesList.length === 0 ? (
+    <p class="topic-empty">
+      No series yet. Add <code>series</code> metadata to post frontmatter.
+    </p>
+  ) : (
+    <section class="series-list">
+      {seriesList.map((series) => (
+        <article class="series-block" id={`series-${series.slug}`}>
+          <h2>{series.name}</h2>
+          <ol>
+            {series.posts.map((post) => (
+              <li>
+                <a href={`/posts/${post.slug}/`}>{post.title}</a>
+                <span>
+                  {' '}
+                  Published <time datetime={post.publishedDate.toISOString()}>{formatDate(post.publishedDate)}</time>
+                </span>
+              </li>
+            ))}
+          </ol>
+        </article>
+      ))}
+    </section>
+  )}
+</Layout>

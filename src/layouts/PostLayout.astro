@@ -5,16 +5,44 @@ import { calculateReadingTime } from '../utils/readingTime';
 import { normalizeTag } from '../utils/tags';
 import { hasCitationContent, hasMathContent } from '../utils/contentFeatures';
 
+type Topic = { label: string; slug: string };
+type Series = { name: string; slug: string; order?: number };
+type RelatedPost = { slug: string; title: string; score: number; reasons: string[] };
+type CitedByPost = { slug: string; title: string; sharedKeys: string[] };
+
 export interface Props {
   title: string;
   date?: Date;
   modified?: Date;
   tags?: string[];
+  topics?: Topic[];
+  summary?: string;
+  difficulty?: 'intro' | 'intermediate' | 'advanced' | null;
+  prerequisites?: string[];
+  status?: 'reviewed' | 'evergreen' | 'archived' | null;
+  series?: Series | null;
+  relatedPosts?: RelatedPost[];
+  citedByPosts?: CitedByPost[];
   description?: string;
   content?: string;
 }
 
-const { title, date, modified, tags, description, content } = Astro.props as Props;
+const {
+  title,
+  date,
+  modified,
+  tags,
+  topics = [],
+  summary,
+  difficulty,
+  prerequisites = [],
+  status,
+  series,
+  relatedPosts = [],
+  citedByPosts = [],
+  description,
+  content,
+} = Astro.props as Props;
 
 const readingTime = content ? calculateReadingTime(content) : null;
 const enableMath = content ? hasMathContent(content) : false;
@@ -38,6 +66,23 @@ const readingLabel = readingTime
   : null;
 
 const metaItems = [publishLabel, updatedLabel, readingLabel].filter(Boolean);
+const difficultyLabel =
+  difficulty === 'intro'
+    ? 'Intro'
+    : difficulty === 'intermediate'
+      ? 'Intermediate'
+      : difficulty === 'advanced'
+        ? 'Advanced'
+        : null;
+
+const statusLabel =
+  status === 'reviewed'
+    ? 'Reviewed'
+    : status === 'evergreen'
+      ? 'Evergreen'
+      : status === 'archived'
+        ? 'Archived'
+        : null;
 ---
 
 <Layout
@@ -50,6 +95,7 @@ const metaItems = [publishLabel, updatedLabel, readingLabel].filter(Boolean);
     <header class="post-header">
       <h1 class="post-title">{title}</h1>
       {description && <p class="post-summary">{description}</p>}
+      {summary && <p class="post-summary post-summary--brief">{summary}</p>}
 
       {metaItems.length > 0 && (
         <ul class="post-meta">
@@ -57,6 +103,37 @@ const metaItems = [publishLabel, updatedLabel, readingLabel].filter(Boolean);
             <li>{item}</li>
           ))}
         </ul>
+      )}
+
+      {(statusLabel || difficultyLabel || series || topics.length > 0) && (
+        <div class="post-architecture">
+          {statusLabel && <span class="post-badge">{statusLabel}</span>}
+          {difficultyLabel && <span class="post-badge">{difficultyLabel}</span>}
+          {series && (
+            <a
+              class="post-badge post-badge--link"
+              href={`/series/#series-${series.slug}`}
+            >
+              Series: {series.name}
+            </a>
+          )}
+          {topics.map((topic) => (
+            <a class="post-badge post-badge--link" href={`/topics/#topic-${topic.slug}`}>
+              Topic: {topic.label}
+            </a>
+          ))}
+        </div>
+      )}
+
+      {prerequisites.length > 0 && (
+        <section class="post-prereq" aria-label="Prerequisites">
+          <h2 class="post-prereq__title">Prerequisites</h2>
+          <ul class="post-prereq__list">
+            {prerequisites.map((item) => (
+              <li>{item}</li>
+            ))}
+          </ul>
+        </section>
       )}
 
       {tags && tags.length > 0 && (
@@ -75,6 +152,55 @@ const metaItems = [publishLabel, updatedLabel, readingLabel].filter(Boolean);
     <div class={`post-body markdown-body${enableCitations ? ' citations-enabled' : ''}`}>
       <slot />
     </div>
+
+    {(citedByPosts.length > 0 || relatedPosts.length > 0) && (
+      <section class="post-discovery" aria-label="Discovery">
+        {citedByPosts.length > 0 && (
+          <div class="post-discovery__block">
+            <h2>Cited By Other Posts</h2>
+            <ul>
+              {citedByPosts.map((post) => (
+                <li>
+                  <a
+                    href={`/posts/${post.slug}/`}
+                    data-track-event="citation_graph_click"
+                    data-track-meta={`target:${post.slug}`}
+                  >
+                    {post.title}
+                  </a>
+                  <span>
+                    {' '}
+                    ({post.sharedKeys.length} shared reference{post.sharedKeys.length === 1 ? '' : 's'})
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {relatedPosts.length > 0 && (
+          <div class="post-discovery__block">
+            <h2>Related Posts</h2>
+            <ul>
+              {relatedPosts.map((post) => (
+                <li>
+                  <a
+                    href={`/posts/${post.slug}/`}
+                    data-track-event="related_post_click"
+                    data-track-meta={`target:${post.slug}`}
+                  >
+                    {post.title}
+                  </a>
+                  {post.reasons.length > 0 && (
+                    <p class="post-discovery__reasons">{post.reasons.join(' | ')}</p>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </section>
+    )}
 
     <div
       class="post-comments"

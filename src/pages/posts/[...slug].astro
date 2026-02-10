@@ -1,31 +1,76 @@
 ---
 import { getCollection } from 'astro:content';
 import PostLayout from '../../layouts/PostLayout.astro';
-import { getPostDates } from '../../utils/postDates';
 import { filterPublishedPosts } from '../../utils/postVisibility';
+import { buildPostCatalog } from '../../utils/postCatalog';
+import { buildCitationIndex, getCitedByPosts } from '../../utils/citationGraph';
+import { getRelatedPosts } from '../../utils/relatedPosts';
+import { getPostDates } from '../../utils/postDates';
+
+type PostPageProps = {
+  post: Awaited<ReturnType<typeof getCollection<'posts'>>>[number];
+  topics: { label: string; slug: string }[];
+  difficulty: 'intro' | 'intermediate' | 'advanced' | null;
+  prerequisites: string[];
+  status: 'reviewed' | 'evergreen' | 'archived' | null;
+  series: { name: string; slug: string; order?: number } | null;
+  relatedPosts: { slug: string; title: string; score: number; reasons: string[] }[];
+  citedByPosts: { slug: string; title: string; sharedKeys: string[] }[];
+};
 
 export async function getStaticPaths() {
-  const posts = filterPublishedPosts(await getCollection('posts'));
-  return posts.map((post) => ({
-    params: { slug: post.slug },
-    props: { post },
+  const entries = filterPublishedPosts(await getCollection('posts'));
+  const catalog = buildPostCatalog(entries);
+  const citationIndex = buildCitationIndex(catalog);
+
+  return catalog.map((node) => ({
+    params: { slug: node.slug },
+    props: {
+      post: node.entry,
+      topics: node.topics,
+      difficulty: node.difficulty,
+      prerequisites: node.prerequisites,
+      status: node.status,
+      series: node.series,
+      relatedPosts: getRelatedPosts(node, catalog),
+      citedByPosts: getCitedByPosts(node.slug, catalog, citationIndex).map((item) => ({
+        slug: item.slug,
+        title: item.title,
+        sharedKeys: item.sharedKeys,
+      })),
+    } as PostPageProps,
   }));
 }
 
-const { post } = Astro.props;
-const { Content } = await post.render();
+const {
+  post,
+  topics,
+  difficulty,
+  prerequisites,
+  status,
+  series,
+  relatedPosts,
+  citedByPosts,
+} = Astro.props as PostPageProps;
 
+const { Content } = await post.render();
 const { published, updated } = getPostDates(post);
-const publishDate = published;
-const modifiedDate = updated;
 ---
 
 <PostLayout
   title={post.data.title}
-  date={publishDate}
-  modified={modifiedDate}
+  date={published}
+  modified={updated}
   tags={post.data.tags}
+  topics={topics}
+  difficulty={difficulty}
+  prerequisites={prerequisites}
+  status={status}
+  series={series}
+  relatedPosts={relatedPosts}
+  citedByPosts={citedByPosts}
   description={post.data.description || post.data.summary}
+  summary={post.data.summary}
   content={post.body}
 >
   <Content />

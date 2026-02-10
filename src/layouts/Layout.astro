@@ -3,6 +3,7 @@ import '../styles/global.css';
 import ContactLinks from '../components/ContactLinks.astro';
 import NavScript from '../components/scripts/NavScript.astro';
 import CitationScript from '../components/scripts/CitationScript.astro';
+import AnalyticsScript from '../components/scripts/AnalyticsScript.astro';
 import { SITE, NAV_LINKS, CONTACT_LINKS } from '../config/site.js';
 
 export interface Props {
@@ -118,12 +119,13 @@ const isActive = (href: string) => {
         <slot />
         <footer class="site-footer">
           <span>(c) {siteName} {year}</span>
-          <span>All rights reserved.</span>
+          <span><a href="/privacy/">Privacy</a> | All rights reserved.</span>
         </footer>
       </main>
     </div>
     <NavScript />
     {enableCitations && <CitationScript />}
+    {SITE.analytics?.endpoint && <AnalyticsScript endpoint={SITE.analytics.endpoint} />}
     <slot name="scripts" />
   </body>
 </html>
