@@ -410,12 +410,12 @@ body.nav-open .nav-rail {
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.post-item[data-reveal] {
+.js-reveal .post-item[data-reveal] {
   opacity: 0;
   transform: translateY(8px);
 }
 
-.post-item[data-reveal].is-visible {
+.js-reveal .post-item[data-reveal].is-visible {
   opacity: 1;
   transform: translateY(0);
   transition:
@@ -1102,8 +1102,8 @@ button.tag-pill {
     scroll-behavior: auto;
   }
 
-  .post-item[data-reveal],
-  .post-item[data-reveal].is-visible {
+  .js-reveal .post-item[data-reveal],
+  .js-reveal .post-item[data-reveal].is-visible {
     opacity: 1;
     transform: none;
     transition: none;
