@@ -29,9 +29,9 @@ for (const post of catalog) {
       tagsMap.set(tag.slug, { label: tag.label, slug: tag.slug, count: 0 });
     }
 
-    const summary = tagsMap.get(tag.slug);
-    if (summary) {
-      summary.count += 1;
+    const tagEntry = tagsMap.get(tag.slug);
+    if (tagEntry) {
+      tagEntry.count += 1;
     }
   }
 }
@@ -89,7 +89,7 @@ const tags = Array.from(tagsMap.values()).sort((a, b) => a.label.localeCompare(b
       <PostCard
         title={post.title}
         href={`/posts/${post.slug}/`}
-        description={post.excerpt}
+        description={post.abstract}
         publishedDate={post.publishedDate}
         updatedDate={post.updatedDate}
         pinned={post.pinned}

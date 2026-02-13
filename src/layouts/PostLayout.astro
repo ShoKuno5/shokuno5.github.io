@@ -1,11 +1,11 @@
 ---
 import Layout from './Layout.astro';
 import CommentsScript from '../components/scripts/CommentsScript.astro';
+import PostCard from '../components/PostCard.astro';
 import { calculateReadingTime } from '../utils/readingTime';
 import { normalizeTag } from '../utils/tags';
 import { hasCitationContent, hasMathContent } from '../utils/contentFeatures';
 
-type Topic = { label: string; slug: string };
 type Series = { name: string; slug: string; order?: number };
 type RelatedPost = { slug: string; title: string; score: number; reasons: string[] };
 type CitedByPost = { slug: string; title: string; sharedKeys: string[] };
@@ -15,10 +15,7 @@ export interface Props {
   date?: Date;
   modified?: Date;
   tags?: string[];
-  topics?: Topic[];
-  summary?: string;
   difficulty?: 'intro' | 'intermediate' | 'advanced' | null;
-  prerequisites?: string[];
   status?: 'reviewed' | 'evergreen' | 'archived' | null;
   series?: Series | null;
   relatedPosts?: RelatedPost[];
@@ -32,10 +29,7 @@ const {
   date,
   modified,
   tags,
-  topics = [],
-  summary,
   difficulty,
-  prerequisites = [],
   status,
   series,
   relatedPosts = [],
@@ -48,24 +42,15 @@ const readingTime = content ? calculateReadingTime(content) : null;
 const enableMath = content ? hasMathContent(content) : false;
 const enableCitations = content ? hasCitationContent(content) : false;
 
-const publishLabel = date
-  ? `Published ${date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}`
-  : null;
+const statusLabel =
+  status === 'reviewed'
+    ? 'Reviewed'
+    : status === 'evergreen'
+      ? 'Evergreen'
+      : status === 'archived'
+        ? 'Archived'
+        : null;
 
-const updatedLabel =
-  date && modified && modified.getTime() !== date.getTime()
-    ? `Last updated ${modified.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-      })}`
-    : null;
-
-const readingLabel = readingTime
-  ? `${readingTime.readingTimeText}${readingTime.wordCount ? ` - ${readingTime.wordCount} words` : ''}`
-  : null;
-
-const metaItems = [publishLabel, updatedLabel, readingLabel].filter(Boolean);
 const difficultyLabel =
   difficulty === 'intro'
     ? 'Intro'
@@ -75,157 +60,133 @@ const difficultyLabel =
         ? 'Advanced'
         : null;
 
-const statusLabel =
-  status === 'reviewed'
-    ? 'Reviewed'
-    : status === 'evergreen'
-      ? 'Evergreen'
-      : status === 'archived'
-        ? 'Archived'
-        : null;
+const lengthLabel =
+  readingTime && readingTime.wordCount ? `${readingTime.wordCount.toLocaleString('en-US')} words` : null;
+const readingTimeLabel = readingTime ? `${readingTime.readingTime} min read` : null;
+
+const abstract = description?.trim() || '';
+
+const primaryContext = series
+  ? {
+      label: `Series: ${series.name}`,
+      href: `/series/#series-${series.slug}`,
+    }
+  : null;
+const normalizedTags = tags
+  ? Array.from(new Set(tags.map((tag) => tag.trim()).filter(Boolean)))
+  : [];
+
+const metaPills = [
+  ...(primaryContext ? [primaryContext] : []),
+  ...(readingTimeLabel ? [{ label: readingTimeLabel }] : []),
+  ...(lengthLabel ? [{ label: lengthLabel }] : []),
+  ...(difficultyLabel ? [{ label: difficultyLabel }] : []),
+  ...(statusLabel ? [{ label: statusLabel }] : []),
+];
+
+const tagLinks = normalizedTags.map((tag) => ({
+  label: tag,
+  href: `/tags/#tag-${normalizeTag(tag)}`,
+}));
 ---
 
 <Layout
   title={title}
-  description={description}
+  description={abstract}
   enableMath={enableMath}
   enableCitations={enableCitations}
 >
-  <article class="post-shell">
-    <header class="post-header">
-      <h1 class="post-title">{title}</h1>
-      {description && <p class="post-summary">{description}</p>}
-      {summary && <p class="post-summary post-summary--brief">{summary}</p>}
+  <PostCard
+    title={title}
+    titleTag="h1"
+    description={abstract}
+    publishedDate={date}
+    updatedDate={modified}
+    pills={metaPills}
+    tagLinks={tagLinks}
+    bodyClassName={enableCitations ? 'citations-enabled' : ''}
+    className="post-item--full"
+    dataPost
+  >
+    <slot />
 
-      {metaItems.length > 0 && (
-        <ul class="post-meta">
-          {metaItems.map((item) => (
-            <li>{item}</li>
-          ))}
-        </ul>
-      )}
+    <Fragment slot="after">
+      <div class="post-item__after">
+        {(citedByPosts.length > 0 || relatedPosts.length > 0) && (
+          <section class="post-discovery" aria-label="Discovery">
+            {citedByPosts.length > 0 && (
+              <div class="post-discovery__block">
+                <h2>Cited By Other Posts</h2>
+                <ul>
+                  {citedByPosts.map((post) => (
+                    <li>
+                      <a
+                        href={`/posts/${post.slug}/`}
+                        data-track-event="citation_graph_click"
+                        data-track-meta={`target:${post.slug}`}
+                      >
+                        {post.title}
+                      </a>
+                      <span>
+                        {' '}
+                        ({post.sharedKeys.length} shared reference{post.sharedKeys.length === 1 ? '' : 's'})
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
 
-      {(statusLabel || difficultyLabel || series || topics.length > 0) && (
-        <div class="post-architecture">
-          {statusLabel && <span class="post-badge">{statusLabel}</span>}
-          {difficultyLabel && <span class="post-badge">{difficultyLabel}</span>}
-          {series && (
-            <a
-              class="post-badge post-badge--link"
-              href={`/series/#series-${series.slug}`}
-            >
-              Series: {series.name}
-            </a>
-          )}
-          {topics.map((topic) => (
-            <a class="post-badge post-badge--link" href={`/topics/#topic-${topic.slug}`}>
-              Topic: {topic.label}
-            </a>
-          ))}
+            {relatedPosts.length > 0 && (
+              <div class="post-discovery__block">
+                <h2>Related Posts</h2>
+                <ul>
+                  {relatedPosts.map((post) => (
+                    <li>
+                      <a
+                        href={`/posts/${post.slug}/`}
+                        data-track-event="related_post_click"
+                        data-track-meta={`target:${post.slug}`}
+                      >
+                        {post.title}
+                      </a>
+                      {post.reasons.length > 0 && (
+                        <p class="post-discovery__reasons">{post.reasons.join(' | ')}</p>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </section>
+        )}
+
+        <div
+          class="post-comments"
+          data-comments-root
+          data-repo="ShoKuno5/shokuno5.github.io"
+          data-repo-id="R_kgDOO_0Lcg"
+          data-category="Announcements"
+          data-category-id="DIC_kwDOO_0Lcs4Cr6Ty"
+          data-mapping="pathname"
+          data-strict="0"
+          data-reactions-enabled="1"
+          data-emit-metadata="0"
+          data-input-position="bottom"
+          data-theme="preferred_color_scheme"
+          data-lang="en"
+        >
+          <button class="comments-trigger" type="button" data-load-comments>
+            Load discussion
+          </button>
+          <div data-comments-mount></div>
+          <noscript>
+            Enable JavaScript to load comments.
+          </noscript>
         </div>
-      )}
-
-      {prerequisites.length > 0 && (
-        <section class="post-prereq" aria-label="Prerequisites">
-          <h2 class="post-prereq__title">Prerequisites</h2>
-          <ul class="post-prereq__list">
-            {prerequisites.map((item) => (
-              <li>{item}</li>
-            ))}
-          </ul>
-        </section>
-      )}
-
-      {tags && tags.length > 0 && (
-        <ul class="post-tags">
-          {tags.map((tag) => (
-            <li>
-              <a class="post-tag" href={`/tags/#tag-${normalizeTag(tag)}`}>
-                #{tag}
-              </a>
-            </li>
-          ))}
-        </ul>
-      )}
-    </header>
-
-    <div class={`post-body markdown-body${enableCitations ? ' citations-enabled' : ''}`}>
-      <slot />
-    </div>
-
-    {(citedByPosts.length > 0 || relatedPosts.length > 0) && (
-      <section class="post-discovery" aria-label="Discovery">
-        {citedByPosts.length > 0 && (
-          <div class="post-discovery__block">
-            <h2>Cited By Other Posts</h2>
-            <ul>
-              {citedByPosts.map((post) => (
-                <li>
-                  <a
-                    href={`/posts/${post.slug}/`}
-                    data-track-event="citation_graph_click"
-                    data-track-meta={`target:${post.slug}`}
-                  >
-                    {post.title}
-                  </a>
-                  <span>
-                    {' '}
-                    ({post.sharedKeys.length} shared reference{post.sharedKeys.length === 1 ? '' : 's'})
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-
-        {relatedPosts.length > 0 && (
-          <div class="post-discovery__block">
-            <h2>Related Posts</h2>
-            <ul>
-              {relatedPosts.map((post) => (
-                <li>
-                  <a
-                    href={`/posts/${post.slug}/`}
-                    data-track-event="related_post_click"
-                    data-track-meta={`target:${post.slug}`}
-                  >
-                    {post.title}
-                  </a>
-                  {post.reasons.length > 0 && (
-                    <p class="post-discovery__reasons">{post.reasons.join(' | ')}</p>
-                  )}
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-      </section>
-    )}
-
-    <div
-      class="post-comments"
-      data-comments-root
-      data-repo="ShoKuno5/shokuno5.github.io"
-      data-repo-id="R_kgDOO_0Lcg"
-      data-category="Announcements"
-      data-category-id="DIC_kwDOO_0Lcs4Cr6Ty"
-      data-mapping="pathname"
-      data-strict="0"
-      data-reactions-enabled="1"
-      data-emit-metadata="0"
-      data-input-position="bottom"
-      data-theme="preferred_color_scheme"
-      data-lang="en"
-    >
-      <button class="comments-trigger" type="button" data-load-comments>
-        Load discussion
-      </button>
-      <div data-comments-mount></div>
-      <noscript>
-        Enable JavaScript to load comments.
-      </noscript>
-    </div>
-  </article>
+      </div>
+    </Fragment>
+  </PostCard>
 
   <CommentsScript slot="scripts" />
 </Layout>

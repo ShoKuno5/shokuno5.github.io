@@ -1,0 +1,95 @@
+---
+export type MetaPill = {
+  label: string;
+  href?: string;
+  action?: string;
+};
+
+export interface Props {
+  publishedDate?: Date | null;
+  updatedDate?: Date | null;
+  pinned?: boolean;
+  pills?: MetaPill[];
+  tagLinks?: MetaPill[];
+  tagPrefix?: string;
+}
+
+const {
+  publishedDate = null,
+  updatedDate = null,
+  pinned = false,
+  pills = [],
+  tagLinks = [],
+  tagPrefix = '#',
+} = Astro.props;
+
+const hasPublishedDate = publishedDate instanceof Date;
+const hasUpdatedDate = updatedDate instanceof Date;
+const showUpdated = hasPublishedDate && hasUpdatedDate && updatedDate.getTime() !== publishedDate.getTime();
+const showStandaloneUpdated = !hasPublishedDate && hasUpdatedDate;
+const hasPrimaryRow = pinned || hasPublishedDate || showUpdated || showStandaloneUpdated;
+
+const formatDate = (value: Date) =>
+  value.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  });
+---
+
+{(hasPrimaryRow || pills.length > 0 || tagLinks.length > 0) && (
+  <div class="post-item__meta">
+    {hasPrimaryRow && (
+      <div class="post-item__meta-row">
+        {pinned && <span class="tag-pill">Pinned</span>}
+        {hasPublishedDate && publishedDate && (
+          <span class="post-item__date">
+            Published <time datetime={publishedDate.toISOString()}>{formatDate(publishedDate)}</time>
+          </span>
+        )}
+        {showUpdated && updatedDate && (
+          <span class="post-item__date">
+            Last updated <time datetime={updatedDate.toISOString()}>{formatDate(updatedDate)}</time>
+          </span>
+        )}
+        {showStandaloneUpdated && updatedDate && (
+          <span class="post-item__date">
+            Updated <time datetime={updatedDate.toISOString()}>{formatDate(updatedDate)}</time>
+          </span>
+        )}
+      </div>
+    )}
+
+    {pills.length > 0 && (
+      <div class="post-item__meta-row post-item__meta-row--tags">
+        {pills.map((pill) =>
+          pill.href ? (
+            <a class="tag-pill" href={pill.href} data-tag-action={pill.action}>
+              {pill.label}
+            </a>
+          ) : (
+            <span class="tag-pill">{pill.label}</span>
+          )
+        )}
+      </div>
+    )}
+
+    {tagLinks.length > 0 && (
+      <div class="post-item__meta-row post-item__meta-row--tags">
+        {tagLinks.map((tag) =>
+          tag.href ? (
+            <a class="tag-pill" href={tag.href} data-tag-action={tag.action}>
+              {tagPrefix}
+              {tag.label}
+            </a>
+          ) : (
+            <span class="tag-pill">
+              {tagPrefix}
+              {tag.label}
+            </span>
+          )
+        )}
+      </div>
+    )}
+  </div>
+)}

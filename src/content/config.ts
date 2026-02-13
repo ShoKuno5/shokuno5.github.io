@@ -19,7 +19,6 @@ const posts = defineCollection({
       summary: z.string().optional(),
       pinned: z.boolean().optional(),
       difficulty: z.enum(['intro', 'intermediate', 'advanced']).optional(),
-      prerequisites: z.array(z.string()).default([]),
       series: z.union([z.string(), postSeriesSchema]).optional(),
       status: z.enum(['reviewed', 'evergreen', 'archived']).optional(),
       heroImage: image().optional(),

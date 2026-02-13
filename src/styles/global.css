@@ -472,7 +472,7 @@ body.nav-open .nav-rail {
   text-wrap: balance;
 }
 
-.post-item__title:hover {
+a.post-item__title:hover {
   color: var(--accent);
 }
 
@@ -482,6 +482,22 @@ body.nav-open .nav-rail {
   font-size: 0.95rem;
   font-style: italic;
   line-height: 1.6;
+}
+
+.post-item--full:hover {
+  border-color: var(--border);
+  box-shadow: var(--shadow-sm);
+}
+
+.post-item__after {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  margin-top: 0.2rem;
+}
+
+.post-item__after .post-comments {
+  margin-top: 0;
 }
 
 .tag-sections {
@@ -564,23 +580,6 @@ button.tag-pill {
   color: var(--muted);
 }
 
-.post-item__tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.45rem;
-  margin-top: 0.2rem;
-}
-
-.post-item__tags .post-tag {
-  background: transparent;
-  cursor: pointer;
-}
-
-.post-item__tags .post-tag:focus-visible {
-  outline: 2px solid rgba(11, 95, 255, 0.35);
-  outline-offset: 2px;
-}
-
 .topic-empty {
   margin: 0;
   color: var(--muted);
@@ -641,147 +640,6 @@ button.tag-pill {
 .series-block span {
   color: var(--muted);
   font-size: 0.86rem;
-}
-
-.post-shell {
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-  width: 100%;
-  max-width: 860px;
-}
-
-.post-header {
-  display: flex;
-  flex-direction: column;
-  gap: 0.7rem;
-}
-
-.post-title {
-  margin: 0;
-  font-family: var(--font-display);
-  font-size: clamp(2.35rem, 4.7vw, 3.25rem);
-  line-height: 1.1;
-  letter-spacing: -0.01em;
-  text-wrap: balance;
-}
-
-.post-summary {
-  margin: 0;
-  color: var(--ink-soft);
-  font-size: 0.98rem;
-  font-style: italic;
-  line-height: 1.65;
-}
-
-.post-summary--brief {
-  font-style: normal;
-  border-left: 2px solid color-mix(in oklab, var(--accent) 34%, var(--border));
-  padding-left: 0.75rem;
-  margin-top: 0.2rem;
-}
-
-.post-architecture {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.45rem;
-}
-
-.post-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  padding: 0.18rem 0.62rem;
-  font-size: 0.72rem;
-  color: var(--muted);
-  font-family: var(--font-mono);
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-}
-
-.post-badge--link:hover {
-  color: var(--ink);
-  border-color: color-mix(in oklab, var(--accent) 26%, var(--border));
-}
-
-.post-prereq {
-  border: 1px dashed var(--border);
-  border-radius: var(--radius-md);
-  padding: 0.75rem 0.9rem;
-  background: color-mix(in oklab, var(--bg-soft) 91%, #eef3ff);
-}
-
-.post-prereq__title {
-  margin: 0 0 0.45rem;
-  font-size: 0.82rem;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--muted);
-  font-family: var(--font-mono);
-}
-
-.post-prereq__list {
-  margin: 0;
-  padding-left: 1.1rem;
-}
-
-.post-prereq__list li {
-  margin: 0.2rem 0;
-  color: var(--ink-soft);
-  font-size: 0.92rem;
-}
-
-.post-meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.6rem;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  font-size: 0.85rem;
-  color: var(--muted);
-  font-family: var(--font-mono);
-}
-
-.post-meta li + li::before {
-  content: '-';
-  margin: 0 0.5rem;
-  color: var(--border);
-}
-
-.post-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.4rem;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.post-tag {
-  text-decoration: none;
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  color: var(--muted);
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  padding: 0.2rem 0.6rem;
-  font-family: var(--font-mono);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-}
-
-.post-tag:hover {
-  color: var(--ink);
-  border-color: color-mix(in oklab, var(--accent) 30%, var(--border));
-}
-
-.post-tag:focus-visible {
-  outline: var(--focus-ring);
-  outline-offset: 2px;
 }
 
 .post-body {
@@ -870,8 +728,8 @@ button.tag-pill {
   max-width: 100%;
   margin: 0;
   padding: 0;
-  font-size: clamp(1rem, 0.96rem + 0.22vw, 1.09rem);
-  line-height: 1.72;
+  font-size: clamp(1rem, 0.98rem + 0.16vw, 1.06rem);
+  line-height: 1.74;
   color: var(--ink);
   text-wrap: pretty;
 }
@@ -890,10 +748,10 @@ button.tag-pill {
   text-wrap: balance;
 }
 
-.markdown-body h1 { font-size: clamp(1.42rem, 1.25rem + 0.44vw, 1.72rem); }
-.markdown-body h2 { font-size: clamp(1.3rem, 1.15rem + 0.32vw, 1.5rem); }
-.markdown-body h3 { font-size: clamp(1.15rem, 1.08rem + 0.24vw, 1.3rem); }
-.markdown-body h4 { font-size: 1.06rem; }
+.markdown-body h1 { font-size: clamp(1.4rem, 1.24rem + 0.42vw, 1.66rem); }
+.markdown-body h2 { font-size: clamp(1.26rem, 1.14rem + 0.28vw, 1.44rem); }
+.markdown-body h3 { font-size: clamp(1.12rem, 1.06rem + 0.2vw, 1.24rem); }
+.markdown-body h4 { font-size: 1.03rem; }
 
 .markdown-body p {
   margin: 0 0 0.92rem;

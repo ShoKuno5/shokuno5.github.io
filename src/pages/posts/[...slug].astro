@@ -9,9 +9,7 @@ import { getPostDates } from '../../utils/postDates';
 
 type PostPageProps = {
   post: Awaited<ReturnType<typeof getCollection<'posts'>>>[number];
-  topics: { label: string; slug: string }[];
   difficulty: 'intro' | 'intermediate' | 'advanced' | null;
-  prerequisites: string[];
   status: 'reviewed' | 'evergreen' | 'archived' | null;
   series: { name: string; slug: string; order?: number } | null;
   relatedPosts: { slug: string; title: string; score: number; reasons: string[] }[];
@@ -27,9 +25,7 @@ export async function getStaticPaths() {
     params: { slug: node.slug },
     props: {
       post: node.entry,
-      topics: node.topics,
       difficulty: node.difficulty,
-      prerequisites: node.prerequisites,
       status: node.status,
       series: node.series,
       relatedPosts: getRelatedPosts(node, catalog),
@@ -44,9 +40,7 @@ export async function getStaticPaths() {
 
 const {
   post,
-  topics,
   difficulty,
-  prerequisites,
   status,
   series,
   relatedPosts,
@@ -62,15 +56,12 @@ const { published, updated } = getPostDates(post);
   date={published}
   modified={updated}
   tags={post.data.tags}
-  topics={topics}
   difficulty={difficulty}
-  prerequisites={prerequisites}
   status={status}
   series={series}
   relatedPosts={relatedPosts}
   citedByPosts={citedByPosts}
   description={post.data.description || post.data.summary}
-  summary={post.data.summary}
   content={post.body}
 >
   <Content />

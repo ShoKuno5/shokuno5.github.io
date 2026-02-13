@@ -58,7 +58,7 @@ const hasCitationsInFeed = rendered.some((post) => post.hasCitations);
           id={post.anchorId}
           title={post.title}
           href={`/posts/${post.slug}/`}
-          description={post.excerpt}
+          description={post.abstract}
           publishedDate={post.publishedDate}
           updatedDate={post.updatedDate}
           pinned={post.pinned}

@@ -1,21 +1,27 @@
 ---
+import PostMeta from './PostMeta.astro';
+
 export type TagLink = {
   label: string;
-  href: string;
+  href?: string;
   action?: string;
 };
 
 export interface Props {
   id?: string;
   title: string;
-  href: string;
+  href?: string;
+  titleTag?: 'h1' | 'h2' | 'h3';
   description?: string;
-  publishedDate: Date;
-  updatedDate: Date;
+  publishedDate?: Date | null;
+  updatedDate?: Date | null;
   pinned?: boolean;
+  pills?: TagLink[];
   tagLinks?: TagLink[];
+  tagPrefix?: string;
   dataTags?: string;
   className?: string;
+  bodyClassName?: string;
   reveal?: boolean;
   dataPost?: boolean;
 }
@@ -23,28 +29,27 @@ export interface Props {
 const {
   id,
   title,
-  href,
+  href = undefined,
+  titleTag = 'h1',
   description,
-  publishedDate,
-  updatedDate,
+  publishedDate = null,
+  updatedDate = null,
   pinned = false,
+  pills = [],
   tagLinks = [],
+  tagPrefix = '#',
   dataTags = '',
   className = '',
+  bodyClassName = '',
   reveal = false,
   dataPost = false,
 } = Astro.props;
 
 const articleClass = ['post-item', className].filter(Boolean).join(' ');
 const hasBody = Astro.slots.has('default');
-const showUpdated = updatedDate.getTime() !== publishedDate.getTime();
-
-const formatDate = (value: Date) =>
-  value.toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  });
+const hasAfter = Astro.slots.has('after');
+const resolvedTitleTag = titleTag || 'h1';
+const bodyClass = ['post-body', 'markdown-body', bodyClassName].filter(Boolean).join(' ');
 ---
 
 <article
@@ -54,39 +59,34 @@ const formatDate = (value: Date) =>
   data-reveal={reveal ? '' : undefined}
   data-post={dataPost ? '' : undefined}
 >
-  <a class="post-item__title" href={href}>{title}</a>
+  {href ? (
+    <a class="post-item__title" href={href}>{title}</a>
+  ) : (
+    resolvedTitleTag === 'h2' ? (
+      <h2 class="post-item__title">{title}</h2>
+    ) : resolvedTitleTag === 'h3' ? (
+      <h3 class="post-item__title">{title}</h3>
+    ) : (
+      <h1 class="post-item__title">{title}</h1>
+    )
+  )}
 
-  <div class="post-item__meta">
-    <div class="post-item__meta-row">
-      {pinned && <span class="tag-pill">Pinned</span>}
-      <span class="post-item__date">
-        Published{' '}
-        <time datetime={publishedDate.toISOString()}>{formatDate(publishedDate)}</time>
-      </span>
-      {showUpdated && (
-        <span class="post-item__date">
-          Last updated{' '}
-          <time datetime={updatedDate.toISOString()}>{formatDate(updatedDate)}</time>
-        </span>
-      )}
-    </div>
-
-    {tagLinks.length > 0 && (
-      <div class="post-item__meta-row post-item__meta-row--tags">
-        {tagLinks.map((tag) => (
-          <a class="tag-pill" href={tag.href} data-tag-action={tag.action}>
-            #{tag.label}
-          </a>
-        ))}
-      </div>
-    )}
-  </div>
+  <PostMeta
+    publishedDate={publishedDate}
+    updatedDate={updatedDate}
+    pinned={pinned}
+    pills={pills}
+    tagLinks={tagLinks}
+    tagPrefix={tagPrefix}
+  />
 
   {description && <p class="post-item__excerpt">{description}</p>}
 
   {hasBody && (
-    <div class="post-body markdown-body">
+    <div class={bodyClass}>
       <slot />
     </div>
   )}
+
+  {hasAfter && <slot name="after" />}
 </article>

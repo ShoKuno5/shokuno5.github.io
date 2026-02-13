@@ -18,8 +18,6 @@ status: reviewed
 series:
   name: Mathematical Notes
   order: 1
-prerequisites:
-  - Basic algebraic notation
 type: academic
 ---
 
