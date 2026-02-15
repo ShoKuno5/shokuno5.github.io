@@ -1,0 +1,212 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import PostCard from '../../components/PostCard.astro';
+import TimelineScript from '../../components/scripts/TimelineScript.astro';
+import { SITE } from '../../config/site.js';
+import { slugToAnchorId } from '../../utils/anchors';
+import { hasCitationContent, hasMathContent } from '../../utils/contentFeatures';
+import { calculateReadingTime } from '../../utils/readingTime';
+import {
+  buildIssuePostContext,
+  filterPublishedIssues,
+  resolveIssueItems,
+  sortResolvedIssueItems,
+  sortIssuesByPubDateDesc,
+  toIssueDisplayTitle,
+  toIssueEditionLabel,
+  type IssueEntry,
+  type ResolvedIssueItem,
+} from '../../utils/issues';
+
+type IssuePageProps = {
+  issue: IssueEntry;
+  timeline: ResolvedIssueItem[];
+};
+
+const toDifficultyLabel = (difficulty: ResolvedIssueItem['post']['difficulty']) =>
+  difficulty === 'intro'
+    ? 'Intro'
+    : difficulty === 'intermediate'
+      ? 'Intermediate'
+      : difficulty === 'advanced'
+        ? 'Advanced'
+        : null;
+
+const toStatusLabel = (status: ResolvedIssueItem['post']['status']) =>
+  status === 'reviewed'
+    ? 'Reviewed'
+    : status === 'evergreen'
+      ? 'Evergreen'
+      : status === 'archived'
+        ? 'Archived'
+        : null;
+
+export async function getStaticPaths() {
+  const [allIssues, allPosts] = await Promise.all([getCollection('issues'), getCollection('posts')]);
+  const issues = sortIssuesByPubDateDesc(filterPublishedIssues(allIssues));
+  const postContext = buildIssuePostContext(allPosts);
+
+  return issues.map((issue) => {
+    const resolvedItems = resolveIssueItems(issue, postContext);
+    const timeline = sortResolvedIssueItems(
+      resolvedItems,
+      issue.data.sortBy,
+      issue.data.sortDirection
+    );
+
+    return {
+      params: { slug: issue.slug },
+      props: {
+        issue,
+        timeline,
+      } satisfies IssuePageProps,
+    };
+  });
+}
+
+const { issue, timeline } = Astro.props as IssuePageProps;
+const { Content: IssueContent } = await issue.render();
+
+const timelineEntries = await Promise.all(
+  timeline.map(async (item) => {
+    const { Content } = await item.post.entry.render();
+    const readingTime = calculateReadingTime(item.post.entry.body);
+    const difficulty = toDifficultyLabel(item.post.difficulty);
+    const status = toStatusLabel(item.post.status);
+    const anchorId = slugToAnchorId(item.post.slug);
+
+    return {
+      ...item,
+      Content,
+      anchorId,
+      pills: [
+        { label: `${readingTime.readingTime} min read` },
+        ...(difficulty ? [{ label: difficulty }] : []),
+        ...(status ? [{ label: status }] : []),
+      ],
+    };
+  })
+);
+
+const sortDescriptor =
+  issue.data.sortBy === 'updated'
+    ? issue.data.sortDirection === 'asc'
+      ? 'updated date, oldest first'
+      : 'updated date, newest first'
+    : issue.data.sortDirection === 'asc'
+      ? 'published date, oldest first'
+      : 'published date, newest first';
+
+const issueDisplayTitle = toIssueDisplayTitle(issue.data.title);
+const issueEditionLabel = toIssueEditionLabel(issue.data.title, issue.slug);
+const issueDateLabel = issue.data.pubDate.toLocaleDateString('en-US', {
+  month: 'short',
+  day: 'numeric',
+  year: 'numeric',
+});
+const postCountLabel = `${timelineEntries.length} post${timelineEntries.length === 1 ? '' : 's'}`;
+const issueSource = issue.body || '';
+const hasEditorialNote = issueSource.trim().length > 0;
+const enableMath = hasMathContent(issueSource) || timelineEntries.some((item) => item.post.hasMath);
+const enableCitations =
+  hasCitationContent(issueSource) || timelineEntries.some((item) => item.post.hasCitations);
+---
+
+<Layout
+  title={`${SITE.name} - ${issueDisplayTitle}`}
+  description={issue.data.description}
+  enableMath={enableMath}
+  enableCitations={enableCitations}
+>
+  <header class="intro issue-hero">
+    <div class="issue-hero__kicker-row">
+      <span class="issue-hero__kicker">{issueEditionLabel}</span>
+      <span class="issue-hero__dot" aria-hidden="true">•</span>
+      <time datetime={issue.data.pubDate.toISOString()}>{issueDateLabel}</time>
+    </div>
+    <h1 class="intro-title">{issueDisplayTitle}</h1>
+    {issue.data.description && <p class="intro-lede">{issue.data.description}</p>}
+    <p class="issue-hero__stats">
+      <span>{postCountLabel}</span>
+      <span class="issue-hero__dot" aria-hidden="true">•</span>
+      <span>Ordered by {sortDescriptor}</span>
+    </p>
+  </header>
+
+  {issue.data.coverImage && (
+    <figure class="issue-cover">
+      <img src={issue.data.coverImage.src} alt={`Cover image for ${issueDisplayTitle}`} />
+    </figure>
+  )}
+
+  {hasEditorialNote && (
+    <section class="issue-editorial">
+      <div class="post-body markdown-body">
+        <IssueContent />
+      </div>
+    </section>
+  )}
+
+  {timelineEntries.length > 1 && (
+    <nav class="timeline-jump timeline-jump--issue" aria-label="Issue timeline shortcuts">
+      <span class="timeline-jump__label">On this edition</span>
+      <div class="timeline-jump__links">
+        {timelineEntries.map((item) => (
+          <a class="timeline-jump__link" href={`#${item.anchorId}`}>
+            {item.post.title}
+          </a>
+        ))}
+      </div>
+    </nav>
+  )}
+
+  <section class="issue-timeline" aria-label="Reading sequence">
+    <div class="issue-section-header">
+      <h2 class="issue-section-title">Reading Sequence</h2>
+      <p class="issue-sort-note">Ordered by {sortDescriptor}.</p>
+    </div>
+
+    {timelineEntries.length === 0 ? (
+      <p class="topic-empty">This edition does not include any published posts yet.</p>
+    ) : (
+      <div class="post-list">
+        {timelineEntries.map((item) => (
+          <PostCard
+            id={item.anchorId}
+            title={item.post.title}
+            titleTag="h3"
+            description={item.post.abstract || undefined}
+            publishedDate={item.post.publishedDate}
+            updatedDate={item.post.updatedDate}
+            pills={item.pills}
+            tagLinks={item.post.tags.map((tag) => ({
+              label: tag.label,
+              href: `/tags/#tag-${tag.slug}`,
+            }))}
+            dataTags={item.post.normalizedTags}
+            dataPost
+            reveal
+          >
+            {item.note && (
+              <p class="issue-editor-note">
+                <strong>Context:</strong> {item.note}
+              </p>
+            )}
+            <item.Content />
+
+            <Fragment slot="after">
+              <p class="issue-entry-actions">
+                <a class="issue-entry-link" href={`/posts/${item.post.slug}/`}>
+                  Open standalone post
+                </a>
+              </p>
+            </Fragment>
+          </PostCard>
+        ))}
+      </div>
+    )}
+  </section>
+
+  <TimelineScript slot="scripts" />
+</Layout>

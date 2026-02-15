@@ -38,18 +38,10 @@ export function getRelatedPosts(
     );
 
     const sharedCitations = intersectionCount(current.citationKeys, candidate.citationKeys);
-    const sameSeries =
-      Boolean(current.series?.slug) &&
-      Boolean(candidate.series?.slug) &&
-      current.series?.slug === candidate.series?.slug;
-
-    const score = sharedTags + sharedTopics * 2 + sharedCitations * 3 + (sameSeries ? 4 : 0);
+    const score = sharedTags + sharedTopics * 2 + sharedCitations * 3;
     if (score <= 0) return;
 
     const reasons: string[] = [];
-    if (sameSeries && current.series?.name) {
-      reasons.push(`Same series: ${current.series.name}`);
-    }
     if (sharedCitations > 0) {
       reasons.push(`${sharedCitations} shared citation${sharedCitations === 1 ? '' : 's'}`);
     }

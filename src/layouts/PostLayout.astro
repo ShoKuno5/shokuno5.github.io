@@ -3,21 +3,24 @@ import Layout from './Layout.astro';
 import CommentsScript from '../components/scripts/CommentsScript.astro';
 import PostCard from '../components/PostCard.astro';
 import { calculateReadingTime } from '../utils/readingTime';
+import { slugToAnchorId } from '../utils/anchors';
 import { normalizeTag } from '../utils/tags';
 import { hasCitationContent, hasMathContent } from '../utils/contentFeatures';
+import { toIssueDisplayTitle, toIssueEditionLabel } from '../utils/issues';
 
-type Series = { name: string; slug: string; order?: number };
 type RelatedPost = { slug: string; title: string; score: number; reasons: string[] };
 type CitedByPost = { slug: string; title: string; sharedKeys: string[] };
+type IssueContext = { slug: string; title: string; pubDate?: Date };
 
 export interface Props {
   title: string;
+  postSlug?: string;
   date?: Date;
   modified?: Date;
   tags?: string[];
   difficulty?: 'intro' | 'intermediate' | 'advanced' | null;
   status?: 'reviewed' | 'evergreen' | 'archived' | null;
-  series?: Series | null;
+  issues?: IssueContext[];
   relatedPosts?: RelatedPost[];
   citedByPosts?: CitedByPost[];
   description?: string;
@@ -26,12 +29,13 @@ export interface Props {
 
 const {
   title,
+  postSlug,
   date,
   modified,
   tags,
   difficulty,
   status,
-  series,
+  issues = [],
   relatedPosts = [],
   citedByPosts = [],
   description,
@@ -65,19 +69,19 @@ const lengthLabel =
 const readingTimeLabel = readingTime ? `${readingTime.readingTime} min read` : null;
 
 const abstract = description?.trim() || '';
-
-const primaryContext = series
-  ? {
-      label: `Series: ${series.name}`,
-      href: `/series/#series-${series.slug}`,
-    }
-  : null;
 const normalizedTags = tags
   ? Array.from(new Set(tags.map((tag) => tag.trim()).filter(Boolean)))
   : [];
 
+const issueContext = postSlug
+  ? issues.map((issue) => ({
+      label: `${toIssueEditionLabel(issue.title, issue.slug)}: ${toIssueDisplayTitle(issue.title)}`,
+      href: `/issues/${issue.slug}/#${slugToAnchorId(postSlug)}`,
+    }))
+  : [];
+
 const metaPills = [
-  ...(primaryContext ? [primaryContext] : []),
+  ...issueContext,
   ...(readingTimeLabel ? [{ label: readingTimeLabel }] : []),
   ...(lengthLabel ? [{ label: lengthLabel }] : []),
   ...(difficultyLabel ? [{ label: difficultyLabel }] : []),

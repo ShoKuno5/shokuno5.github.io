@@ -4,6 +4,7 @@ import Layout from '../layouts/Layout.astro';
 import PostCard from '../components/PostCard.astro';
 import TimelineScript from '../components/scripts/TimelineScript.astro';
 import { SITE } from '../config/site.js';
+import { slugToAnchorId } from '../utils/anchors';
 import { filterPublishedPosts } from '../utils/postVisibility';
 import { buildPostCatalog } from '../utils/postCatalog';
 
@@ -18,7 +19,7 @@ const catalog = buildPostCatalog(entries);
 const rendered = await Promise.all(
   catalog.map(async (post) => {
     const { Content } = await post.entry.render();
-    const anchorId = `post-${post.slug.replace(/[^a-zA-Z0-9_-]+/g, '-')}`;
+    const anchorId = slugToAnchorId(post.slug);
     return { ...post, Content, anchorId };
   })
 );

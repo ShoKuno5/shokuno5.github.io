@@ -9,12 +9,6 @@ export type PostLabel = {
   slug: string;
 };
 
-export type PostSeries = {
-  name: string;
-  slug: string;
-  order?: number;
-};
-
 export type PostCatalogItem = {
   entry: CollectionEntry<'posts'>;
   slug: string;
@@ -31,7 +25,6 @@ export type PostCatalogItem = {
   hasCitations: boolean;
   citationKeys: string[];
   difficulty: 'intro' | 'intermediate' | 'advanced' | null;
-  series: PostSeries | null;
   status: 'reviewed' | 'evergreen' | 'archived' | null;
 };
 
@@ -54,28 +47,6 @@ const normalizeLabels = (values: string[] = []): PostLabel[] => {
   }
 
   return labels;
-};
-
-const resolveSeries = (
-  seriesValue: CollectionEntry<'posts'>['data']['series']
-): PostSeries | null => {
-  if (!seriesValue) return null;
-
-  if (typeof seriesValue === 'string') {
-    const slug = normalizeTag(seriesValue);
-    if (!slug) return null;
-    return { name: seriesValue, slug };
-  }
-
-  const name = seriesValue.name;
-  const slug = normalizeTag(name);
-  if (!slug) return null;
-
-  return {
-    name,
-    slug,
-    order: seriesValue.order,
-  };
 };
 
 export function buildPostCatalog(entries: CollectionEntry<'posts'>[]): PostCatalogItem[] {
@@ -102,7 +73,6 @@ export function buildPostCatalog(entries: CollectionEntry<'posts'>[]): PostCatal
       hasCitations: hasCitationContent(entry.body),
       citationKeys: extractCitationKeys(entry.body),
       difficulty: entry.data.difficulty ?? null,
-      series: resolveSeries(entry.data.series),
       status: entry.data.status ?? null,
     };
   });

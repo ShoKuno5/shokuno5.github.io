@@ -20,7 +20,7 @@ export const SITE = {
 export const NAV_LINKS = [
   { label: 'Home', href: '/' },
   { label: 'Research', href: '/research/' },
-  { label: 'Series', href: '/series/' },
+  { label: 'Editions', href: '/issues/' },
   { label: 'Tags', href: '/tags/' },
 ];
 

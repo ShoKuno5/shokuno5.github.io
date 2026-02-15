@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
 import PostCard from '../components/PostCard.astro';
+import TimelineScript from '../components/scripts/TimelineScript.astro';
 import { SITE } from '../config/site.js';
 import {
   filterPublishedIssues,
@@ -13,16 +14,19 @@ import {
 const issues = sortIssuesByPubDateDesc(filterPublishedIssues(await getCollection('issues')));
 ---
 
-<Layout title={`${SITE.name} - Editions`} description="Series has been replaced by Editions.">
+<Layout
+  title={`${SITE.name} - Editions`}
+  description="Editorial editions that curate related posts into a guided sequence."
+>
   <header class="intro">
     <h1 class="intro-title">Editions</h1>
-    <p class="intro-lede">
-      Series has been replaced by Editions. Browse current releases at <a href="/issues/">/issues/</a>.
-    </p>
+    <p class="intro-lede">Curated sequences of posts with editorial context and reading order.</p>
   </header>
 
-  {issues.length > 0 && (
-    <section class="post-list" aria-label="Published editions">
+  {issues.length === 0 ? (
+    <p class="topic-empty">No editions published yet. Check back soon for the first release.</p>
+  ) : (
+    <section class="post-list" aria-label="Editions">
       {issues.map((issue) => (
         <PostCard
           title={toIssueDisplayTitle(issue.data.title)}
@@ -38,8 +42,11 @@ const issues = sortIssuesByPubDateDesc(filterPublishedIssues(await getCollection
             },
           ]}
           dataPost
+          reveal
         />
       ))}
     </section>
   )}
+
+  <TimelineScript slot="scripts" />
 </Layout>

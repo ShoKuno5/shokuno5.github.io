@@ -1,10 +1,5 @@
 import { z, defineCollection } from 'astro:content';
 
-const postSeriesSchema = z.object({
-  name: z.string(),
-  order: z.number().int().optional(),
-});
-
 const posts = defineCollection({
   type: 'content',
   schema: ({ image }) =>
@@ -19,13 +14,34 @@ const posts = defineCollection({
       summary: z.string().optional(),
       pinned: z.boolean().optional(),
       difficulty: z.enum(['intro', 'intermediate', 'advanced']).optional(),
-      series: z.union([z.string(), postSeriesSchema]).optional(),
       status: z.enum(['reviewed', 'evergreen', 'archived']).optional(),
       heroImage: image().optional(),
       type: z.string().optional(),
     }),
 });
 
+const issues = defineCollection({
+  type: 'content',
+  schema: ({ image }) =>
+    z.object({
+      title: z.string(),
+      description: z.string().optional(),
+      pubDate: z.coerce.date(),
+      draft: z.boolean().default(false),
+      coverImage: image().optional(),
+      sortBy: z.enum(['published', 'updated']).default('published'),
+      sortDirection: z.enum(['asc', 'desc']).default('asc'),
+      items: z.array(
+        z.object({
+          slug: z.string(),
+          note: z.string().optional(),
+          featured: z.boolean().optional(),
+        })
+      ),
+    }),
+});
+
 export const collections = {
   posts,
+  issues,
 };

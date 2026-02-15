@@ -1,25 +1,37 @@
 ---
 import { getCollection } from 'astro:content';
 import PostLayout from '../../layouts/PostLayout.astro';
-import { filterPublishedPosts } from '../../utils/postVisibility';
-import { buildPostCatalog } from '../../utils/postCatalog';
 import { buildCitationIndex, getCitedByPosts } from '../../utils/citationGraph';
 import { getRelatedPosts } from '../../utils/relatedPosts';
 import { getPostDates } from '../../utils/postDates';
+import {
+  buildIssuePostContext,
+  buildIssueReverseIndex,
+  filterPublishedIssues,
+  resolveIssueItems,
+} from '../../utils/issues';
 
 type PostPageProps = {
   post: Awaited<ReturnType<typeof getCollection<'posts'>>>[number];
   difficulty: 'intro' | 'intermediate' | 'advanced' | null;
   status: 'reviewed' | 'evergreen' | 'archived' | null;
-  series: { name: string; slug: string; order?: number } | null;
+  issues: { slug: string; title: string; pubDate: Date }[];
   relatedPosts: { slug: string; title: string; score: number; reasons: string[] }[];
   citedByPosts: { slug: string; title: string; sharedKeys: string[] }[];
 };
 
 export async function getStaticPaths() {
-  const entries = filterPublishedPosts(await getCollection('posts'));
-  const catalog = buildPostCatalog(entries);
+  const [allPosts, allIssues] = await Promise.all([getCollection('posts'), getCollection('issues')]);
+  const postContext = buildIssuePostContext(allPosts);
+  const catalog = postContext.catalog;
   const citationIndex = buildCitationIndex(catalog);
+  const publishedIssues = filterPublishedIssues(allIssues);
+
+  for (const issue of publishedIssues) {
+    resolveIssueItems(issue, postContext);
+  }
+
+  const issueReverseIndex = buildIssueReverseIndex(publishedIssues);
 
   return catalog.map((node) => ({
     params: { slug: node.slug },
@@ -27,7 +39,7 @@ export async function getStaticPaths() {
       post: node.entry,
       difficulty: node.difficulty,
       status: node.status,
-      series: node.series,
+      issues: issueReverseIndex.get(node.slug) ?? [],
       relatedPosts: getRelatedPosts(node, catalog),
       citedByPosts: getCitedByPosts(node.slug, catalog, citationIndex).map((item) => ({
         slug: item.slug,
@@ -42,7 +54,7 @@ const {
   post,
   difficulty,
   status,
-  series,
+  issues,
   relatedPosts,
   citedByPosts,
 } = Astro.props as PostPageProps;
@@ -58,7 +70,8 @@ const { published, updated } = getPostDates(post);
   tags={post.data.tags}
   difficulty={difficulty}
   status={status}
-  series={series}
+  postSlug={post.slug}
+  issues={issues}
   relatedPosts={relatedPosts}
   citedByPosts={citedByPosts}
   description={post.data.description || post.data.summary}
