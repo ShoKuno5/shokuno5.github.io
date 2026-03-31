@@ -1,9 +1,7 @@
 ---
 import '../styles/global.css';
-import ContactLinks from '../components/ContactLinks.astro';
-import NavScript from '../components/scripts/NavScript.astro';
 import CitationScript from '../components/scripts/CitationScript.astro';
-import AnalyticsScript from '../components/scripts/AnalyticsScript.astro';
+import ContactLink from '../components/ContactLink.astro';
 import { SITE, NAV_LINKS, CONTACT_LINKS } from '../config/site.js';
 
 export interface Props {
@@ -17,21 +15,15 @@ const { title, description = '', enableMath = false, enableCitations = false } =
 const siteName = SITE.name;
 const year = new Date().getFullYear();
 
-const hasNavContacts = CONTACT_LINKS.some((link) =>
-  Array.isArray(link.locations) ? link.locations.includes('nav') : true
-);
-
 const pathname = Astro.url.pathname;
 const isActive = (href: string) => {
-  const [path] = href.split('#');
-  if (href.startsWith('/#') && pathname.startsWith('/posts/')) return true;
-  if (!path || path === '/') return pathname === '/';
-  return pathname.startsWith(path);
+  if (href === '/') return pathname === '/';
+  return pathname.startsWith(href);
 };
 ---
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -58,7 +50,7 @@ const isActive = (href: string) => {
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap"
     />
 
     {enableMath && (
@@ -82,50 +74,76 @@ const isActive = (href: string) => {
       </>
     )}
 
-    <slot name="head" />
+    <script is:inline>
+      (function() {
+        var stored = localStorage.getItem('theme');
+        var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        var theme = stored || (prefersDark ? 'dark' : 'light');
+        document.documentElement.dataset.theme = theme;
+      })();
+    </script>
 
+    <slot name="head" />
     <title>{title}</title>
   </head>
   <body>
     <a class="skip-link" href="#content">Skip to content</a>
-    <div class="site-shell">
-      <button class="nav-toggle" type="button" aria-controls="site-nav" aria-expanded="false">
-        Menu
-      </button>
-      <div class="nav-backdrop" data-nav-close></div>
-      <aside class="nav-rail" id="site-nav">
 
-        <nav class="nav-links" aria-label="Primary">
+    <header class="site-header">
+      <nav class="site-nav" aria-label="Primary">
+        <a class="site-nav__home" href="/">~/</a>
+        <div class="site-nav__links">
           {NAV_LINKS.map((link) => (
             <a
-              class={`nav-link${isActive(link.href) ? ' is-active' : ''}`}
               href={link.href}
-              data-nav-link
+              aria-current={isActive(link.href) ? 'page' : undefined}
             >
               {link.label}
             </a>
           ))}
-        </nav>
+          <button
+            class="theme-toggle"
+            type="button"
+            aria-label="Toggle theme"
+            id="theme-toggle"
+          >
+          </button>
+        </div>
+      </nav>
+    </header>
 
-        {hasNavContacts && (
-          <div class="nav-contact">
-            <span class="nav-kicker">Contact</span>
-            <ContactLinks location="nav" variant="inline" className="nav-contact__links" />
-          </div>
-        )}
-      </aside>
+    <main id="content" class="site-main">
+      <slot />
+    </main>
 
-      <main id="content" class="site-main">
-        <slot />
-        <footer class="site-footer">
-          <span>(c) {siteName} {year}</span>
-          <span><a href="/privacy/">Privacy</a> | All rights reserved.</span>
-        </footer>
-      </main>
-    </div>
-    <NavScript />
+    <footer class="site-footer">
+      <span>&copy; {year} {siteName}</span>
+      <div class="site-footer__links">
+        {CONTACT_LINKS.filter(c => c.key !== 'cv').map((contact) => (
+          <ContactLink contact={contact} className="icon-link icon-link--sm" />
+        ))}
+      </div>
+    </footer>
+
     {enableCitations && <CitationScript />}
-    {SITE.analytics?.endpoint && <AnalyticsScript endpoint={SITE.analytics.endpoint} />}
+
+    <script is:inline>
+      (function() {
+        var btn = document.getElementById('theme-toggle');
+        function update(theme) {
+          document.documentElement.dataset.theme = theme;
+          localStorage.setItem('theme', theme);
+          btn.textContent = theme === 'dark' ? '\u2609' : '\u263E';
+        }
+        var current = document.documentElement.dataset.theme || 'light';
+        btn.textContent = current === 'dark' ? '\u2609' : '\u263E';
+        btn.addEventListener('click', function() {
+          var next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+          update(next);
+        });
+      })();
+    </script>
+
     <slot name="scripts" />
   </body>
 </html>

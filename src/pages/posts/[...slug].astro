@@ -1,81 +1,13 @@
 ---
 import { getCollection } from 'astro:content';
-import PostLayout from '../../layouts/PostLayout.astro';
-import { buildCitationIndex, getCitedByPosts } from '../../utils/citationGraph';
-import { getRelatedPosts } from '../../utils/relatedPosts';
-import { getPostDates } from '../../utils/postDates';
-import {
-  buildIssuePostContext,
-  buildIssueReverseIndex,
-  filterPublishedIssues,
-  resolveIssueItems,
-} from '../../utils/issues';
-
-type PostPageProps = {
-  post: Awaited<ReturnType<typeof getCollection<'posts'>>>[number];
-  difficulty: 'intro' | 'intermediate' | 'advanced' | null;
-  status: 'reviewed' | 'evergreen' | 'archived' | null;
-  issues: { slug: string; title: string; pubDate: Date }[];
-  relatedPosts: { slug: string; title: string; score: number; reasons: string[] }[];
-  citedByPosts: { slug: string; title: string; sharedKeys: string[] }[];
-};
 
 export async function getStaticPaths() {
-  const [allPosts, allIssues] = await Promise.all([getCollection('posts'), getCollection('issues')]);
-  const postContext = buildIssuePostContext(allPosts);
-  const catalog = postContext.catalog;
-  const citationIndex = buildCitationIndex(catalog);
-  const publishedIssues = filterPublishedIssues(allIssues);
-
-  for (const issue of publishedIssues) {
-    resolveIssueItems(issue, postContext);
-  }
-
-  const issueReverseIndex = buildIssueReverseIndex(publishedIssues);
-
-  return catalog.map((node) => ({
-    params: { slug: node.slug },
-    props: {
-      post: node.entry,
-      difficulty: node.difficulty,
-      status: node.status,
-      issues: issueReverseIndex.get(node.slug) ?? [],
-      relatedPosts: getRelatedPosts(node, catalog),
-      citedByPosts: getCitedByPosts(node.slug, catalog, citationIndex).map((item) => ({
-        slug: item.slug,
-        title: item.title,
-        sharedKeys: item.sharedKeys,
-      })),
-    } as PostPageProps,
+  const writing = await getCollection('writing');
+  return writing.map((entry) => ({
+    params: { slug: entry.slug },
+    props: { slug: entry.slug },
   }));
 }
 
-const {
-  post,
-  difficulty,
-  status,
-  issues,
-  relatedPosts,
-  citedByPosts,
-} = Astro.props as PostPageProps;
-
-const { Content } = await post.render();
-const { published, updated } = getPostDates(post);
+return Astro.redirect(`/writing/${Astro.props.slug}/`, 301);
 ---
-
-<PostLayout
-  title={post.data.title}
-  date={published}
-  modified={updated}
-  tags={post.data.tags}
-  difficulty={difficulty}
-  status={status}
-  postSlug={post.slug}
-  issues={issues}
-  relatedPosts={relatedPosts}
-  citedByPosts={citedByPosts}
-  description={post.data.description || post.data.summary}
-  content={post.body}
->
-  <Content />
-</PostLayout>

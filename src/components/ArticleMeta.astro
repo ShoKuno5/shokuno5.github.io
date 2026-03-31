@@ -1,0 +1,33 @@
+---
+import MaturityBadge from './MaturityBadge.astro';
+
+export interface Props {
+  date?: Date | null;
+  modified?: Date | null;
+  maturity?: 'seedling' | 'budding' | 'evergreen';
+  readingTime?: string;
+  tags?: { label: string; slug: string }[];
+}
+
+const { date, modified, maturity, readingTime, tags = [] } = Astro.props;
+
+const fmt = (d: Date) =>
+  d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+---
+
+<div class="writing-post__meta">
+  {date && <time datetime={date.toISOString()}>{fmt(date)}</time>}
+  {modified && modified.getTime() !== date?.getTime() && (
+    <span>(updated {fmt(modified)})</span>
+  )}
+  {maturity && <MaturityBadge maturity={maturity} />}
+  {readingTime && <span>{readingTime}</span>}
+</div>
+
+{tags.length > 0 && (
+  <div class="writing-post__tags">
+    {tags.map((tag) => (
+      <span class="tag-pill">{tag.label}</span>
+    ))}
+  </div>
+)}

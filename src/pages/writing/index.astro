@@ -1,0 +1,35 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import MaturityBadge from '../../components/MaturityBadge.astro';
+import { filterPublishedPosts } from '../../utils/postVisibility';
+import { buildPostCatalog } from '../../utils/postCatalog';
+
+const entries = filterPublishedPosts(await getCollection('writing'));
+const catalog = buildPostCatalog(entries);
+
+const fmt = (d: Date) =>
+  d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+---
+
+<Layout title="Writing - Sho Kuno" description="Essays on machine learning, mathematics, and visual thinking.">
+  <header class="page-header">
+    <h1>Writing</h1>
+  </header>
+
+  {catalog.length === 0 ? (
+    <p class="visual-placeholder">No posts yet.</p>
+  ) : (
+    catalog.map((post) => (
+      <div class="article-card">
+        <a class="article-card__link" href={`/writing/${post.slug}/`}>
+          <span class="article-card__title">{post.title}</span>
+          <span class="article-card__meta">
+            <MaturityBadge maturity={post.maturity} />
+            <time datetime={post.publishedDate.toISOString()}>{fmt(post.publishedDate)}</time>
+          </span>
+        </a>
+      </div>
+    ))
+  )}
+</Layout>

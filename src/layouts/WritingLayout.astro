@@ -1,0 +1,113 @@
+---
+import Layout from './Layout.astro';
+import ArticleMeta from '../components/ArticleMeta.astro';
+import CommentsScript from '../components/scripts/CommentsScript.astro';
+import { calculateReadingTime } from '../utils/readingTime';
+import { hasCitationContent, hasMathContent } from '../utils/contentFeatures';
+import type { PostLabel } from '../utils/postCatalog';
+
+export interface RelatedPost {
+  slug: string;
+  title: string;
+  score: number;
+  reasons: string[];
+}
+
+export interface CitedByPost {
+  slug: string;
+  title: string;
+  sharedKeys: string[];
+}
+
+export interface Props {
+  title: string;
+  date?: Date;
+  modified?: Date;
+  tags?: PostLabel[];
+  maturity?: 'seedling' | 'budding' | 'evergreen';
+  relatedPosts?: RelatedPost[];
+  citedByPosts?: CitedByPost[];
+  description?: string;
+  content?: string;
+}
+
+const {
+  title,
+  date,
+  modified,
+  tags = [],
+  maturity = 'seedling',
+  relatedPosts = [],
+  citedByPosts = [],
+  description = '',
+  content = '',
+} = Astro.props;
+
+const enableMath = hasMathContent(content);
+const enableCitations = hasCitationContent(content);
+const { readingTimeText } = calculateReadingTime(content);
+---
+
+<Layout
+  title={`${title} - Sho Kuno`}
+  description={description}
+  enableMath={enableMath}
+  enableCitations={enableCitations}
+>
+  <article class="writing-post">
+    <header class="writing-post__header">
+      <h1>{title}</h1>
+      <ArticleMeta
+        date={date}
+        modified={modified}
+        maturity={maturity}
+        readingTime={readingTimeText}
+        tags={tags}
+      />
+      {description && <p class="writing-post__abstract">{description}</p>}
+    </header>
+
+    <div class={`prose ${enableCitations ? 'citations-enabled' : ''}`}>
+      <slot />
+    </div>
+
+    {(relatedPosts.length > 0 || citedByPosts.length > 0) && (
+      <div class="post-discovery">
+        {citedByPosts.length > 0 && (
+          <section>
+            <h2>Cited by</h2>
+            <ul>
+              {citedByPosts.map((post) => (
+                <li>
+                  <a href={`/writing/${post.slug}/`}>{post.title}</a>
+                  <span class="tag-pill">{post.sharedKeys.length} shared</span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+        {relatedPosts.length > 0 && (
+          <section>
+            <h2>Related</h2>
+            <ul>
+              {relatedPosts.map((post) => (
+                <li>
+                  <a href={`/writing/${post.slug}/`}>{post.title}</a>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+      </div>
+    )}
+
+    <div class="comments-section">
+      <button class="comments-toggle" id="load-comments">
+        Load comments
+      </button>
+      <div id="comments-container"></div>
+    </div>
+  </article>
+
+  <CommentsScript slot="scripts" />
+</Layout>

@@ -1,0 +1,39 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { SITE } from '../../config/site.js';
+---
+
+<Layout title="About - Sho Kuno" description="About Sho Kuno — ML researcher, photographer, writer.">
+  <article class="prose">
+    <h1>About</h1>
+
+    <p>
+      I am a PhD student at the University of Tokyo, researching 3D object generation
+      within a world models team. My work sits at the intersection of geometric deep learning
+      and generative AI.
+    </p>
+
+    <p>
+      I am looking for industry research opportunities in video and 3D generative AI.
+    </p>
+
+    <h2>Elsewhere</h2>
+
+    <p>
+      Outside of research, I photograph with a Lumix camera, experiment with Blender,
+      and write essays on technical and philosophical topics. I am interested in the works
+      of Camus, Oe Kenzaburo, Heidegger, and Abe Kobo.
+    </p>
+
+    <h2>Contact</h2>
+
+    <ul>
+      <li><a href={`mailto:${SITE.contact.email}`}>Email</a></li>
+      <li><a href={SITE.contact.github} target="_blank" rel="noopener">GitHub</a></li>
+      <li><a href={SITE.contact.linkedin} target="_blank" rel="noopener">LinkedIn</a></li>
+      <li><a href={SITE.contact.scholar} target="_blank" rel="noopener">Google Scholar</a></li>
+      <li><a href={SITE.contact.x} target="_blank" rel="noopener">X (Twitter)</a></li>
+      <li><a href={SITE.contact.cv}>CV (PDF)</a></li>
+    </ul>
+  </article>
+</Layout>

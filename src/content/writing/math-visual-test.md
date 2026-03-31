@@ -9,16 +9,8 @@ tags:
   - test
   - katex
   - images
-topics:
-  - mathematics
-  - visual reasoning
 summary: 'A stress-test article for math rendering, figures, and citation behavior across the site.'
-difficulty: intro
-status: reviewed
-series:
-  name: Mathematical Notes
-  order: 1
-type: academic
+maturity: budding
 ---
 
 This post demonstrates the rendering capabilities for various mathematical expressions, images, and visual content on the blog.

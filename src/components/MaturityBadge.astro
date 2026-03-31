@@ -1,0 +1,9 @@
+---
+export interface Props {
+  maturity: 'seedling' | 'budding' | 'evergreen';
+}
+
+const { maturity } = Astro.props;
+---
+
+<span class={`maturity-badge maturity-badge--${maturity}`}>{maturity}</span>

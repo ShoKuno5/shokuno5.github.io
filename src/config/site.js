@@ -1,11 +1,8 @@
 export const SITE = {
   name: 'Sho Kuno',
-  tagline: 'Building up: research, projects, fragments, notes.',
-  posts: {
+  tagline: 'ML researcher. 3D generation, world models, visual thinking.',
+  writing: {
     excludeTags: ['draft', 'private'],
-  },
-  analytics: {
-    endpoint: '',
   },
   contact: {
     email: 'kunosho1225@g.ecc.u-tokyo.ac.jp',
@@ -18,10 +15,10 @@ export const SITE = {
 };
 
 export const NAV_LINKS = [
-  { label: 'Home', href: '/' },
+  { label: 'Writing', href: '/writing/' },
   { label: 'Research', href: '/research/' },
-  { label: 'Editions', href: '/issues/' },
-  { label: 'Tags', href: '/tags/' },
+  { label: 'Visual', href: '/visual/' },
+  { label: 'About', href: '/about/' },
 ];
 
 /** @type {{ key: string; label: string; href: string; locations?: string[] }[]} */

@@ -4,7 +4,7 @@ import { normalizeTag } from './tags';
 
 const defaultExcludeTags = ['draft', 'private'];
 
-const configuredTags = SITE.posts?.excludeTags ?? defaultExcludeTags;
+const configuredTags = SITE.writing?.excludeTags ?? defaultExcludeTags;
 const excludedTags = configuredTags
   .map((tag) => normalizeTag(tag))
   .filter(Boolean);
@@ -14,8 +14,8 @@ const hasExcludedTag = (tags: string[] = []) => {
   return tags.map((tag) => normalizeTag(tag)).some((tag) => excludedTags.includes(tag));
 };
 
-export const shouldPublishPost = (entry: CollectionEntry<'posts'>) =>
+export const shouldPublishPost = (entry: CollectionEntry<'writing'>) =>
   !hasExcludedTag(entry.data.tags ?? []);
 
-export const filterPublishedPosts = (entries: CollectionEntry<'posts'>[]) =>
+export const filterPublishedPosts = (entries: CollectionEntry<'writing'>[]) =>
   entries.filter(shouldPublishPost);

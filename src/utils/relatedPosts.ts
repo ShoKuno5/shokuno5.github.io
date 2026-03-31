@@ -32,21 +32,13 @@ export function getRelatedPosts(
       candidate.tags.map((tag) => tag.slug)
     );
 
-    const sharedTopics = intersectionCount(
-      current.topics.map((topic) => topic.slug),
-      candidate.topics.map((topic) => topic.slug)
-    );
-
     const sharedCitations = intersectionCount(current.citationKeys, candidate.citationKeys);
-    const score = sharedTags + sharedTopics * 2 + sharedCitations * 3;
+    const score = sharedTags + sharedCitations * 3;
     if (score <= 0) return;
 
     const reasons: string[] = [];
     if (sharedCitations > 0) {
       reasons.push(`${sharedCitations} shared citation${sharedCitations === 1 ? '' : 's'}`);
-    }
-    if (sharedTopics > 0) {
-      reasons.push(`${sharedTopics} shared topic${sharedTopics === 1 ? '' : 's'}`);
     }
     if (sharedTags > 0) {
       reasons.push(`${sharedTags} shared tag${sharedTags === 1 ? '' : 's'}`);

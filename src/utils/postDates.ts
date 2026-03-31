@@ -10,7 +10,7 @@ type GitDates = {
 
 const gitDateCache = new Map<string, GitDates>();
 const repoRoot = process.cwd();
-const postsDir = path.join(repoRoot, 'src', 'content', 'posts');
+const postsDir = path.join(repoRoot, 'src', 'content', 'writing');
 
 const parseGitDate = (value: string): Date | null => {
   if (!value) return null;
@@ -63,7 +63,7 @@ const getGitDates = (filePath: string): GitDates => {
 };
 
 export const getPostDates = (
-  entry: CollectionEntry<'posts'>
+  entry: CollectionEntry<'writing'>
 ): { published: Date; updated: Date } => {
   const filePath = path.join(postsDir, entry.id);
   const { published: gitPublished, updated: gitUpdated } = getGitDates(filePath);

@@ -1,0 +1,44 @@
+---
+import { getCollection } from 'astro:content';
+import WritingLayout from '../../layouts/WritingLayout.astro';
+import { filterPublishedPosts } from '../../utils/postVisibility';
+import { buildPostCatalog } from '../../utils/postCatalog';
+import { buildCitationIndex, getCitedByPosts } from '../../utils/citationGraph';
+import { getRelatedPosts } from '../../utils/relatedPosts';
+
+export async function getStaticPaths() {
+  const allWriting = filterPublishedPosts(await getCollection('writing'));
+  const catalog = buildPostCatalog(allWriting);
+  const citationIndex = buildCitationIndex(catalog);
+
+  return catalog.map((node) => ({
+    params: { slug: node.slug },
+    props: {
+      entry: node.entry,
+      maturity: node.maturity,
+      tags: node.tags,
+      publishedDate: node.publishedDate,
+      updatedDate: node.updatedDate,
+      relatedPosts: getRelatedPosts(node, catalog),
+      citedByPosts: getCitedByPosts(node.slug, catalog, citationIndex),
+    },
+  }));
+}
+
+const { entry, maturity, tags, publishedDate, updatedDate, relatedPosts, citedByPosts } = Astro.props;
+const { Content } = await entry.render();
+---
+
+<WritingLayout
+  title={entry.data.title}
+  date={publishedDate}
+  modified={updatedDate}
+  tags={tags}
+  maturity={maturity}
+  relatedPosts={relatedPosts}
+  citedByPosts={citedByPosts}
+  description={entry.data.description || entry.data.summary || ''}
+  content={entry.body}
+>
+  <Content />
+</WritingLayout>
