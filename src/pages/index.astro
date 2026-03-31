@@ -18,10 +18,8 @@ const fmt = (d: Date) =>
 <Layout title={`${SITE.name}`} description={SITE.tagline}>
   <section class="landing-hero">
     <h1 class="landing-hero__name">{SITE.name}</h1>
-    <p class="landing-hero__subtitle">{SITE.tagline}</p>
-    <p class="landing-hero__subtitle">
-      PhD student at the University of Tokyo. Researching 3D object generation and world models.
-    </p>
+    <p class="landing-hero__subtitle">Building machines that see and generate in 3D.</p>
+    <p class="landing-hero__subtitle">PhD student at the University of Tokyo.</p>
     <nav class="landing-hero__links">
       {CONTACT_LINKS.map((contact) => (
         <ContactLink contact={contact} className="icon-link" />
