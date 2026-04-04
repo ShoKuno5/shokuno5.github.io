@@ -1,21 +1,10 @@
 ---
-import { getCollection } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
-import MaturityBadge from '../components/MaturityBadge.astro';
 import { SITE, CONTACT_LINKS } from '../config/site.js';
 import ContactLink from '../components/ContactLink.astro';
-import { filterPublishedPosts } from '../utils/postVisibility';
-import { buildPostCatalog } from '../utils/postCatalog';
-
-const entries = filterPublishedPosts(await getCollection('writing'));
-const catalog = buildPostCatalog(entries);
-const recentWriting = catalog.slice(0, 5);
-
-const fmt = (d: Date) =>
-  d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
 ---
 
-<Layout title={`${SITE.name}`} description={SITE.tagline}>
+<Layout title={`${SITE.name}`} description={SITE.tagline} hideFooter>
   <section class="landing-hero">
     <h1 class="landing-hero__name">{SITE.name}</h1>
     <p class="landing-hero__subtitle">Building machines that see and generate in 3D.</p>
@@ -33,22 +22,4 @@ const fmt = (d: Date) =>
       3D object generation, world models.
     </p>
   </section>
-
-  {recentWriting.length > 0 && (
-    <section class="landing-section">
-      <h2>Recent Writing</h2>
-      {recentWriting.map((post) => (
-        <div class="article-card">
-          <a class="article-card__link" href={`/writing/${post.slug}/`}>
-            <span class="article-card__title">{post.title}</span>
-            <span class="article-card__meta">
-              <MaturityBadge maturity={post.maturity} />
-              <time datetime={post.publishedDate.toISOString()}>{fmt(post.publishedDate)}</time>
-            </span>
-          </a>
-        </div>
-      ))}
-      <a class="landing-section__more" href="/writing/">All writing &rarr;</a>
-    </section>
-  )}
 </Layout>

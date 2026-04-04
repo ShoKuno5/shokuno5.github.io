@@ -4,6 +4,7 @@ description: 'A comprehensive test post showcasing various mathematical expressi
 pubDate: 2025-07-03T15:25:00.000Z
 author: Sho Kuno
 tags:
+  - draft
   - mathematics
   - visualization
   - test

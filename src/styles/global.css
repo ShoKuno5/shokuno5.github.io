@@ -4,9 +4,16 @@
   /* Typography */
   --font-mono: 'IBM Plex Mono', 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
 
+  /* Type scale */
+  --text-xs: 0.75rem;     /* 12px — badges, timestamps, meta */
+  --text-sm: 0.8125rem;   /* 13px — nav, footer, secondary UI */
+  --text-base: 0.875rem;  /* 14px — body, prose, cards */
+  --text-lg: 1.125rem;    /* 18px — h3 */
+  --text-xl: 1.375rem;    /* 22px — h2 */
+  --text-2xl: 1.75rem;    /* 28px — h1, page titles */
+
   /* Layout */
-  --measure-prose: 65ch;
-  --measure-wide: 900px;
+  --content-width: 640px;
   --nav-height: 3.5rem;
   --radius-sm: 4px;
   --radius-md: 8px;
@@ -81,7 +88,7 @@ select {
 
 body {
   font-family: var(--font-mono);
-  font-size: 0.9rem;
+  font-size: var(--text-base);
   line-height: 1.7;
   color: var(--fg);
   background: var(--bg);
@@ -90,15 +97,16 @@ body {
 }
 
 h1, h2, h3, h4, h5, h6 {
-  line-height: 1.3;
-  font-weight: 600;
+  line-height: 1.25;
+  font-weight: 500;
   color: var(--fg);
+  letter-spacing: -0.02em;
 }
 
-h1 { font-size: clamp(1.6rem, 3.2vw, 2.2rem); }
-h2 { font-size: clamp(1.2rem, 2.2vw, 1.5rem); }
-h3 { font-size: 1.1rem; }
-h4 { font-size: 0.95rem; }
+h1 { font-size: var(--text-2xl); }
+h2 { font-size: var(--text-xl); }
+h3 { font-size: var(--text-lg); }
+h4 { font-size: var(--text-base); }
 
 a {
   color: var(--accent);
@@ -131,7 +139,7 @@ a:focus-visible {
 }
 
 .site-nav {
-  max-width: var(--measure-wide);
+  max-width: var(--content-width);
   margin: 0 auto;
   display: flex;
   align-items: center;
@@ -142,7 +150,7 @@ a:focus-visible {
 
 .site-nav__home {
   font-weight: 600;
-  font-size: 0.95rem;
+  font-size: var(--text-base);
   color: var(--fg);
   text-decoration: none;
   white-space: nowrap;
@@ -159,7 +167,7 @@ a:focus-visible {
 }
 
 .site-nav__links a {
-  font-size: 0.78rem;
+  font-size: var(--text-sm);
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--fg-muted);
@@ -180,7 +188,7 @@ a:focus-visible {
   border: 1px solid var(--border);
   border-radius: 999px;
   padding: 0.3rem 0.5rem;
-  font-size: 0.8rem;
+  font-size: var(--text-sm);
   color: var(--fg-muted);
   cursor: pointer;
   transition: color 0.15s, border-color 0.15s;
@@ -193,21 +201,21 @@ a:focus-visible {
 }
 
 .site-main {
-  max-width: var(--measure-wide);
+  max-width: var(--content-width);
   margin: 0 auto;
   padding: 2.5rem 1.5rem 4rem;
   min-height: calc(100vh - var(--nav-height) - 4rem);
 }
 
 .site-footer {
-  max-width: var(--measure-wide);
+  max-width: var(--content-width);
   margin: 0 auto;
   padding: 1.5rem 1.5rem 2rem;
   border-top: 1px solid var(--border);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 0.72rem;
+  font-size: var(--text-xs);
   color: var(--fg-faint);
 }
 
@@ -251,7 +259,7 @@ a:focus-visible {
 }
 
 .article-card__title {
-  font-size: 0.88rem;
+  font-size: var(--text-base);
   font-weight: 500;
   transition: color 0.15s;
 }
@@ -261,7 +269,7 @@ a:focus-visible {
   align-items: center;
   gap: 0.6rem;
   flex-shrink: 0;
-  font-size: 0.72rem;
+  font-size: var(--text-xs);
   color: var(--fg-faint);
 }
 
@@ -269,7 +277,7 @@ a:focus-visible {
 
 .maturity-badge {
   display: inline-block;
-  font-size: 0.62rem;
+  font-size: var(--text-xs);
   letter-spacing: 0.06em;
   text-transform: uppercase;
   padding: 0.1rem 0.4rem;
@@ -290,7 +298,7 @@ a:focus-visible {
 
 .tag-pill {
   display: inline-block;
-  font-size: 0.62rem;
+  font-size: var(--text-xs);
   letter-spacing: 0.04em;
   color: var(--fg-faint);
   text-decoration: none;
@@ -329,7 +337,7 @@ a:focus-visible {
 }
 
 .icon-link .icon-text {
-  font-size: 0.7rem;
+  font-size: var(--text-xs);
   font-weight: 600;
   letter-spacing: 0.04em;
 }
@@ -345,7 +353,7 @@ a:focus-visible {
 }
 
 .icon-link--sm .icon-text {
-  font-size: 0.58rem;
+  font-size: var(--text-xs);
 }
 
 /* -- Page Header -- */
@@ -355,14 +363,15 @@ a:focus-visible {
 }
 
 .page-header h1 {
-  font-size: clamp(1.6rem, 3.2vw, 2.2rem);
-  font-weight: 600;
+  font-size: var(--text-2xl);
+  font-weight: 500;
+  letter-spacing: -0.03em;
 }
 
 .page-header p {
   margin-top: 0.5rem;
   color: var(--fg-muted);
-  font-size: 0.85rem;
+  font-size: var(--text-base);
 }
 
 /* -- Landing Page -- */
@@ -372,13 +381,14 @@ a:focus-visible {
 }
 
 .landing-hero__name {
-  font-size: clamp(2rem, 4vw, 2.8rem);
-  font-weight: 600;
+  font-size: var(--text-2xl);
+  font-weight: 500;
+  letter-spacing: -0.03em;
   margin-bottom: 0.75rem;
 }
 
 .landing-hero__subtitle {
-  font-size: 0.85rem;
+  font-size: var(--text-base);
   color: var(--fg-muted);
   max-width: 50ch;
   line-height: 1.6;
@@ -395,7 +405,7 @@ a:focus-visible {
 }
 
 .landing-section h2 {
-  font-size: 0.78rem;
+  font-size: var(--text-xs);
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--fg-faint);
@@ -406,7 +416,7 @@ a:focus-visible {
 .landing-section__more {
   display: inline-block;
   margin-top: 0.75rem;
-  font-size: 0.78rem;
+  font-size: var(--text-sm);
   color: var(--fg-muted);
 }
 
@@ -414,67 +424,10 @@ a:focus-visible {
   color: var(--accent);
 }
 
-/* -- Visual Grid -- */
-
-.visual-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1rem;
-}
-
-.visual-grid__item {
-  overflow: hidden;
-  border-radius: var(--radius-md);
-}
-
-.visual-grid__item img {
-  width: 100%;
-  aspect-ratio: 4 / 3;
-  object-fit: cover;
-  transition: transform 0.3s;
-}
-
-.visual-grid__item:hover img {
-  transform: scale(1.02);
-}
-
-.visual-grid__item figcaption {
-  padding: 0.5rem 0;
-  font-size: 0.75rem;
-  color: var(--fg-muted);
-}
-
-.visual-placeholder {
+.empty-placeholder {
   color: var(--fg-faint);
-  font-size: 0.85rem;
+  font-size: var(--text-base);
   padding: 3rem 0;
-}
-
-/* -- Research Page -- */
-
-.research-section {
-  margin-bottom: 2rem;
-}
-
-.research-section h2 {
-  font-size: 1rem;
-  font-weight: 600;
-  margin-bottom: 0.75rem;
-}
-
-.research-section p,
-.research-section li {
-  font-size: 0.85rem;
-  color: var(--fg-muted);
-  line-height: 1.7;
-}
-
-.research-section ul {
-  padding-left: 1.25rem;
-}
-
-.research-section li {
-  margin: 0.3rem 0;
 }
 
 /* -- Writing Post Header -- */
@@ -494,14 +447,14 @@ a:focus-visible {
   flex-wrap: wrap;
   gap: 0.6rem;
   align-items: center;
-  font-size: 0.72rem;
+  font-size: var(--text-xs);
   color: var(--fg-faint);
 }
 
 .writing-post__abstract {
   margin-top: 0.75rem;
   color: var(--fg-muted);
-  font-size: 0.85rem;
+  font-size: var(--text-base);
   font-style: italic;
 }
 
@@ -520,7 +473,7 @@ a:focus-visible {
 }
 
 .post-discovery h2 {
-  font-size: 0.78rem;
+  font-size: var(--text-xs);
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--fg-faint);
@@ -535,7 +488,7 @@ a:focus-visible {
 
 .post-discovery li {
   margin: 0.4rem 0;
-  font-size: 0.85rem;
+  font-size: var(--text-base);
 }
 
 .post-discovery li a {
@@ -559,7 +512,7 @@ a:focus-visible {
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   padding: 0.4rem 0.8rem;
-  font-size: 0.75rem;
+  font-size: var(--text-sm);
   color: var(--fg-muted);
   cursor: pointer;
   transition: color 0.15s, border-color 0.15s;
@@ -573,8 +526,7 @@ a:focus-visible {
 /* ===== 6. PROSE (Markdown Body) ===== */
 
 .prose {
-  max-width: var(--measure-prose);
-  font-size: 0.88rem;
+  font-size: var(--text-base);
   line-height: 1.8;
 }
 
@@ -582,9 +534,9 @@ a:focus-visible {
   margin-top: 1.2rem;
 }
 
-.prose h1 { font-size: clamp(1.4rem, 2.8vw, 1.8rem); margin-top: 2.5rem; }
-.prose h2 { font-size: clamp(1.1rem, 2vw, 1.35rem); margin-top: 2rem; }
-.prose h3 { font-size: 1.05rem; margin-top: 1.5rem; }
+.prose h1 { font-size: var(--text-xl); margin-top: 2.5rem; }
+.prose h2 { font-size: var(--text-lg); margin-top: 2rem; }
+.prose h3 { font-size: var(--text-base); font-weight: 600; margin-top: 1.5rem; }
 
 .prose h1 + *,
 .prose h2 + *,
@@ -634,7 +586,7 @@ a:focus-visible {
   padding: 1rem 1.25rem;
   border-radius: var(--radius-md);
   overflow-x: auto;
-  font-size: 0.82rem;
+  font-size: var(--text-sm);
   line-height: 1.6;
 }
 
@@ -660,7 +612,7 @@ a:focus-visible {
 .prose table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.82rem;
+  font-size: var(--text-sm);
 }
 
 .prose th,
@@ -673,7 +625,7 @@ a:focus-visible {
 .prose th {
   background: var(--bg-surface);
   font-weight: 600;
-  font-size: 0.72rem;
+  font-size: var(--text-xs);
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
@@ -686,7 +638,7 @@ a:focus-visible {
 
 /* Table of Contents */
 .prose .toc {
-  font-size: 0.8rem;
+  font-size: var(--text-sm);
   color: var(--fg-muted);
   margin: 1.5rem 0;
   padding: 1rem;
@@ -721,7 +673,7 @@ a:focus-visible {
   display: inline-block;
   position: relative;
   vertical-align: super;
-  font-size: 0.72rem;
+  font-size: var(--text-xs);
   line-height: 1;
   scroll-margin-top: 6rem;
 }
@@ -757,7 +709,7 @@ a:focus-visible {
   background: var(--bg-surface);
   border: 1px solid var(--border);
   color: var(--fg);
-  font-size: 0.7rem;
+  font-size: var(--text-xs);
   line-height: 1.45;
   text-wrap: pretty;
   box-shadow: var(--shadow-md);
@@ -785,7 +737,7 @@ a:focus-visible {
   padding: 0;
   border: none;
   background: transparent;
-  font-size: 0.66rem;
+  font-size: var(--text-xs);
   color: var(--fg-faint);
   text-decoration: none;
   position: relative;
@@ -815,7 +767,7 @@ a:focus-visible {
   background: var(--bg-surface);
   border: 1px solid var(--border);
   color: var(--fg);
-  font-size: 0.68rem;
+  font-size: var(--text-xs);
   line-height: 1.4;
   white-space: normal;
   box-shadow: var(--shadow-md);
@@ -856,7 +808,7 @@ a:focus-visible {
   overflow: hidden;
   max-height: inherit;
   position: relative;
-  font-size: 0.9rem;
+  font-size: var(--text-base);
 }
 
 .citation-preview-window::after {
@@ -931,7 +883,7 @@ body.citation-sidepanel-open {
 
 .citation-sidepanel__title {
   margin: 0;
-  font-size: 0.78rem;
+  font-size: var(--text-xs);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--fg-faint);
@@ -942,7 +894,7 @@ body.citation-sidepanel-open {
   border-radius: 999px;
   background: transparent;
   padding: 0.24rem 0.52rem;
-  font-size: 0.66rem;
+  font-size: var(--text-xs);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--fg-faint);
@@ -972,7 +924,7 @@ body.citation-sidepanel-open {
 
 .citation-sidepanel__mentions h4 {
   margin: 0 0 0.45rem;
-  font-size: 0.78rem;
+  font-size: var(--text-xs);
   text-transform: uppercase;
   letter-spacing: 0.09em;
   color: var(--fg-faint);
@@ -986,7 +938,7 @@ body.citation-sidepanel-open {
 .citation-sidepanel__mentions li {
   margin: 0.35rem 0;
   line-height: 1.45;
-  font-size: 0.85rem;
+  font-size: var(--text-base);
 }
 
 .citations-enabled {
@@ -994,12 +946,12 @@ body.citation-sidepanel-open {
 }
 
 .citations-enabled sup[data-citation] {
-  font-size: 0.75rem;
+  font-size: var(--text-xs);
 }
 
 .citations-enabled sup[data-citation]:empty::before {
   content: '[' attr(data-citation-index) ']';
-  font-size: 0.75rem;
+  font-size: var(--text-xs);
   margin-left: 0.2rem;
 }
 
@@ -1007,12 +959,12 @@ body.citation-sidepanel-open {
   border-top: 1px solid var(--border);
   padding-top: 1.6rem;
   margin-top: 2.3rem;
-  font-size: 0.85rem;
+  font-size: var(--text-base);
   color: var(--fg-muted);
 }
 
 .citations-enabled .references h2 {
-  font-size: 1.1rem;
+  font-size: var(--text-lg);
   margin-bottom: 1rem;
   color: var(--fg);
 }
@@ -1059,7 +1011,7 @@ body.citation-sidepanel-open {
   color: #fff;
   border-radius: var(--radius-sm);
   z-index: 100;
-  font-size: 0.8rem;
+  font-size: var(--text-sm);
 }
 
 .skip-link:focus {
@@ -1079,7 +1031,7 @@ body.citation-sidepanel-open {
   }
 
   .site-nav__links a {
-    font-size: 0.7rem;
+    font-size: var(--text-xs);
   }
 
   .site-main {

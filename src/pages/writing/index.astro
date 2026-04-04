@@ -18,7 +18,7 @@ const fmt = (d: Date) =>
   </header>
 
   {catalog.length === 0 ? (
-    <p class="visual-placeholder">No posts yet.</p>
+    <p class="empty-placeholder">No posts yet.</p>
   ) : (
     catalog.map((post) => (
       <div class="article-card">

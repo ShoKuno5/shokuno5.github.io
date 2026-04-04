@@ -16,7 +16,6 @@ export const SITE = {
 
 export const NAV_LINKS = [
   { label: 'Writing', href: '/writing/' },
-  { label: 'Visual', href: '/visual/' },
 ];
 
 /** @type {{ key: string; label: string; href: string; locations?: string[] }[]} */

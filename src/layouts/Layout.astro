@@ -9,9 +9,10 @@ export interface Props {
   description?: string;
   enableMath?: boolean;
   enableCitations?: boolean;
+  hideFooter?: boolean;
 }
 
-const { title, description = '', enableMath = false, enableCitations = false } = Astro.props;
+const { title, description = '', enableMath = false, enableCitations = false, hideFooter = false } = Astro.props;
 const siteName = SITE.name;
 const year = new Date().getFullYear();
 
@@ -116,14 +117,16 @@ const isActive = (href: string) => {
       <slot />
     </main>
 
-    <footer class="site-footer">
-      <span>&copy; {year} {siteName}</span>
-      <div class="site-footer__links">
-        {CONTACT_LINKS.filter(c => c.key !== 'cv').map((contact) => (
-          <ContactLink contact={contact} className="icon-link icon-link--sm" />
-        ))}
-      </div>
-    </footer>
+    {!hideFooter && (
+      <footer class="site-footer">
+        <span>&copy; {year} {siteName}</span>
+        <div class="site-footer__links">
+          {CONTACT_LINKS.map((contact) => (
+            <ContactLink contact={contact} className="icon-link icon-link--sm" />
+          ))}
+        </div>
+      </footer>
+    )}
 
     {enableCitations && <CitationScript />}
 
