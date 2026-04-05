@@ -430,6 +430,55 @@ a:focus-visible {
   padding: 3rem 0;
 }
 
+/* -- Epigraphs (quiet timeline) -- */
+
+.landing-epigraphs {
+  margin-top: 3.5rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border);
+}
+
+.epigraph {
+  display: grid;
+  grid-template-columns: 3rem 1fr;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.epigraph:last-child {
+  margin-bottom: 0;
+}
+
+.epigraph__year {
+  font-size: var(--text-xs);
+  color: var(--fg-faint);
+  padding-top: 0.15rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.epigraph blockquote {
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.epigraph blockquote p {
+  font-size: var(--text-sm);
+  color: var(--fg-muted);
+  line-height: 1.7;
+  margin-bottom: 0.4rem;
+}
+
+.epigraph blockquote p:last-of-type {
+  margin-bottom: 0.5rem;
+}
+
+.epigraph blockquote cite {
+  font-size: var(--text-xs);
+  color: var(--fg-faint);
+  font-style: normal;
+}
+
 /* -- Writing Post Header -- */
 
 .writing-post__header {
